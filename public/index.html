@@ -101,7 +101,8 @@
       }
       .form-group input {
         width: 100%;
-        padding: 16px 16px 16px 46px;
+        padding: 16px 16px 16px 52px;
+        box-sizing: border-box;
         border: 2px solid var(--border);
         border-radius: 14px;
         font-size: 14px;
@@ -120,11 +121,13 @@
       .input-wrapper { position: relative; }
       .input-wrapper i {
         position: absolute;
-        left: 16px;
+        left: 14px;
         top: 50%;
         transform: translateY(-50%);
         color: var(--text-muted);
         font-size: 16px;
+        pointer-events: none;
+        z-index: 1;
       }
       .remember-group {
         display: flex;
@@ -239,6 +242,7 @@
       @media (max-width: 768px) {
         body { padding: 15px 10px 20px 10px; }
         .login-container { padding: 25px 20px; max-width: 350px; }
+        .form-group input { padding-left: 52px; }
         .footer {
           position: relative;
           margin-top: 30px;
