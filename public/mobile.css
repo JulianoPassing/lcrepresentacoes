@@ -374,6 +374,141 @@
     touch-action: manipulation !important;
   }
 
+  /* ========== VERTICE - PRODUTOS EM CARDS NO MOBILE ========== */
+  #produtos-container .produto-card-mobile {
+    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #produtos-container .produto-card-mobile::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0065B3, #4CAB3F);
+  }
+
+  #produtos-container .produto-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  #produtos-container .produto-ref-badge {
+    background: linear-gradient(135deg, #0065B3 0%, #00508a 100%);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+
+  #produtos-container .produto-preco-badge {
+    background: linear-gradient(135deg, #4CAB3F 0%, #3d8a32 100%);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+
+  #produtos-container .produto-card-desc {
+    margin-bottom: 8px;
+    padding: 8px;
+    background: rgba(248, 250, 252, 0.8);
+    border-radius: 8px;
+    border-left: 4px solid #0065B3;
+  }
+
+  #produtos-container .produto-card-desc strong {
+    display: block;
+    font-size: 0.95rem;
+    color: #1e293b;
+    margin-bottom: 2px;
+  }
+
+  #produtos-container .produto-card-desc small {
+    display: block;
+    color: #64748b;
+    font-size: 0.8rem;
+    margin-top: 1px;
+  }
+
+  #produtos-container .produto-precos-info {
+    font-size: 0.7rem !important;
+    margin-top: 4px !important;
+    line-height: 1.35;
+  }
+
+  #produtos-container .produto-card-tamanhos {
+    margin-bottom: 10px;
+    padding: 8px;
+    background: rgba(76, 171, 63, 0.05);
+    border-radius: 8px;
+    border-left: 4px solid #4CAB3F;
+  }
+
+  #produtos-container .produto-card-tam-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #334155;
+    margin-bottom: 8px;
+  }
+
+  #produtos-container .produto-card-mobile .tamanho-input-container {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+
+  #produtos-container .produto-tam-item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 2px !important;
+    background: white;
+    padding: 4px;
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+
+  #produtos-container .produto-tam-item label {
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    color: #64748b !important;
+    margin: 0 !important;
+  }
+
+  #produtos-container .produto-tam-item input {
+    width: 40px !important;
+    padding: 6px 2px !important;
+    font-size: 0.85rem !important;
+    text-align: center !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 6px !important;
+    margin: 0 !important;
+  }
+
+  #produtos-container .produto-card-btn {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 10px !important;
+    font-size: 14px !important;
+  }
+
   /* Login */
   .login-container {
     margin: 10px !important;

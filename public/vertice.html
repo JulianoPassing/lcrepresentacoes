@@ -431,7 +431,34 @@
 
     function renderizarProdutos() {
       const container = document.getElementById('produtos-container');
+      const isMobile = window.innerWidth <= 768;
       container.innerHTML = CATEGORIAS.map(cat => {
+        if (isMobile) {
+          const cards = cat.produtos.map(p => {
+            const precos = `Até 30: R$ ${p.PRECO[0].toFixed(2)} | 31-100: R$ ${p.PRECO[1].toFixed(2)} | 101-200: R$ ${p.PRECO[2].toFixed(2)} | +200: R$ ${p.PRECO[3].toFixed(2)}`;
+            const inputs = p.TAMANHOS.map(t =>
+              `<div class="produto-tam-item"><label>${t}</label><input type="number" min="0" value="0" id="q-${p.REF}-${t}" data-ref="${p.REF}" data-tam="${t}"></div>`
+            ).join('');
+            return `
+              <div class="produto-card-mobile">
+                <div class="produto-card-header">
+                  <span class="produto-ref-badge">${p.REF}</span>
+                  <span class="produto-preco-badge">R$ ${p.PRECO[0].toFixed(2)}</span>
+                </div>
+                <div class="produto-card-desc">
+                  <strong>${p.DESC}</strong>
+                  <small>${p.MATERIAL}</small>
+                  <small class="produto-precos-info">${precos}</small>
+                </div>
+                <div class="produto-card-tamanhos">
+                  <span class="produto-card-tam-label">Tamanhos & Quantidades</span>
+                  <div class="tamanho-input-container">${inputs}</div>
+                </div>
+                <button class="btn btn-success produto-card-btn" onclick="adicionarProduto('${p.REF}')">Adicionar</button>
+              </div>`;
+          }).join('');
+          return `<div class="categoria-produtos"><div class="categoria-titulo">${cat.nome}</div><div class="produtos-cards-mobile">${cards}</div></div>`;
+        }
         const rows = cat.produtos.map(p => {
           const precos = `Até 30: R$ ${p.PRECO[0].toFixed(2)} | 31-100: R$ ${p.PRECO[1].toFixed(2)} | 101-200: R$ ${p.PRECO[2].toFixed(2)} | +200: R$ ${p.PRECO[3].toFixed(2)}`;
           const inputs = p.TAMANHOS.map(t =>
@@ -842,6 +869,11 @@
       };
       await carregarClientes();
       renderizarProdutos();
+      window.addEventListener('resize', () => {
+        const wasMobile = document.querySelector('.produtos-cards-mobile');
+        const isMobile = window.innerWidth <= 768;
+        if ((wasMobile && !isMobile) || (!wasMobile && isMobile)) renderizarProdutos();
+      });
       const urlParams = new URLSearchParams(window.location.search);
       const idPedido = urlParams.get('id');
       if (idPedido) await carregarPedidoParaEdicao(idPedido);
