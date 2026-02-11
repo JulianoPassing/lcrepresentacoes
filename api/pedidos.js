@@ -26,8 +26,18 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const urlParts = (req.url || '').split('/');
-    const idFromUrl = urlParts[urlParts.length - 1];
+    let idFromUrl = '';
+    if (req.headers['x-vercel-path']) {
+      const pathParts = req.headers['x-vercel-path'].split('/');
+      const lastPart = pathParts[pathParts.length - 1];
+      idFromUrl = (lastPart || '').split('?')[0];
+    }
+    if (!idFromUrl && req.url) {
+      const urlWithoutQuery = (req.url || '').split('?')[0];
+      const urlParts = urlWithoutQuery.split('/');
+      const lastPart = urlParts[urlParts.length - 1];
+      idFromUrl = lastPart || '';
+    }
     const isNumericId = /^\d+$/.test(idFromUrl);
 
     if (req.method === 'POST') {
@@ -97,9 +107,18 @@ module.exports = async (req, res) => {
       const [rows] = await connection.execute('SELECT * FROM pedidos WHERE id = ?', [parseInt(idFromUrl)]);
       if (rows.length === 0) return res.status(404).json({ error: 'Pedido não encontrado.' });
       const row = rows[0];
+      let dadosParsed = null;
+      try {
+        if (row.dados) {
+          const raw = row.dados;
+          dadosParsed = typeof raw === 'string' ? JSON.parse(raw) : (Buffer.isBuffer(raw) ? JSON.parse(raw.toString()) : raw);
+        }
+      } catch (parseErr) {
+        console.error('Erro ao parsear dados do pedido:', parseErr);
+      }
       return res.status(200).json({
         ...row,
-        dados: row.dados ? (typeof row.dados === 'string' ? JSON.parse(row.dados) : row.dados) : null
+        dados: dadosParsed
       });
     }
 

@@ -833,20 +833,44 @@
     }
 
     async function carregarPedidoParaEdicao(id) {
+      let p = null;
       try {
         const res = await fetch(`/api/pedidos/${id}`);
-        if (!res.ok) return;
-        const p = await res.json();
+        if (res.ok) {
+          p = await res.json();
+        }
+      } catch (_) {}
+      if (!p) {
+        try {
+          const resAll = await fetch('/api/pedidos');
+          if (resAll.ok) {
+            const lista = await resAll.json();
+            p = Array.isArray(lista) ? lista.find(x => String(x.id) === String(id)) : null;
+          }
+        } catch (_) {}
+      }
+      if (!p) {
+        alert('Não foi possível carregar o pedido #' + id + '. Verifique sua conexão.');
+        return;
+      }
+      try {
         const dados = p.dados ? (typeof p.dados === 'string' ? JSON.parse(p.dados) : p.dados) : {};
         const cliente = dados.cliente || {};
-        const itens = dados.itens || [];
+        const itens = Array.isArray(dados.itens) ? dados.itens : [];
         ['razao','cnpj','ie','endereco','bairro','cidade','estado','cep','email','telefone','transporte','prazo','obs'].forEach(k => {
           const el = document.getElementById(k);
-          if (el) el.value = cliente[k] || '';
+          if (el) el.value = (cliente[k] ?? '').toString();
         });
         const buscaEl = document.getElementById('busca-cliente');
-        if (buscaEl) buscaEl.value = cliente.razao || '';
-        window.pedidoItens = itens.map(i => ({ ...i, subtotal: i.subtotal || (i.preco || 0) * (i.quantidade || 0) }));
+        if (buscaEl) buscaEl.value = (cliente.razao ?? '').toString();
+        window.pedidoItens = itens.map(i => ({
+          REF: i.REF,
+          DESC: i.DESC,
+          tamanho: i.tamanho,
+          preco: Number(i.preco) || 0,
+          quantidade: Number(i.quantidade) || 0,
+          subtotal: Number(i.subtotal) || (Number(i.preco) || 0) * (Number(i.quantidade) || 0)
+        }));
         pedidoEmEdicaoId = parseInt(id, 10);
         atualizarPedido();
         const main = document.querySelector('main');
@@ -856,7 +880,10 @@
           alert.textContent = '✏️ Editando pedido #' + id;
           main.insertBefore(alert, main.firstChild);
         }
-      } catch (e) { console.error('Erro ao carregar pedido:', e); }
+      } catch (e) {
+        console.error('Erro ao carregar pedido:', e);
+        alert('Erro ao processar os dados do pedido.');
+      }
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
