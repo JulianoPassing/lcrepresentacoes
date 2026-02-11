@@ -182,6 +182,18 @@
       border-radius: 8px;
       border-left: 4px solid var(--lc-azul);
     }
+    .categoria-produtos {
+      margin-bottom: 32px;
+    }
+    .categoria-produtos:last-of-type { margin-bottom: 0; }
+    .categoria-titulo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--lc-azul);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--lc-azul);
+    }
     .erro-validacao { color: #ef4444; font-size: 13px; margin-top: 8px; }
     #sugestoes-clientes {
       position: absolute;
@@ -272,23 +284,11 @@
       <div class="form-group">
         <label><input type="checkbox" id="logo-cliente" /> Logo do cliente (+R$6 peito / +R$9 costas)</label>
       </div>
-      <div class="table-responsive">
-        <table>
-          <thead>
-            <tr>
-              <th>Ref.</th>
-              <th>Descrição</th>
-              <th>Material</th>
-              <th>Tabela</th>
-              <th>Tamanhos & Quantidades</th>
-              <th>Ação</th>
-            </tr>
-          </thead>
-          <tbody id="produtos-tbody"></tbody>
-        </table>
+      <div id="produtos-container">
+        <!-- Categorias preenchidas via JS -->
       </div>
       <div class="politica-info">
-        <strong>Política comercial:</strong> Pedido mínimo R$ 1.500. Produtos GGX +15%. Estoque: min 12 unid/produto. Personalizado: min 60 unid/produto. Frete CIF acima de R$ 3.500.
+        <strong>Política comercial:</strong> Pedido mínimo R$ 1.500. Tamanho ESP +15% no valor. Estoque: min 12 unid/produto. Personalizado: min 60 unid/produto. Frete CIF acima de R$ 3.500.
       </div>
     </section>
 
@@ -316,16 +316,27 @@
   </footer>
 
   <script>
-    // Produtos Vértice - PRECO: [até30, 31a100, 101a200, acima200]
-    // TABELA 1: pode mesclar para desconto | TABELA 2 e 3: não pode mesclar
-    const PRODUTOS_VERTICE = [
-      { REF: '1212L', DESC: 'Linha Light Masc.', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX'], PRECO: [144.14, 136.65, 129.50, 122.75], TABELA: 1 },
-      { REF: '1212P', DESC: 'Linha Plus Masc.', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX'], PRECO: [152.58, 144.65, 137.10, 129.93], TABELA: 1 },
-      { REF: '1212LC', DESC: 'Linha Light Color', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX'], PRECO: [166.45, 157.95, 149.55, 141.75], TABELA: 2 },
-      { REF: '1212PF', DESC: 'Linha Plus Fem.', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX'], PRECO: [146.24, 138.60, 131.69, 124.54], TABELA: 1 },
-      { REF: '1212PFC', DESC: 'Linha Plus Color Fem.', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX'], PRECO: [153.69, 145.68, 138.08, 130.89], TABELA: 2 },
-      { REF: '5000', DESC: 'Japona Casual com Gola', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX'], PRECO: [167.30, 158.60, 150.35, 142.45], TABELA: 3 }
+    // PRECO: [até30, 31a100, 101a200, acima200] | TABELA 1: mescla | TABELA 2 e 3: não mescla
+    const CATEGORIAS = [
+      { id: 1, nome: 'Tabela 01 – Linha Combate', produtos: [
+        { REF: '1212L', DESC: 'Conjunto de Moto Light', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [144.14, 136.65, 129.50, 122.75], TABELA: 1 },
+        { REF: '1212LB', DESC: 'Conjunto de Moto Light c/ bolso', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [149.10, 141.33, 133.96, 126.98], TABELA: 1 },
+        { REF: '1212P', DESC: 'Conjunto de Moto Plus', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [152.58, 144.65, 137.10, 129.93], TABELA: 1 },
+        { REF: '1212PF', DESC: 'Conjunto Moto Plus Feminino', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [146.24, 138.60, 131.69, 124.54], TABELA: 1 },
+        { REF: 'CALCA', DESC: 'Calça Impermeável', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [64.95, 60.30, 57.10, 53.90], TABELA: 1 }
+      ]},
+      { id: 2, nome: 'Tabela 02 – Produtos Especiais', produtos: [
+        { REF: '1212PFC', DESC: 'Conjunto Plus Feminino - Color', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [153.69, 145.68, 138.08, 130.89], TABELA: 2 },
+        { REF: '1212LC', DESC: 'Conjunto Light Color', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [166.45, 157.95, 149.55, 141.75], TABELA: 2 },
+        { REF: '1212PRE', DESC: 'Conjunto Premium', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [320.00, 301.25, 285.54, 270.66], TABELA: 2 },
+        { REF: '1212PFOR', DESC: 'Conjunto Plus Forrado', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [187.62, 177.84, 168.57, 159.78], TABELA: 2 }
+      ]},
+      { id: 3, nome: 'Tabela 03 – Japonas Forradas', produtos: [
+        { REF: '5000', DESC: 'Japona com Gola', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [167.30, 158.60, 150.35, 142.45], TABELA: 3 },
+        { REF: '5000C', DESC: 'Japona com Capuz', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [185.45, 176.90, 168.30, 160.48], TABELA: 3 }
+      ]}
     ];
+    const PRODUTOS_VERTICE = CATEGORIAS.flatMap(c => c.produtos);
 
     const getTierIndex = (qtd) => {
       if (qtd <= 30) return 0;
@@ -408,21 +419,45 @@
     });
 
     function renderizarProdutos() {
-      const tbody = document.getElementById('produtos-tbody');
-      tbody.innerHTML = PRODUTOS_VERTICE.map(p => {
-        const precos = `Até 30: R$ ${p.PRECO[0].toFixed(2)} | 31-100: R$ ${p.PRECO[1].toFixed(2)} | 101-200: R$ ${p.PRECO[2].toFixed(2)} | +200: R$ ${p.PRECO[3].toFixed(2)}`;
-        const inputs = p.TAMANHOS.map(t =>
-          `<div><label>${t}</label><input type="number" min="0" value="0" id="q-${p.REF}-${t}"></div>`
-        ).join('');
-        return `<tr>
-          <td><strong>${p.REF}</strong></td>
-          <td>${p.DESC}<br><small style="color:#666">${precos}</small></td>
-          <td>${p.MATERIAL}</td>
-          <td>Tabela ${p.TABELA}</td>
-          <td><div class="tamanho-input-container">${inputs}</div></td>
-          <td><button class="btn btn-success" onclick="adicionarProduto('${p.REF}')">Adicionar</button></td>
-        </tr>`;
+      const container = document.getElementById('produtos-container');
+      container.innerHTML = CATEGORIAS.map(cat => {
+        const rows = cat.produtos.map(p => {
+          const precos = `Até 30: R$ ${p.PRECO[0].toFixed(2)} | 31-100: R$ ${p.PRECO[1].toFixed(2)} | 101-200: R$ ${p.PRECO[2].toFixed(2)} | +200: R$ ${p.PRECO[3].toFixed(2)}`;
+          const inputs = p.TAMANHOS.map(t =>
+            `<div><label>${t}</label><input type="number" min="0" value="0" id="q-${p.REF}-${t}" data-ref="${p.REF}" data-tam="${t}"></div>`
+          ).join('');
+          return `<tr>
+            <td><strong>${p.REF}</strong></td>
+            <td>${p.DESC}<br><small style="color:#666">${precos}</small></td>
+            <td>${p.MATERIAL}</td>
+            <td><div class="tamanho-input-container">${inputs}</div></td>
+            <td><button class="btn btn-success" onclick="adicionarProduto('${p.REF}')">Adicionar</button></td>
+          </tr>`;
+        }).join('');
+        return `
+          <div class="categoria-produtos">
+            <div class="categoria-titulo">${cat.nome}</div>
+            <div class="table-responsive">
+              <table>
+                <thead><tr><th>Ref.</th><th>Descrição</th><th>Material</th><th>Tamanhos & Quantidades</th><th>Ação</th></tr></thead>
+                <tbody>${rows}</tbody>
+              </table>
+            </div>
+          </div>`;
       }).join('');
+      attachQtyListeners();
+    }
+
+    function attachQtyListeners() {
+      document.querySelectorAll('[id^="q-"]').forEach(el => {
+        el.removeEventListener('input', window._qtyHandler);
+        el.removeEventListener('change', window._qtyHandler);
+      });
+      window._qtyHandler = () => recalcPrecosPedido();
+      document.querySelectorAll('[id^="q-"]').forEach(el => {
+        el.addEventListener('input', window._qtyHandler);
+        el.addEventListener('change', window._qtyHandler);
+      });
     }
 
     function adicionarProduto(ref) {
@@ -447,7 +482,7 @@
         if (qtd <= 0) return;
         itemAdicionado = true;
         let preco = precoBase;
-        if (t === 'GGX') preco *= 1.15;
+        if (t === 'ESP') preco *= 1.15;
         if (logoCliente) preco += 15;
         const subtotal = preco * qtd;
         const exist = window.pedidoItens.find(x => x.REF === ref && x.tamanho === t);
@@ -460,10 +495,43 @@
       });
       if (itemAdicionado) {
         p.TAMANHOS.forEach(t => { const el = document.getElementById(`q-${ref}-${t}`); if (el) el.value = 0; });
-        atualizarPedido();
+        recalcPrecosPedido();
       } else {
         alert('Informe a quantidade para pelo menos um tamanho.');
       }
+    }
+
+    function getQtdForm(ref, tam) {
+      const el = document.getElementById(`q-${ref}-${tam}`);
+      return parseInt(el?.value || 0, 10);
+    }
+    function getQtdCart(ref) {
+      return (window.pedidoItens || []).filter(i => i.REF === ref).reduce((s, i) => s + i.quantidade, 0);
+    }
+    function recalcPrecosPedido() {
+      if (!Array.isArray(window.pedidoItens) || window.pedidoItens.length === 0) return;
+      const logoCliente = document.getElementById('logo-cliente')?.checked;
+      const qtdTotalT1 = PRODUTOS_VERTICE.filter(x => x.TABELA === 1).reduce((s, px) => {
+        const form = px.TAMANHOS.reduce((s2, t2) => s2 + getQtdForm(px.REF, t2), 0);
+        return s + getQtdCart(px.REF) + form;
+      }, 0);
+      window.pedidoItens.forEach(item => {
+        const p = PRODUTOS_VERTICE.find(x => x.REF === item.REF);
+        if (!p) return;
+        let precoBase;
+        if (p.TABELA === 1) {
+          precoBase = p.PRECO[getTierIndex(qtdTotalT1)];
+        } else {
+          const qtdProd = getQtdCart(p.REF) + p.TAMANHOS.reduce((s, t2) => s + getQtdForm(p.REF, t2), 0);
+          precoBase = p.PRECO[getTierIndex(qtdProd)];
+        }
+        let preco = precoBase;
+        if (item.tamanho === 'ESP') preco *= 1.15;
+        if (logoCliente) preco += 15;
+        item.preco = preco;
+        item.subtotal = preco * item.quantidade;
+      });
+      atualizarPedido();
     }
 
     function atualizarPedido() {
@@ -498,7 +566,8 @@
 
     function removerItem(idx) {
       window.pedidoItens.splice(idx, 1);
-      atualizarPedido();
+      if (window.pedidoItens.length === 0) atualizarPedido();
+      else recalcPrecosPedido();
     }
 
     function validarPedido() {
@@ -687,6 +756,7 @@
       await carregarClientes();
       renderizarProdutos();
       document.getElementById('busca-cliente').addEventListener('input', e => mostrarSugestoes(e.target.value));
+      document.getElementById('logo-cliente').addEventListener('change', recalcPrecosPedido);
       document.getElementById('gerar-pedido-btn').addEventListener('click', gerarPedidoPDF);
     });
   </script>
