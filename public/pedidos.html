@@ -7,6 +7,8 @@
   <link rel="icon" href="https://i.imgur.com/kNGKxVO.png" type="image/png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
   <link rel="stylesheet" href="mobile.css" />
   <link rel="stylesheet" href="modern-design.css" />
   <style>
@@ -135,8 +137,13 @@
     .empty { text-align: center; padding: 40px; color: #666; font-size: 15px; }
     .loading { opacity: 0.6; pointer-events: none; }
     .error-msg { background: #fef2f2; color: #b91c1c; padding: 12px 16px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; }
-    .dados-preview { font-size: 12px; color: #666; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .expand-dados { cursor: pointer; color: var(--lc-azul); font-size: 12px; }
+    .cliente-razao { font-size: 13px; font-weight: 500; color: var(--lc-cinza); }
+    .expand-dados { cursor: pointer; color: var(--lc-azul); font-size: 11px; }
+    .expand-dados:hover { text-decoration: underline; }
+    .btn-ver-pdf { background: var(--lc-azul); color: white; }
+    .btn-ver-pdf:hover { background: #005a9e; }
+    .btn-editar { background: var(--lc-verde); color: white; }
+    .btn-editar:hover { background: #3d8a32; }
     .modal-overlay {
       position: fixed;
       top: 0; left: 0;
@@ -180,7 +187,7 @@
         <h2 style="margin: 0;">Lista de Pedidos</h2>
         <a href="vertice.html" class="btn btn-primary"><i class="fas fa-motorcycle"></i> Novo Pedido Vértice</a>
       </div>
-      <input type="text" id="busca-pedido" class="search-box" placeholder="Buscar por empresa, descrição..." />
+      <input type="text" id="busca-pedido" class="search-box" placeholder="Buscar por empresa, descrição, cliente..." />
       <div id="erro-msg" class="error-msg" style="display:none;"></div>
       <div class="table-responsive">
         <table id="pedidos-tabela">
@@ -190,7 +197,7 @@
               <th>Empresa</th>
               <th>Descrição</th>
               <th>Data</th>
-              <th>Dados</th>
+              <th>Cliente</th>
               <th>Ações</th>
             </tr>
           </thead>
@@ -278,10 +285,12 @@
     function filtrarPedidos(termo) {
       const busca = (termo || '').toLowerCase().trim();
       const filtrados = busca
-        ? todosPedidos.filter(p =>
-            (p.empresa || '').toLowerCase().includes(busca) ||
-            (p.descricao || '').toLowerCase().includes(busca)
-          )
+        ? todosPedidos.filter(p => {
+            if ((p.empresa || '').toLowerCase().includes(busca)) return true;
+            if ((p.descricao || '').toLowerCase().includes(busca)) return true;
+            if (extrairRazao(p).toLowerCase().includes(busca)) return true;
+            return false;
+          })
         : todosPedidos;
       renderizarPedidos(filtrados);
     }
@@ -295,6 +304,13 @@
     }
 
     let pedidosRenderizados = [];
+    function extrairRazao(p) {
+      try {
+        const dados = p.dados ? (typeof p.dados === 'string' ? JSON.parse(p.dados) : p.dados) : null;
+        return (dados?.cliente?.razao || '-');
+      } catch (e) { return '-'; }
+    }
+
     function renderizarPedidos(lista) {
       pedidosRenderizados = lista;
       const tbody = document.getElementById('pedidos-tbody');
@@ -303,21 +319,20 @@
         return;
       }
       tbody.innerHTML = lista.map((p, i) => {
-        const dadosStr = p.dados ? (typeof p.dados === 'string' ? p.dados : JSON.stringify(p.dados)) : '';
-        const dadosPreview = dadosStr ? dadosStr.substring(0, 50) + (dadosStr.length > 50 ? '...' : '') : '-';
+        const razao = extrairRazao(p);
+        const temDadosVertice = p.dados && (typeof p.dados === 'string' ? (() => { try { const d = JSON.parse(p.dados); return d?.cliente && d?.itens; } catch(_) { return false; } })() : (p.dados?.cliente && p.dados?.itens));
         return `
         <tr>
           <td>${p.id || '-'}</td>
           <td>${(p.empresa || '-')}</td>
           <td>${(p.descricao || '-')}</td>
           <td>${formatarData(p.data_pedido)}</td>
-          <td>
-            <span class="dados-preview">${dadosPreview}</span>
-            ${dadosStr ? `<span class="expand-dados" data-idx="${i}">Ver</span>` : ''}
-          </td>
+          <td><span class="cliente-razao">${razao}</span> ${p.dados ? `<span class="expand-dados" data-idx="${i}" style="cursor:pointer;color:var(--lc-azul);font-size:11px;margin-left:6px;">detalhes</span>` : ''}</td>
           <td>
             <div class="actions-cell">
-              <button class="btn btn-danger" onclick="excluirPedido(${p.id})"><i class="fas fa-trash"></i></button>
+              ${temDadosVertice ? `<button class="btn btn-ver-pdf" onclick="verPedidoPDF(${p.id})" title="Ver PDF"><i class="fas fa-file-pdf"></i> Ver</button>` : ''}
+              ${temDadosVertice ? `<a href="vertice.html?id=${p.id}" class="btn btn-editar" title="Editar pedido"><i class="fas fa-edit"></i> Editar</a>` : ''}
+              <button class="btn btn-danger" onclick="excluirPedido(${p.id})" title="Excluir"><i class="fas fa-trash"></i></button>
             </div>
           </td>
         </tr>
@@ -330,6 +345,109 @@
           if (p && p.dados) abrirModalDados(p.dados);
         });
       });
+    }
+
+    async function verPedidoPDF(id) {
+      const p = todosPedidos.find(x => x.id === id);
+      if (!p || !p.dados) { alert('Pedido sem dados para gerar PDF.'); return; }
+      let dados;
+      try { dados = typeof p.dados === 'string' ? JSON.parse(p.dados) : p.dados; } catch(e) { alert('Dados do pedido inválidos.'); return; }
+      const cliente = dados.cliente || {};
+      const itens = dados.itens || [];
+      const total = typeof dados.total === 'number' ? dados.total : itens.reduce((s, i) => s + (i.subtotal || 0), 0);
+      const LC_LOGO = 'https://i.imgur.com/kNGKxVO.png';
+      const logoImg = new Image();
+      logoImg.crossOrigin = 'anonymous';
+      logoImg.onload = () => gerarPDFPedido(logoImg, cliente, itens, total);
+      logoImg.onerror = () => gerarPDFPedido(null, cliente, itens, total);
+      logoImg.src = LC_LOGO;
+    }
+
+    function gerarPDFPedido(logoImg, cliente, itens, total) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 15;
+      const LC_AZUL = [0, 101, 179];
+      const LC_CINZA = [47, 47, 47];
+      const get = (k) => cliente[k] || '';
+
+      try { if (logoImg && logoImg.complete && logoImg.naturalWidth) doc.addImage(logoImg, 'PNG', margin, 10, 90, 15); } catch (_) {}
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(LC_AZUL[0], LC_AZUL[1], LC_AZUL[2]);
+      doc.text('Pedido de Venda - Vértice', pageWidth - margin, 18, { align: 'right' });
+      doc.setTextColor(0, 0, 0);
+      const hoje = new Date();
+      const dataAtual = `${hoje.getDate().toString().padStart(2, '0')}/${(hoje.getMonth() + 1).toString().padStart(2, '0')}/${hoje.getFullYear()}`;
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Data: ${dataAtual}`, pageWidth - margin, 24, { align: 'right' });
+      doc.text('LC Representações', pageWidth - margin, 30, { align: 'right' });
+
+      doc.autoTable({
+        startY: 35,
+        theme: 'grid',
+        head: [[{ content: 'DADOS DO CLIENTE', colSpan: 4, styles: { halign: 'center', fontStyle: 'bold', fillColor: [230, 240, 250], textColor: LC_CINZA } }]],
+        body: [
+          ['Cliente:', { content: get('razao') || 'N/A', colSpan: 3 }],
+          ['CNPJ:', get('cnpj') || 'N/A', 'I.E.:', get('ie') || 'N/A'],
+          ['Telefone:', get('telefone') || 'N/A', 'E-mail:', get('email') || 'N/A'],
+          ['Endereço:', { content: `${get('endereco') || ''}, ${get('bairro') || ''}`, colSpan: 3 }],
+          ['Cidade/UF:', `${get('cidade') || ''}/${get('estado') || ''}`, 'CEP:', get('cep') || '']
+        ],
+        styles: { fontSize: 8, cellPadding: 1.5 },
+        columnStyles: { 0: { fontStyle: 'bold', cellWidth: 22 }, 2: { fontStyle: 'bold', cellWidth: 20 } },
+        margin: { left: margin, right: margin }
+      });
+
+      let startY = doc.autoTable.previous.finalY + 7;
+      const head = [['Ref.', 'Descrição', 'Tam', 'Qtd', 'Unit.', 'Total']];
+      const body = itens.map(i => [
+        i.REF || '-', i.DESC || '-', i.tamanho || '-', i.quantidade || 0,
+        `R$ ${(i.preco || 0).toFixed(2)}`, `R$ ${(i.subtotal || 0).toFixed(2)}`
+      ]);
+      doc.autoTable({
+        head, body, startY,
+        theme: 'grid',
+        styles: { fontSize: 8, cellPadding: 2 },
+        headStyles: { fillColor: LC_AZUL, textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' },
+        columnStyles: { 0: { cellWidth: 15 }, 1: { cellWidth: 'auto' }, 2: { cellWidth: 15, halign: 'center' }, 3: { cellWidth: 12, halign: 'center' }, 4: { cellWidth: 22, halign: 'right' }, 5: { cellWidth: 25, halign: 'right' } },
+        margin: { top: 30, bottom: 15 }
+      });
+
+      const finalY = doc.autoTable.previous.finalY + 8;
+      const obsText = `Transporte: ${get('transporte') || 'A combinar'}\nPrazo: ${get('prazo') || 'A combinar'}\n\nObservações:\n${get('obs') || 'Nenhuma.'}`;
+      const summaryData = [
+        ['Subtotal:', `R$ ${total.toFixed(2)}`],
+        ['', ''],
+        [{ content: 'Total do Pedido:', styles: { fontStyle: 'bold', fontSize: 10 } }, { content: `R$ ${total.toFixed(2)}`, styles: { fontStyle: 'bold', fontSize: 10 } }]
+      ];
+      const finalTableBody = [];
+      const leftColumn = { content: obsText, rowSpan: 3, styles: { valign: 'top', fontSize: 9 } };
+      for (let i = 0; i < summaryData.length; i++) {
+        const row = [];
+        if (i === 0) row.push(leftColumn);
+        row.push(summaryData[i][0], summaryData[i][1]);
+        finalTableBody.push(row);
+      }
+      doc.autoTable({
+        startY: finalY,
+        theme: 'plain',
+        body: finalTableBody,
+        margin: { left: margin, right: margin },
+        columnStyles: {
+          0: { cellWidth: pageWidth / 2 - margin },
+          1: { halign: 'right', fontStyle: 'bold' },
+          2: { halign: 'right' }
+        }
+      });
+
+      const blob = doc.output('blob');
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank', 'noopener');
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
     }
 
     async function excluirPedido(id) {
@@ -352,5 +470,6 @@
       }
     }
   </script>
+  <script src="mobile-menu.js"></script>
 </body>
 </html>

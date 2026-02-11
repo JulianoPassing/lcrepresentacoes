@@ -1,14 +1,518 @@
-/* ========== LC REPRESENTAÇÕES - RESPONSIVO ========== */
-@media (max-width: 768px) {
-  body { font-size: 13px; }
-  .card { padding: 16px; }
-  table { font-size: 12px; }
-  th, td { padding: 10px 12px; }
+/* ========== MOBILE CSS OTIMIZADO - LC REPRESENTAÇÕES (Padrão G8Sistema) ========== */
+
+/* Ocultar elementos mobile no desktop */
+@media screen and (min-width: 769px) {
+  .mobile-menu-toggle,
+  .mobile-menu,
+  .mobile-menu-overlay {
+    display: none !important;
+  }
 }
 
-@media (max-width: 480px) {
-  .btn-primary, .btn-secondary {
-    padding: 10px 18px;
-    font-size: 13px;
+/* Reset e configurações base para mobile */
+@media screen and (max-width: 768px) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    -webkit-overflow-scrolling: touch;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    padding: 90px 15px 20px 15px !important;
+    font-size: 15px !important;
+    overflow-x: hidden;
+  }
+
+  input, textarea, select, button {
+    -webkit-user-select: auto;
+    user-select: auto;
+  }
+
+  /* ========== HEADER MOBILE COM MENU HAMBÚRGUER ========== */
+  .header-top, header {
+    height: 80px !important;
+    padding: 10px 15px !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1000 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+
+  .header-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    flex: 1 !important;
+  }
+
+  .header-left img {
+    height: 32px !important;
+  }
+
+  .header-left span {
+    font-size: 14px !important;
+  }
+
+  /* Ocultar user/logout/voltar - vão para o menu hambúrguer */
+  .header-right {
+    display: none !important;
+  }
+
+  #user-info, #logout-button, .btn-back {
+    display: none !important;
+  }
+
+  /* Menu hambúrguer */
+  .mobile-menu-toggle {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    width: 30px !important;
+    height: 22px !important;
+    background: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    z-index: 1002 !important;
+  }
+
+  .mobile-menu-toggle span {
+    display: block !important;
+    height: 3px !important;
+    width: 100% !important;
+    background: var(--lc-cinza, #2F2F2F) !important;
+    border-radius: 2px !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .mobile-menu-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(6px, 6px) !important;
+  }
+
+  .mobile-menu-toggle.active span:nth-child(2) {
+    opacity: 0 !important;
+  }
+
+  .mobile-menu-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(6px, -6px) !important;
+  }
+
+  /* Menu mobile dropdown */
+  .mobile-menu {
+    position: fixed !important;
+    top: 80px !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: white !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    border-top: 1px solid #e2e8f0 !important;
+    transform: translateY(-100%) !important;
+    transition: transform 0.3s ease !important;
+    z-index: 999 !important;
+    max-height: calc(100vh - 80px) !important;
+    overflow-y: auto !important;
+  }
+
+  .mobile-menu.active {
+    transform: translateY(0) !important;
+  }
+
+  .mobile-menu-item {
+    padding: 15px 20px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    font-size: 16px !important;
+    color: #334155 !important;
+    text-decoration: none !important;
+  }
+
+  .mobile-menu-item:hover {
+    background: #f8fafc !important;
+  }
+
+  .mobile-menu-item.user-info {
+    background: #f8fafc !important;
+    font-weight: 600 !important;
+    color: #1e293b !important;
+    justify-content: center !important;
+  }
+
+  .mobile-menu-item.logout {
+    color: #dc2626 !important;
+    font-weight: 600 !important;
+  }
+
+  .mobile-menu-item.voltar {
+    color: var(--lc-azul, #0065B3) !important;
+    font-weight: 600 !important;
+  }
+
+  .mobile-menu-item .icon {
+    margin-right: 10px !important;
+    font-size: 18px !important;
+  }
+
+  /* Overlay */
+  .mobile-menu-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    z-index: 998 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .mobile-menu-overlay.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Container */
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Cards */
+  .card {
+    margin-bottom: 20px !important;
+    padding: 20px 15px !important;
+    border-radius: 10px !important;
+  }
+
+  .card-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 15px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .card-header h2 {
+    font-size: 1.4rem !important;
+    margin: 0 !important;
+  }
+
+  /* Botões */
+  button, .btn {
+    width: 100% !important;
+    padding: 15px !important;
+    font-size: 15px !important;
+    border-radius: 8px !important;
+    margin-bottom: 10px !important;
+    min-height: 48px !important;
+    touch-action: manipulation !important;
+    box-sizing: border-box !important;
+  }
+
+  .btn-primary, .btn-success, .btn-danger, .btn-secondary, .btn-ver-pdf, .btn-editar {
+    width: 100% !important;
+  }
+
+  .actions-cell {
+    flex-direction: column !important;
+  }
+
+  .actions-cell .btn {
+    width: 100% !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* Inputs */
+  input, select, textarea {
+    width: 100% !important;
+    padding: 15px !important;
+    font-size: 16px !important;
+    border-radius: 8px !important;
+    box-sizing: border-box !important;
+    margin-bottom: 10px !important;
+  }
+
+  /* Tabelas responsivas */
+  .table-responsive {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    margin: 0 -15px !important;
+    padding: 0 15px !important;
+  }
+
+  table {
+    min-width: 500px !important;
+    font-size: 13px !important;
+  }
+
+  th, td {
+    padding: 10px 8px !important;
+  }
+
+  th {
+    font-size: 12px !important;
+  }
+
+  /* Formulários */
+  .form-group {
+    margin-bottom: 20px !important;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Dashboard */
+  .dashboard-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .filtro-calendario {
+    width: 100% !important;
+  }
+
+  .filtro-calendario select {
+    min-width: 100% !important;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Cards de produtos */
+  .cards-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Pedido - inputs de quantidade */
+  .pedido-item {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .pedido-item-campos {
+    flex-direction: column !important;
+  }
+
+  .pedido-item-campos input {
+    width: 100% !important;
+  }
+
+  /* Categorias produtos */
+  .categoria-produtos {
+    margin-bottom: 24px !important;
+  }
+
+  .categoria-titulo {
+    font-size: 1rem !important;
+  }
+
+  .tamanho-input-container {
+    flex-wrap: wrap !important;
+  }
+
+  .tamanho-input-container input {
+    width: 50px !important;
+    padding: 8px !important;
+  }
+
+  /* Modais */
+  .modal-overlay {
+    padding: 15px !important;
+  }
+
+  .modal-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    padding: 20px !important;
+  }
+
+  /* Search */
+  .search-box {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 40px !important;
+    padding: 20px 15px !important;
+    font-size: 14px !important;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px !important;
+    height: 6px !important;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9 !important;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1 !important;
+    border-radius: 3px !important;
+  }
+
+  /* Touch */
+  a, button, input, select, textarea {
+    touch-action: manipulation !important;
+  }
+
+  /* Login */
+  .login-container {
+    margin: 10px !important;
+    padding: 30px 20px !important;
+    width: calc(100% - 20px) !important;
+    max-width: none !important;
+  }
+
+  .login-container h2 {
+    font-size: 1.5rem !important;
+  }
+
+  .login-container input {
+    font-size: 16px !important;
+    padding: 15px !important;
+  }
+
+  .login-container button {
+    font-size: 16px !important;
+    padding: 15px !important;
+    width: 100% !important;
+  }
+}
+
+/* ========== MOBILE LANDSCAPE ========== */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  body {
+    padding: 75px 15px 20px 15px !important;
+  }
+
+  .header-top, header {
+    height: 70px !important;
+  }
+
+  .mobile-menu {
+    top: 70px !important;
+    max-height: calc(100vh - 70px) !important;
+  }
+}
+
+/* ========== MOBILE PEQUENO ========== */
+@media screen and (max-width: 480px) {
+  body {
+    padding: 85px 10px 20px 10px !important;
+    font-size: 14px !important;
+  }
+
+  .header-top, header {
+    height: 75px !important;
+    padding: 8px 10px !important;
+  }
+
+  .header-left span {
+    font-size: 12px !important;
+  }
+
+  .header-left img {
+    height: 28px !important;
+  }
+
+  .card {
+    padding: 15px 10px !important;
+    margin-bottom: 15px !important;
+  }
+
+  .card-header h2 {
+    font-size: 1.2rem !important;
+  }
+
+  h1 {
+    font-size: 1.4rem !important;
+  }
+
+  input, select, textarea {
+    padding: 12px !important;
+    font-size: 16px !important;
+  }
+
+  button, .btn {
+    padding: 12px !important;
+    font-size: 14px !important;
+  }
+
+  table {
+    font-size: 12px !important;
+  }
+
+  th, td {
+    padding: 8px 6px !important;
+  }
+
+  .mobile-menu {
+    top: 75px !important;
+    max-height: calc(100vh - 75px) !important;
+  }
+
+  .mobile-menu-item {
+    padding: 12px 15px !important;
+    font-size: 15px !important;
+  }
+}
+
+/* ========== TELAS MUITO PEQUENAS ========== */
+@media screen and (max-width: 360px) {
+  body {
+    font-size: 13px !important;
+    padding: 80px 8px 20px 8px !important;
+  }
+
+  .header-top, header {
+    height: 70px !important;
+    padding: 6px 8px !important;
+  }
+
+  .card {
+    padding: 12px 8px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .header-left img {
+    height: 24px !important;
+  }
+
+  .mobile-menu {
+    top: 70px !important;
+    max-height: calc(100vh - 70px) !important;
+  }
+
+  .mobile-menu-item {
+    padding: 10px 12px !important;
+    font-size: 14px !important;
+  }
+
+  /* Safe area para notch */
+  .header-top, header {
+    padding-top: max(10px, env(safe-area-inset-top)) !important;
+  }
+
+  body {
+    padding-bottom: max(20px, env(safe-area-inset-bottom)) !important;
   }
 }

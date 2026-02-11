@@ -93,6 +93,16 @@ module.exports = async (req, res) => {
       return res.status(200).json({ message: 'Pedido removido com sucesso!' });
     }
 
+    if (req.method === 'GET' && isNumericId) {
+      const [rows] = await connection.execute('SELECT * FROM pedidos WHERE id = ?', [parseInt(idFromUrl)]);
+      if (rows.length === 0) return res.status(404).json({ error: 'Pedido não encontrado.' });
+      const row = rows[0];
+      return res.status(200).json({
+        ...row,
+        dados: row.dados ? (typeof row.dados === 'string' ? JSON.parse(row.dados) : row.dados) : null
+      });
+    }
+
     const [rows] = await connection.execute('SELECT * FROM pedidos ORDER BY data_pedido DESC');
     const pedidos = rows.map(row => ({
       ...row,

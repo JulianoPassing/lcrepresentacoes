@@ -357,6 +357,7 @@
 
     window.pedidoItens = [];
     let clientesCadastrados = [];
+    let pedidoEmEdicaoId = null;
     const inputsCliente = {
       razao: () => document.getElementById('razao'),
       cnpj: () => document.getElementById('cnpj'),
@@ -792,14 +793,43 @@
         total,
         data: new Date().toISOString()
       };
-      fetch('/api/pedidos', {
-        method: 'POST',
+      const url = pedidoEmEdicaoId ? `/api/pedidos/${pedidoEmEdicaoId}` : '/api/pedidos';
+      const method = pedidoEmEdicaoId ? 'PUT' : 'POST';
+      fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ empresa: 'Vertice', descricao, dados })
       })
       .then(r => r.json())
-      .then(() => { alert('Pedido enviado com sucesso!'); })
+      .then(() => { alert(pedidoEmEdicaoId ? 'Pedido atualizado com sucesso!' : 'Pedido enviado com sucesso!'); if (pedidoEmEdicaoId) window.location.href = 'pedidos.html'; })
       .catch(() => { alert('Pedido salvo em PDF. Erro ao enviar para o servidor.'); });
+    }
+
+    async function carregarPedidoParaEdicao(id) {
+      try {
+        const res = await fetch(`/api/pedidos/${id}`);
+        if (!res.ok) return;
+        const p = await res.json();
+        const dados = p.dados ? (typeof p.dados === 'string' ? JSON.parse(p.dados) : p.dados) : {};
+        const cliente = dados.cliente || {};
+        const itens = dados.itens || [];
+        ['razao','cnpj','ie','endereco','bairro','cidade','estado','cep','email','telefone','transporte','prazo','obs'].forEach(k => {
+          const el = document.getElementById(k);
+          if (el) el.value = cliente[k] || '';
+        });
+        const buscaEl = document.getElementById('busca-cliente');
+        if (buscaEl) buscaEl.value = cliente.razao || '';
+        window.pedidoItens = itens.map(i => ({ ...i, subtotal: i.subtotal || (i.preco || 0) * (i.quantidade || 0) }));
+        pedidoEmEdicaoId = parseInt(id, 10);
+        atualizarPedido();
+        const main = document.querySelector('main');
+        if (main) {
+          const alert = document.createElement('div');
+          alert.style.cssText = 'background:#e8f5e9;color:#2e7d32;padding:12px 16px;border-radius:10px;margin-bottom:20px;font-weight:600;';
+          alert.textContent = '✏️ Editando pedido #' + id;
+          main.insertBefore(alert, main.firstChild);
+        }
+      } catch (e) { console.error('Erro ao carregar pedido:', e); }
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -812,10 +842,14 @@
       };
       await carregarClientes();
       renderizarProdutos();
+      const urlParams = new URLSearchParams(window.location.search);
+      const idPedido = urlParams.get('id');
+      if (idPedido) await carregarPedidoParaEdicao(idPedido);
       document.getElementById('busca-cliente').addEventListener('input', e => mostrarSugestoes(e.target.value));
       document.getElementById('logo-cliente').addEventListener('change', recalcPrecosPedido);
       document.getElementById('gerar-pedido-btn').addEventListener('click', gerarPedidoPDF);
     });
   </script>
+  <script src="mobile-menu.js"></script>
 </body>
 </html>
