@@ -145,17 +145,23 @@
       font-weight: 600;
       margin: 0;
     }
-    .filtro-mes {
+    .filtro-calendario {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      flex-wrap: wrap;
     }
-    .filtro-mes label {
+    .filtro-calendario label {
       font-size: 14px;
       color: #666;
       font-weight: 500;
     }
-    .filtro-mes select {
+    .filtro-calendario .filtro-grupo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .filtro-calendario select {
       padding: 10px 14px;
       border: 2px solid var(--border-color);
       border-radius: 10px;
@@ -163,8 +169,9 @@
       font-family: inherit;
       background: white;
       cursor: pointer;
+      min-width: 140px;
     }
-    .filtro-mes select:focus {
+    .filtro-calendario select:focus {
       outline: none;
       border-color: var(--lc-azul);
     }
@@ -238,11 +245,27 @@
     <section class="dashboard-section">
       <div class="dashboard-header">
         <h2>Dashboard</h2>
-        <div class="filtro-mes">
-          <label for="filtro-mes">Filtrar por mês:</label>
-          <select id="filtro-mes">
-            <!-- Preenchido via JS -->
-          </select>
+        <div class="filtro-calendario">
+          <label>Período:</label>
+          <div class="filtro-grupo">
+            <select id="filtro-mes" title="Mês">
+              <option value="1">Janeiro</option>
+              <option value="2">Fevereiro</option>
+              <option value="3">Março</option>
+              <option value="4">Abril</option>
+              <option value="5">Maio</option>
+              <option value="6">Junho</option>
+              <option value="7">Julho</option>
+              <option value="8">Agosto</option>
+              <option value="9">Setembro</option>
+              <option value="10">Outubro</option>
+              <option value="11">Novembro</option>
+              <option value="12">Dezembro</option>
+            </select>
+            <select id="filtro-ano" title="Ano">
+              <!-- Preenchido via JS -->
+            </select>
+          </div>
         </div>
       </div>
       <div id="dashboard-content">
@@ -293,25 +316,26 @@
 
       const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
       const hoje = new Date();
-      let anoAtual = hoje.getFullYear();
-      let mesAtual = hoje.getMonth();
+      const anoAtual = hoje.getFullYear();
+      const mesAtual = hoje.getMonth() + 1;
 
       const selectMes = document.getElementById('filtro-mes');
-      function popularFiltroMes() {
-        const opts = [];
-        const totalMeses = 36;
-        for (let i = 0; i < totalMeses; i++) {
-          const d = new Date(anoAtual, mesAtual - i, 1);
-          const a = d.getFullYear();
-          const m = d.getMonth();
-          const valor = `${a}-${String(m + 1).padStart(2, '0')}`;
-          const label = `${meses[m]} ${a}`;
-          const sel = i === 0;
-          opts.push({ valor, label, sel });
+      const selectAno = document.getElementById('filtro-ano');
+
+      function popularFiltroAno() {
+        let html = '';
+        for (let a = anoAtual + 1; a >= anoAtual - 5; a--) {
+          const sel = a === anoAtual ? ' selected' : '';
+          html += `<option value="${a}"${sel}>${a}</option>`;
         }
-        selectMes.innerHTML = opts.map(o => `<option value="${o.valor}"${o.sel ? ' selected' : ''}>${o.label}</option>`).join('');
+        selectAno.innerHTML = html;
       }
-      popularFiltroMes();
+      popularFiltroAno();
+      selectMes.value = String(mesAtual);
+
+      function getMesAnoSelecionado() {
+        return { mes: parseInt(selectMes.value, 10), ano: parseInt(selectAno.value, 10) };
+      }
 
       let clientesCache = [];
       let pedidosCache = [];
@@ -358,7 +382,7 @@
           pedidosCache = [];
         }
 
-        const [ano, mes] = selectMes.value.split('-').map(Number);
+        const { mes, ano } = getMesAnoSelecionado();
         const pedidosDoMes = pedidosCache.filter(p => pedidoNoMes(p, ano, mes));
         const totalPedidos = pedidosDoMes.length;
         const totalValor = pedidosDoMes.reduce((s, p) => s + extrairValorPedido(p), 0);
@@ -385,6 +409,7 @@
       }
 
       selectMes.addEventListener('change', carregarDashboard);
+      selectAno.addEventListener('change', carregarDashboard);
       await carregarDashboard();
     });
   </script>
