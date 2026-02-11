@@ -464,14 +464,14 @@
       const vazio = document.getElementById('pedido-vazio');
       const totalEl = document.getElementById('total-pedido');
       const freteEl = document.getElementById('frete-info');
-      container.innerHTML = '';
+      if (!container || !totalEl || !freteEl) return;
+      container.querySelectorAll('.pedido-item').forEach(el => el.remove());
       if (!Array.isArray(window.pedidoItens)) window.pedidoItens = [];
       let total = 0;
       if (window.pedidoItens.length === 0) {
-        vazio.style.display = 'block';
-        container.appendChild(vazio);
+        if (vazio) vazio.style.display = 'block';
       } else {
-        vazio.style.display = 'none';
+        if (vazio) vazio.style.display = 'none';
         window.pedidoItens.forEach((item, idx) => {
           total += item.subtotal;
           const div = document.createElement('div');

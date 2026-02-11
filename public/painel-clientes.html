@@ -136,21 +136,57 @@
       transition: all 0.3s ease;
     }
     .search-box:focus { outline: none; border-color: var(--lc-azul); }
-    .table-responsive { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border-color); }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; }
-    thead th {
-      background: linear-gradient(135deg, #f8fafc 0%, #e8eef5 100%);
-      font-weight: 600;
-      color: var(--lc-cinza);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    .table-responsive {
+      max-height: 450px;
+      overflow-y: auto;
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
     }
+    table { width: 100%; border-collapse: collapse; min-width: 700px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 13px; }
+    td:nth-child(2), td:nth-child(5) { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    th:nth-child(6), td:nth-child(6) { position: sticky; right: 0; background: white; box-shadow: -4px 0 8px rgba(0,0,0,0.05); white-space: nowrap; }
+    thead th:nth-child(6) { z-index: 2; background: linear-gradient(135deg, #f8fafc 0%, #e8eef5 100%); }
     tbody tr:hover { background: #f8fafc; }
-    .actions-cell { display: flex; gap: 8px; flex-wrap: wrap; }
-    .actions-cell .btn { padding: 6px 12px; font-size: 12px; }
+    tbody tr:hover td:nth-child(6) { background: #f8fafc; }
+    .actions-cell { display: flex; gap: 6px; flex-wrap: nowrap; }
+    .actions-cell .btn { padding: 6px 10px; font-size: 11px; flex-shrink: 0; }
+    .btn-info { background: var(--lc-azul); color: white; }
+    .btn-info:hover { opacity: 0.9; transform: translateY(-2px); }
     .empty { text-align: center; padding: 40px; color: #666; font-size: 15px; }
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+    .modal-overlay.visible { opacity: 1; visibility: visible; }
+    .modal-content {
+      background: white;
+      border-radius: 14px;
+      padding: 28px;
+      max-width: 480px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      transform: scale(0.95);
+      transition: transform 0.3s;
+    }
+    .modal-overlay.visible .modal-content { transform: scale(1); }
+    .modal-content h3 { margin: 0 0 20px 0; color: var(--lc-cinza); font-size: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; }
+    .modal-content .info-row { display: flex; margin-bottom: 12px; font-size: 14px; gap: 8px; }
+    .modal-content .info-label { font-weight: 600; color: var(--lc-cinza); min-width: 100px; flex-shrink: 0; }
+    .modal-content .info-value { color: #444; word-break: break-word; flex: 1; }
     .loading { opacity: 0.6; pointer-events: none; }
     .error-msg { background: #fef2f2; color: #b91c1c; padding: 12px 16px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; }
     input[type="hidden"] { display: none; }
@@ -259,6 +295,14 @@
     </div>
   </main>
 
+  <div id="modal-cliente" class="modal-overlay">
+    <div class="modal-content">
+      <h3><i class="fas fa-user"></i> Dados do Cliente</h3>
+      <div id="modal-cliente-body"></div>
+      <button type="button" class="btn btn-secondary" id="modal-fechar" style="margin-top: 20px;"><i class="fas fa-times"></i> Fechar</button>
+    </div>
+  </div>
+
   <script>
     const API = '/api/clientes';
     let todosClientes = [];
@@ -278,9 +322,47 @@
       document.getElementById('cliente-form').addEventListener('submit', salvarCliente);
       document.getElementById('btn-cancelar').addEventListener('click', cancelarEdicao);
       document.getElementById('busca-cliente').addEventListener('input', function() { filtrarClientes(this.value); });
+      document.getElementById('modal-fechar').addEventListener('click', fecharModalCliente);
+      document.getElementById('modal-cliente').addEventListener('click', (e) => { if (e.target.id === 'modal-cliente') fecharModalCliente(); });
 
       carregarClientes();
     });
+
+    function verCliente(id) {
+      const c = todosClientes.find(x => x.id === id);
+      if (!c) {
+        fetch(`${API}/${id}`).then(r => r.json()).then(cli => {
+          if (cli.error) alert(cli.error); else abrirModalCliente(cli);
+        }).catch(() => alert('Erro ao carregar cliente.'));
+        return;
+      }
+      abrirModalCliente(c);
+    }
+
+    function abrirModalCliente(c) {
+      const body = document.getElementById('modal-cliente-body');
+      body.innerHTML = `
+        <div class="info-row"><span class="info-label">ID:</span><span class="info-value">${c.id || '-'}</span></div>
+        <div class="info-row"><span class="info-label">Razão Social:</span><span class="info-value">${c.razao || '-'}</span></div>
+        <div class="info-row"><span class="info-label">CNPJ:</span><span class="info-value">${c.cnpj || '-'}</span></div>
+        <div class="info-row"><span class="info-label">I.E.:</span><span class="info-value">${c.ie || '-'}</span></div>
+        <div class="info-row"><span class="info-label">Endereço:</span><span class="info-value">${c.endereco || '-'}</span></div>
+        <div class="info-row"><span class="info-label">Bairro:</span><span class="info-value">${c.bairro || '-'}</span></div>
+        <div class="info-row"><span class="info-label">Cidade:</span><span class="info-value">${c.cidade || '-'}</span></div>
+        <div class="info-row"><span class="info-label">Estado:</span><span class="info-value">${c.estado || '-'}</span></div>
+        <div class="info-row"><span class="info-label">CEP:</span><span class="info-value">${c.cep || '-'}</span></div>
+        <div class="info-row"><span class="info-label">Email:</span><span class="info-value">${c.email || '-'}</span></div>
+        <div class="info-row"><span class="info-label">Telefone:</span><span class="info-value">${c.telefone || '-'}</span></div>
+        <div class="info-row"><span class="info-label">Transporte:</span><span class="info-value">${c.transporte || '-'}</span></div>
+        <div class="info-row"><span class="info-label">Prazo:</span><span class="info-value">${c.prazo || '-'}</span></div>
+        <div class="info-row"><span class="info-label">Observações:</span><span class="info-value">${c.obs || '-'}</span></div>
+      `;
+      document.getElementById('modal-cliente').classList.add('visible');
+    }
+
+    function fecharModalCliente() {
+      document.getElementById('modal-cliente').classList.remove('visible');
+    }
 
     function mostrarErro(msg) {
       const el = document.getElementById('erro-msg');
@@ -332,14 +414,15 @@
       tbody.innerHTML = lista.map(c => `
         <tr>
           <td>${c.id || '-'}</td>
-          <td>${(c.razao || '-')}</td>
+          <td title="${(c.razao || '').replace(/"/g, '&quot;')}">${(c.razao || '-')}</td>
           <td>${(c.cidade || '-')}</td>
           <td>${(c.telefone || '-')}</td>
-          <td>${(c.email || '-')}</td>
+          <td title="${(c.email || '').replace(/"/g, '&quot;')}">${(c.email || '-')}</td>
           <td>
             <div class="actions-cell">
-              <button class="btn btn-primary" onclick="editarCliente(${c.id})"><i class="fas fa-edit"></i></button>
-              <button class="btn btn-danger" onclick="excluirCliente(${c.id}, '${(c.razao || '').replace(/'/g, "\\'")}')"><i class="fas fa-trash"></i></button>
+              <button class="btn btn-info" onclick="verCliente(${c.id})" title="Ver cliente"><i class="fas fa-eye"></i></button>
+              <button class="btn btn-primary" onclick="editarCliente(${c.id})" title="Editar"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-danger" onclick="excluirCliente(${c.id}, '${(c.razao || '').replace(/'/g, "\\'")}')" title="Excluir"><i class="fas fa-trash"></i></button>
             </div>
           </td>
         </tr>
