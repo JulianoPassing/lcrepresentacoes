@@ -584,7 +584,6 @@
           container.appendChild(div);
         });
         container.querySelectorAll('.pedido-item input[data-field]').forEach(inp => {
-          inp.addEventListener('input', (e) => atualizarItemPedido(e.target));
           inp.addEventListener('change', (e) => atualizarItemPedido(e.target));
         });
       }
