@@ -236,9 +236,23 @@
         <div class="form-group"><label>CEP</label><input type="text" id="cep" readonly /></div>
         <div class="form-group"><label>Email</label><input type="email" id="email" readonly /></div>
         <div class="form-group"><label>Telefone</label><input type="text" id="telefone" readonly /></div>
-        <div class="form-group"><label>Transporte</label><input type="text" id="transporte" readonly /></div>
-        <div class="form-group"><label>Prazo Pagamento</label><input type="text" id="prazo" readonly /></div>
-        <div class="form-group full"><label>Observações</label><textarea id="obs" readonly></textarea></div>
+        <div class="form-group"><label>Transporte (Frete)</label>
+          <select id="transporte">
+            <option value="CIF">CIF</option>
+            <option value="FOB">FOB</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Prazo Pagamento (Boleto/dias)</label>
+          <select id="prazo">
+            <option value="28">28</option>
+            <option value="28/42">28/42</option>
+            <option value="28/42/56">28/42/56</option>
+            <option value="28/42/56/70">28/42/56/70</option>
+            <option value="28/42/56/70/84">28/42/56/70/84</option>
+            <option value="28/42/56/70/84/98">28/42/56/70/84/98</option>
+          </select>
+        </div>
+        <div class="form-group full"><label>Observações</label><textarea id="obs" placeholder="Digite observações do pedido (opcional)"></textarea></div>
       </div>
     </section>
 
