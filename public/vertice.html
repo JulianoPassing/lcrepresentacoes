@@ -698,9 +698,13 @@
         const LC_AZUL = [0, 101, 179];
         const LC_CINZA = [47, 47, 47];
 
+        const LOGO_ORIG_W = 781;
+        const LOGO_ORIG_H = 473;
+        const LOGO_DISPLAY_H = 22;
+        const LOGO_DISPLAY_W = Math.round(LOGO_DISPLAY_H * (LOGO_ORIG_W / LOGO_ORIG_H));
         const drawHeaderAndFooter = (data) => {
           try {
-            if (logoImg && logoImg.complete && logoImg.naturalWidth) doc.addImage(logoImg, 'PNG', margin, 10, 90, 15);
+            if (logoImg && logoImg.complete && logoImg.naturalWidth) doc.addImage(logoImg, 'PNG', margin, 10, LOGO_DISPLAY_W, LOGO_DISPLAY_H);
           } catch (_) {}
           doc.setFontSize(16);
           doc.setFont('helvetica', 'bold');

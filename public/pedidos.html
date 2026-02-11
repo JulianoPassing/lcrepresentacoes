@@ -166,6 +166,14 @@
       overflow-y: auto;
     }
     .modal-content pre { font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+    .modal-dados-layout { max-width: 520px; }
+    .modal-dados-layout .dados-secao { margin-bottom: 16px; }
+    .modal-dados-layout .dados-secao h4 { font-size: 13px; color: var(--lc-azul); margin-bottom: 8px; font-weight: 600; }
+    .modal-dados-layout .dados-linha { display: flex; gap: 8px; padding: 4px 0; font-size: 13px; }
+    .modal-dados-layout .dados-linha .label { min-width: 90px; color: #666; }
+    .modal-dados-layout .dados-tabela { width: 100%; font-size: 12px; border-collapse: collapse; margin-top: 8px; }
+    .modal-dados-layout .dados-tabela th, .modal-dados-layout .dados-tabela td { padding: 6px 8px; text-align: left; border-bottom: 1px solid var(--border-color); }
+    .modal-dados-layout .dados-tabela th { background: #f5f7fa; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -210,9 +218,9 @@
   </main>
 
   <div id="modal-dados" class="modal-overlay hidden">
-    <div class="modal-content">
+    <div class="modal-content modal-dados-layout">
       <h3 style="margin-bottom:12px;">Dados do Pedido</h3>
-      <pre id="modal-dados-content"></pre>
+      <div id="modal-dados-content"></div>
       <button id="modal-fechar" class="btn btn-secondary" style="margin-top:16px;">Fechar</button>
     </div>
   </div>
@@ -251,11 +259,43 @@
     }
 
     function abrirModalDados(dados) {
+      const el = document.getElementById('modal-dados-content');
       try {
         const obj = typeof dados === 'string' ? JSON.parse(dados) : dados;
-        document.getElementById('modal-dados-content').textContent = JSON.stringify(obj, null, 2);
+        const c = obj.cliente || {};
+        const itens = obj.itens || [];
+        const total = typeof obj.total === 'number' ? obj.total : itens.reduce((s, i) => s + (i.subtotal || 0), 0);
+        const dataStr = obj.data ? (() => { try { const d = new Date(obj.data); return d.toLocaleDateString('pt-BR'); } catch(_) { return '-'; } })() : '-';
+
+        let html = '';
+        html += '<div class="dados-secao"><h4>Data</h4><div class="dados-linha"><span class="label">Pedido:</span><span>' + dataStr + '</span></div></div>';
+
+        html += '<div class="dados-secao"><h4>Cliente</h4>';
+        html += '<div class="dados-linha"><span class="label">Razão Social:</span><span>' + (c.razao || '-') + '</span></div>';
+        html += '<div class="dados-linha"><span class="label">CNPJ:</span><span>' + (c.cnpj || '-') + '</span></div>';
+        html += '<div class="dados-linha"><span class="label">I.E.:</span><span>' + (c.ie || '-') + '</span></div>';
+        html += '<div class="dados-linha"><span class="label">Endereço:</span><span>' + (c.endereco || '-') + (c.bairro ? ', ' + c.bairro : '') + '</span></div>';
+        html += '<div class="dados-linha"><span class="label">Cidade/UF:</span><span>' + (c.cidade || '-') + '/' + (c.estado || '-') + '</span></div>';
+        html += '<div class="dados-linha"><span class="label">CEP:</span><span>' + (c.cep || '-') + '</span></div>';
+        html += '<div class="dados-linha"><span class="label">E-mail:</span><span>' + (c.email || '-') + '</span></div>';
+        html += '<div class="dados-linha"><span class="label">Telefone:</span><span>' + (c.telefone || '-') + '</span></div>';
+        html += '<div class="dados-linha"><span class="label">Transporte:</span><span>' + (c.transporte || '-') + '</span></div>';
+        html += '<div class="dados-linha"><span class="label">Prazo:</span><span>' + (c.prazo || '-') + '</span></div>';
+        if (c.obs) html += '<div class="dados-linha"><span class="label">Obs.:</span><span>' + c.obs + '</span></div>';
+        html += '</div>';
+
+        if (itens.length) {
+          html += '<div class="dados-secao"><h4>Itens</h4><table class="dados-tabela"><thead><tr><th>Ref.</th><th>Descrição</th><th>Tam</th><th>Qtd</th><th>Unit.</th><th>Total</th></tr></thead><tbody>';
+          itens.forEach(i => {
+            html += '<tr><td>' + (i.REF || '-') + '</td><td>' + (i.DESC || '-') + '</td><td>' + (i.tamanho || '-') + '</td><td>' + (i.quantidade || 0) + '</td><td>R$ ' + (i.preco || 0).toFixed(2) + '</td><td>R$ ' + (i.subtotal || 0).toFixed(2) + '</td></tr>';
+          });
+          html += '</tbody></table></div>';
+        }
+
+        html += '<div class="dados-secao"><h4>Total</h4><div class="dados-linha"><span class="label">Total do Pedido:</span><span style="font-weight:700;font-size:15px;">R$ ' + total.toFixed(2) + '</span></div></div>';
+        el.innerHTML = html;
       } catch (e) {
-        document.getElementById('modal-dados-content').textContent = dados || '(vazio)';
+        el.innerHTML = '<p style="color:#666;">Erro ao exibir dados.</p>';
       }
       document.getElementById('modal-dados').classList.remove('hidden');
     }
@@ -299,7 +339,7 @@
       if (!str) return '-';
       try {
         const d = new Date(str);
-        return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        return d.toLocaleDateString('pt-BR');
       } catch (e) { return str; }
     }
 
@@ -372,8 +412,12 @@
       const LC_AZUL = [0, 101, 179];
       const LC_CINZA = [47, 47, 47];
       const get = (k) => cliente[k] || '';
+      const LOGO_ORIG_W = 781;
+      const LOGO_ORIG_H = 473;
+      const LOGO_DISPLAY_H = 22;
+      const LOGO_DISPLAY_W = Math.round(LOGO_DISPLAY_H * (LOGO_ORIG_W / LOGO_ORIG_H));
 
-      try { if (logoImg && logoImg.complete && logoImg.naturalWidth) doc.addImage(logoImg, 'PNG', margin, 10, 90, 15); } catch (_) {}
+      try { if (logoImg && logoImg.complete && logoImg.naturalWidth) doc.addImage(logoImg, 'PNG', margin, 10, LOGO_DISPLAY_W, LOGO_DISPLAY_H); } catch (_) {}
       doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(LC_AZUL[0], LC_AZUL[1], LC_AZUL[2]);
