@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LC Representações - Pedidos</title>
+  <link rel="icon" href="https://i.imgur.com/kNGKxVO.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="mobile.css" />
+  <link rel="stylesheet" href="modern-design.css" />
+  <style>
+    :root {
+      --lc-azul: #0065B3;
+      --lc-verde: #4CAB3F;
+      --lc-cinza: #2F2F2F;
+      --gradient-primary: linear-gradient(135deg, #0065B3 0%, #4CAB3F 100%);
+      --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+      --border-color: #e0e0e0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+      min-height: 100vh;
+      padding: 70px 20px 20px;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at 20% 80%, rgba(0, 101, 179, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(76, 171, 63, 0.05) 0%, transparent 50%);
+      z-index: -1;
+    }
+    .header-top {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 60px;
+      background: white;
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 1000;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .header-left img { height: 40px; }
+    .header-left span { font-size: 18px; font-weight: 600; color: var(--lc-cinza); }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    #user-info { font-size: 14px; color: var(--lc-cinza); font-weight: 500; padding: 8px 14px; background: #f5f7fa; border-radius: 10px; }
+    #logout-button {
+      background: var(--gradient-danger);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    #logout-button:hover { transform: translateY(-2px); }
+    .btn-back {
+      background: var(--lc-cinza);
+      color: white;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+    .btn-back:hover { opacity: 0.9; transform: translateY(-2px); }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .card {
+      background: white;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border-color);
+    }
+    .card h2 { font-size: 18px; color: var(--lc-cinza); margin-bottom: 20px; font-weight: 600; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+    .form-group { display: flex; flex-direction: column; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-weight: 600; margin-bottom: 6px; color: var(--lc-cinza); font-size: 14px; }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    input:focus, textarea:focus { outline: none; border-color: var(--lc-azul); box-shadow: 0 0 0 3px rgba(0, 101, 179, 0.15); }
+    .actions { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary { background: var(--gradient-primary); color: white; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 101, 179, 0.3); }
+    .btn-danger { background: var(--gradient-danger); color: white; }
+    .btn-danger:hover { transform: translateY(-2px); }
+    .btn-secondary { background: #e5e7eb; color: var(--lc-cinza); }
+    .search-box {
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 20px;
+      padding: 10px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    .search-box:focus { outline: none; border-color: var(--lc-azul); }
+    .table-responsive { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border-color); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+    thead th {
+      background: linear-gradient(135deg, #f8fafc 0%, #e8eef5 100%);
+      font-weight: 600;
+      color: var(--lc-cinza);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    tbody tr:hover { background: #f8fafc; }
+    .actions-cell { display: flex; gap: 8px; flex-wrap: wrap; }
+    .actions-cell .btn { padding: 6px 12px; font-size: 12px; }
+    .empty { text-align: center; padding: 40px; color: #666; font-size: 15px; }
+    .loading { opacity: 0.6; pointer-events: none; }
+    .error-msg { background: #fef2f2; color: #b91c1c; padding: 12px 16px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; }
+    .dados-preview { font-size: 12px; color: #666; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .expand-dados { cursor: pointer; color: var(--lc-azul); font-size: 12px; }
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal-content {
+      background: white;
+      border-radius: 14px;
+      padding: 24px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal-content pre { font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <header class="header-top">
+    <div class="header-left">
+      <img src="https://i.imgur.com/kNGKxVO.png" alt="LC Representações" />
+      <span>LC Representações</span>
+    </div>
+    <div class="header-right">
+      <a href="painel.html" class="btn-back"><i class="fas fa-arrow-left"></i> Voltar</a>
+      <span id="user-info">Usuário</span>
+      <button id="logout-button"><i class="fas fa-sign-out-alt"></i> Sair</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card" id="form-card">
+      <h2 id="form-title">Novo Pedido</h2>
+      <form id="pedido-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="empresa">Empresa / Cliente</label>
+            <input type="text" id="empresa" name="empresa" placeholder="Nome da empresa" />
+          </div>
+          <div class="form-group">
+            <label for="descricao">Descrição</label>
+            <input type="text" id="descricao" name="descricao" placeholder="Descrição do pedido" />
+          </div>
+          <div class="form-group full">
+            <label for="dados">Dados (JSON)</label>
+            <textarea id="dados" name="dados" placeholder='{"itens": [], "observacoes": ""}'></textarea>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn btn-primary" id="btn-salvar"><i class="fas fa-save"></i> Salvar</button>
+          <button type="button" class="btn btn-secondary" id="btn-cancelar" style="display:none;">Cancelar</button>
+        </div>
+        <input type="hidden" id="pedido-id" />
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Lista de Pedidos</h2>
+      <input type="text" id="busca-pedido" class="search-box" placeholder="Buscar por empresa, descrição..." />
+      <div id="erro-msg" class="error-msg" style="display:none;"></div>
+      <div class="table-responsive">
+        <table id="pedidos-tabela">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Empresa</th>
+              <th>Descrição</th>
+              <th>Data</th>
+              <th>Dados</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="pedidos-tbody">
+            <tr><td colspan="6" class="empty">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <div id="modal-dados" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h3 style="margin-bottom:12px;">Dados do Pedido</h3>
+      <pre id="modal-dados-content"></pre>
+      <button id="modal-fechar" class="btn btn-secondary" style="margin-top:16px;">Fechar</button>
+    </div>
+  </div>
+
+  <script>
+    const API = '/api/pedidos';
+    let todosPedidos = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = sessionStorage.getItem('loggedInUser');
+      if (!user) {
+        window.location.href = 'index.html';
+        return;
+      }
+      document.getElementById('user-info').textContent = `Olá, ${user}`;
+      document.getElementById('logout-button').addEventListener('click', () => {
+        sessionStorage.removeItem('loggedInUser');
+        window.location.href = 'index.html';
+      });
+
+      document.getElementById('pedido-form').addEventListener('submit', salvarPedido);
+      document.getElementById('btn-cancelar').addEventListener('click', cancelarEdicao);
+      document.getElementById('busca-pedido').addEventListener('input', function() { filtrarPedidos(this.value); });
+      document.getElementById('modal-fechar').addEventListener('click', () => {
+        document.getElementById('modal-dados').classList.add('hidden');
+      });
+      document.getElementById('modal-dados').addEventListener('click', (e) => {
+        if (e.target.id === 'modal-dados') document.getElementById('modal-dados').classList.add('hidden');
+      });
+
+      carregarPedidos();
+    });
+
+    function mostrarErro(msg) {
+      const el = document.getElementById('erro-msg');
+      el.textContent = msg;
+      el.style.display = msg ? 'block' : 'none';
+    }
+
+    function abrirModalDados(dados) {
+      try {
+        const obj = typeof dados === 'string' ? JSON.parse(dados) : dados;
+        document.getElementById('modal-dados-content').textContent = JSON.stringify(obj, null, 2);
+      } catch (e) {
+        document.getElementById('modal-dados-content').textContent = dados || '(vazio)';
+      }
+      document.getElementById('modal-dados').classList.remove('hidden');
+    }
+
+    async function carregarPedidos() {
+      const tbody = document.getElementById('pedidos-tbody');
+      tbody.innerHTML = '<tr><td colspan="6" class="empty">Carregando...</td></tr>';
+      mostrarErro('');
+      try {
+        const res = await fetch(API);
+        const data = await res.json();
+        if (!res.ok) {
+          if (res.status === 503) mostrarErro('Banco de dados não configurado. Configure DB_HOST, DB_USER, DB_PASSWORD e DB_NAME no Vercel.');
+          else mostrarErro(data.error || 'Erro ao carregar pedidos.');
+          todosPedidos = [];
+          tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum pedido encontrado.</td></tr>';
+          return;
+        }
+        todosPedidos = Array.isArray(data) ? data : [];
+        filtrarPedidos(document.getElementById('busca-pedido').value);
+      } catch (err) {
+        mostrarErro('Erro de conexão. Verifique se o servidor está rodando.');
+        tbody.innerHTML = '<tr><td colspan="6" class="empty">Erro ao carregar.</td></tr>';
+      }
+    }
+
+    function filtrarPedidos(termo) {
+      const busca = (termo || '').toLowerCase().trim();
+      const filtrados = busca
+        ? todosPedidos.filter(p =>
+            (p.empresa || '').toLowerCase().includes(busca) ||
+            (p.descricao || '').toLowerCase().includes(busca)
+          )
+        : todosPedidos;
+      renderizarPedidos(filtrados);
+    }
+
+    function formatarData(str) {
+      if (!str) return '-';
+      try {
+        const d = new Date(str);
+        return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      } catch (e) { return str; }
+    }
+
+    let pedidosRenderizados = [];
+    function renderizarPedidos(lista) {
+      pedidosRenderizados = lista;
+      const tbody = document.getElementById('pedidos-tbody');
+      if (lista.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum pedido encontrado.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = lista.map((p, i) => {
+        const dadosStr = p.dados ? (typeof p.dados === 'string' ? p.dados : JSON.stringify(p.dados)) : '';
+        const dadosPreview = dadosStr ? dadosStr.substring(0, 50) + (dadosStr.length > 50 ? '...' : '') : '-';
+        return `
+        <tr>
+          <td>${p.id || '-'}</td>
+          <td>${(p.empresa || '-')}</td>
+          <td>${(p.descricao || '-')}</td>
+          <td>${formatarData(p.data_pedido)}</td>
+          <td>
+            <span class="dados-preview">${dadosPreview}</span>
+            ${dadosStr ? `<span class="expand-dados" data-idx="${i}">Ver</span>` : ''}
+          </td>
+          <td>
+            <div class="actions-cell">
+              <button class="btn btn-primary" onclick="editarPedido(${p.id})"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-danger" onclick="excluirPedido(${p.id})"><i class="fas fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+      `;
+      }).join('');
+      tbody.querySelectorAll('.expand-dados').forEach(el => {
+        el.addEventListener('click', () => {
+          const idx = parseInt(el.dataset.idx, 10);
+          const p = pedidosRenderizados[idx];
+          if (p && p.dados) abrirModalDados(p.dados);
+        });
+      });
+    }
+
+    async function salvarPedido(e) {
+      e.preventDefault();
+      const id = document.getElementById('pedido-id').value;
+      let dadosObj = {};
+      const dadosRaw = document.getElementById('dados').value.trim();
+      if (dadosRaw) {
+        try {
+          dadosObj = JSON.parse(dadosRaw);
+        } catch (er) {
+          alert('Dados inválidos: JSON inválido.');
+          return;
+        }
+      }
+      const payload = {
+        empresa: document.getElementById('empresa').value.trim() || null,
+        descricao: document.getElementById('descricao').value.trim() || null,
+        dados: dadosObj
+      };
+      const body = document.querySelector('main');
+      body.classList.add('loading');
+      try {
+        if (id) {
+          const res = await fetch(`${API}/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...payload, id: parseInt(id) })
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            alert(data.error || 'Erro ao atualizar');
+            return;
+          }
+          alert(data.message || 'Pedido atualizado!');
+        } else {
+          const res = await fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            alert(data.error || 'Erro ao cadastrar');
+            return;
+          }
+          alert(data.message || 'Pedido cadastrado com sucesso!');
+        }
+        cancelarEdicao();
+        carregarPedidos();
+      } catch (err) {
+        alert('Erro de conexão. Tente novamente.');
+      } finally {
+        body.classList.remove('loading');
+      }
+    }
+
+    async function editarPedido(id) {
+      const p = todosPedidos.find(x => x.id === id);
+      if (!p) {
+        alert('Pedido não encontrado na lista.');
+        return;
+      }
+      document.getElementById('pedido-id').value = p.id;
+      document.getElementById('empresa').value = p.empresa || '';
+      document.getElementById('descricao').value = p.descricao || '';
+      document.getElementById('dados').value = p.dados ? (typeof p.dados === 'string' ? p.dados : JSON.stringify(p.dados, null, 2)) : '{}';
+      document.getElementById('form-title').textContent = 'Editar Pedido';
+      document.getElementById('btn-cancelar').style.display = 'inline-flex';
+    }
+
+    function cancelarEdicao() {
+      document.getElementById('pedido-id').value = '';
+      document.getElementById('pedido-form').reset();
+      document.getElementById('dados').value = '';
+      document.getElementById('form-title').textContent = 'Novo Pedido';
+      document.getElementById('btn-cancelar').style.display = 'none';
+    }
+
+    async function excluirPedido(id) {
+      if (!confirm('Deseja realmente excluir este pedido?')) return;
+      try {
+        const res = await fetch(API, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: parseInt(id) })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || 'Erro ao excluir');
+          return;
+        }
+        alert(data.message || 'Pedido excluído!');
+        carregarPedidos();
+      } catch (err) {
+        alert('Erro de conexão. Tente novamente.');
+      }
+    }
+  </script>
+</body>
+</html>

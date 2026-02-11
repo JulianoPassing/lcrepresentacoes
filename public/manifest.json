@@ -1,0 +1,24 @@
+{
+  "name": "LC Representações",
+  "short_name": "LC Rep",
+  "description": "Sistema LC Representações",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0065B3",
+  "theme_color": "#0065B3",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://i.imgur.com/kNGKxVO.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://i.imgur.com/kNGKxVO.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

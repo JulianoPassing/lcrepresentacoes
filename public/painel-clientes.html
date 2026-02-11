@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LC Representações - Clientes</title>
+  <link rel="icon" href="https://i.imgur.com/kNGKxVO.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="mobile.css" />
+  <link rel="stylesheet" href="modern-design.css" />
+  <style>
+    :root {
+      --lc-azul: #0065B3;
+      --lc-verde: #4CAB3F;
+      --lc-cinza: #2F2F2F;
+      --gradient-primary: linear-gradient(135deg, #0065B3 0%, #4CAB3F 100%);
+      --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+      --border-color: #e0e0e0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+      min-height: 100vh;
+      padding: 70px 20px 20px;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at 20% 80%, rgba(0, 101, 179, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(76, 171, 63, 0.05) 0%, transparent 50%);
+      z-index: -1;
+    }
+    .header-top {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 60px;
+      background: white;
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 1000;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .header-left img { height: 40px; }
+    .header-left span { font-size: 18px; font-weight: 600; color: var(--lc-cinza); }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    #user-info { font-size: 14px; color: var(--lc-cinza); font-weight: 500; padding: 8px 14px; background: #f5f7fa; border-radius: 10px; }
+    #logout-button {
+      background: var(--gradient-danger);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    #logout-button:hover { transform: translateY(-2px); }
+    .btn-back {
+      background: var(--lc-cinza);
+      color: white;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+    .btn-back:hover { opacity: 0.9; transform: translateY(-2px); }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .card {
+      background: white;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border-color);
+    }
+    .card h2 { font-size: 18px; color: var(--lc-cinza); margin-bottom: 20px; font-weight: 600; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .form-group { display: flex; flex-direction: column; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-weight: 600; margin-bottom: 6px; color: var(--lc-cinza); font-size: 14px; }
+    input[type="text"], input[type="email"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    input:focus { outline: none; border-color: var(--lc-azul); box-shadow: 0 0 0 3px rgba(0, 101, 179, 0.15); }
+    .actions { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary { background: var(--gradient-primary); color: white; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 101, 179, 0.3); }
+    .btn-danger { background: var(--gradient-danger); color: white; }
+    .btn-danger:hover { transform: translateY(-2px); }
+    .btn-secondary { background: #e5e7eb; color: var(--lc-cinza); }
+    .search-box {
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 20px;
+      padding: 10px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    .search-box:focus { outline: none; border-color: var(--lc-azul); }
+    .table-responsive { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border-color); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+    thead th {
+      background: linear-gradient(135deg, #f8fafc 0%, #e8eef5 100%);
+      font-weight: 600;
+      color: var(--lc-cinza);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    tbody tr:hover { background: #f8fafc; }
+    .actions-cell { display: flex; gap: 8px; flex-wrap: wrap; }
+    .actions-cell .btn { padding: 6px 12px; font-size: 12px; }
+    .empty { text-align: center; padding: 40px; color: #666; font-size: 15px; }
+    .loading { opacity: 0.6; pointer-events: none; }
+    .error-msg { background: #fef2f2; color: #b91c1c; padding: 12px 16px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; }
+    input[type="hidden"] { display: none; }
+  </style>
+</head>
+<body>
+  <header class="header-top">
+    <div class="header-left">
+      <img src="https://i.imgur.com/kNGKxVO.png" alt="LC Representações" />
+      <span>LC Representações</span>
+    </div>
+    <div class="header-right">
+      <a href="painel.html" class="btn-back"><i class="fas fa-arrow-left"></i> Voltar</a>
+      <span id="user-info">Usuário</span>
+      <button id="logout-button"><i class="fas fa-sign-out-alt"></i> Sair</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card" id="form-card">
+      <h2 id="form-title">Cadastrar Novo Cliente</h2>
+      <form id="cliente-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="razao">Razão Social *</label>
+            <input type="text" id="razao" name="razao" required />
+          </div>
+          <div class="form-group">
+            <label for="cnpj">CNPJ</label>
+            <input type="text" id="cnpj" name="cnpj" placeholder="00.000.000/0000-00" />
+          </div>
+          <div class="form-group">
+            <label for="ie">IE</label>
+            <input type="text" id="ie" name="ie" />
+          </div>
+          <div class="form-group">
+            <label for="endereco">Endereço</label>
+            <input type="text" id="endereco" name="endereco" />
+          </div>
+          <div class="form-group">
+            <label for="bairro">Bairro</label>
+            <input type="text" id="bairro" name="bairro" />
+          </div>
+          <div class="form-group">
+            <label for="cidade">Cidade</label>
+            <input type="text" id="cidade" name="cidade" />
+          </div>
+          <div class="form-group">
+            <label for="estado">Estado</label>
+            <input type="text" id="estado" name="estado" placeholder="UF" maxlength="2" />
+          </div>
+          <div class="form-group">
+            <label for="cep">CEP</label>
+            <input type="text" id="cep" name="cep" />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" />
+          </div>
+          <div class="form-group">
+            <label for="telefone">Telefone</label>
+            <input type="text" id="telefone" name="telefone" />
+          </div>
+          <div class="form-group">
+            <label for="transporte">Transporte</label>
+            <input type="text" id="transporte" name="transporte" />
+          </div>
+          <div class="form-group">
+            <label for="prazo">Prazo</label>
+            <input type="text" id="prazo" name="prazo" />
+          </div>
+          <div class="form-group full">
+            <label for="obs">Observações</label>
+            <input type="text" id="obs" name="obs" />
+          </div>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn btn-primary" id="btn-salvar"><i class="fas fa-save"></i> Salvar</button>
+          <button type="button" class="btn btn-secondary" id="btn-cancelar" style="display:none;">Cancelar</button>
+        </div>
+        <input type="hidden" id="cliente-id" />
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Lista de Clientes</h2>
+      <input type="text" id="busca-cliente" class="search-box" placeholder="Buscar por razão social, cidade, email..." />
+      <div id="erro-msg" class="error-msg" style="display:none;"></div>
+      <div class="table-responsive">
+        <table id="clientes-tabela">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Razão Social</th>
+              <th>Cidade</th>
+              <th>Telefone</th>
+              <th>Email</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="clientes-tbody">
+            <tr><td colspan="6" class="empty">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const API = '/api/clientes';
+    let todosClientes = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = sessionStorage.getItem('loggedInUser');
+      if (!user) {
+        window.location.href = 'index.html';
+        return;
+      }
+      document.getElementById('user-info').textContent = `Olá, ${user}`;
+      document.getElementById('logout-button').addEventListener('click', () => {
+        sessionStorage.removeItem('loggedInUser');
+        window.location.href = 'index.html';
+      });
+
+      document.getElementById('cliente-form').addEventListener('submit', salvarCliente);
+      document.getElementById('btn-cancelar').addEventListener('click', cancelarEdicao);
+      document.getElementById('busca-cliente').addEventListener('input', function() { filtrarClientes(this.value); });
+
+      carregarClientes();
+    });
+
+    function mostrarErro(msg) {
+      const el = document.getElementById('erro-msg');
+      el.textContent = msg;
+      el.style.display = msg ? 'block' : 'none';
+    }
+
+    async function carregarClientes() {
+      const tbody = document.getElementById('clientes-tbody');
+      tbody.innerHTML = '<tr><td colspan="6" class="empty">Carregando...</td></tr>';
+      mostrarErro('');
+      try {
+        const res = await fetch(API);
+        const data = await res.json();
+        if (!res.ok) {
+          if (res.status === 503) mostrarErro('Banco de dados não configurado. Configure as variáveis DB_HOST, DB_USER, DB_PASSWORD e DB_NAME no Vercel.');
+          else mostrarErro(data.error || 'Erro ao carregar clientes.');
+          todosClientes = [];
+          tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum cliente encontrado.</td></tr>';
+          return;
+        }
+        todosClientes = Array.isArray(data) ? data : [];
+        filtrarClientes(document.getElementById('busca-cliente').value);
+      } catch (err) {
+        mostrarErro('Erro de conexão. Verifique se o servidor está rodando.');
+        tbody.innerHTML = '<tr><td colspan="6" class="empty">Erro ao carregar.</td></tr>';
+      }
+    }
+
+    function filtrarClientes(termo) {
+      const busca = (termo || '').toLowerCase().trim();
+      const filtrados = busca
+        ? todosClientes.filter(c =>
+            (c.razao || '').toLowerCase().includes(busca) ||
+            (c.cidade || '').toLowerCase().includes(busca) ||
+            (c.email || '').toLowerCase().includes(busca) ||
+            (c.telefone || '').includes(busca)
+          )
+        : todosClientes;
+      renderizarClientes(filtrados);
+    }
+
+    function renderizarClientes(lista) {
+      const tbody = document.getElementById('clientes-tbody');
+      if (lista.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum cliente encontrado.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = lista.map(c => `
+        <tr>
+          <td>${c.id || '-'}</td>
+          <td>${(c.razao || '-')}</td>
+          <td>${(c.cidade || '-')}</td>
+          <td>${(c.telefone || '-')}</td>
+          <td>${(c.email || '-')}</td>
+          <td>
+            <div class="actions-cell">
+              <button class="btn btn-primary" onclick="editarCliente(${c.id})"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-danger" onclick="excluirCliente(${c.id}, '${(c.razao || '').replace(/'/g, "\\'")}')"><i class="fas fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function salvarCliente(e) {
+      e.preventDefault();
+      const id = document.getElementById('cliente-id').value;
+      const payload = {
+        razao: document.getElementById('razao').value.trim(),
+        cnpj: document.getElementById('cnpj').value,
+        ie: document.getElementById('ie').value,
+        endereco: document.getElementById('endereco').value,
+        bairro: document.getElementById('bairro').value,
+        cidade: document.getElementById('cidade').value,
+        estado: document.getElementById('estado').value,
+        cep: document.getElementById('cep').value,
+        email: document.getElementById('email').value,
+        telefone: document.getElementById('telefone').value,
+        transporte: document.getElementById('transporte').value,
+        prazo: document.getElementById('prazo').value,
+        obs: document.getElementById('obs').value
+      };
+      const url = id ? `${API}/${id}` : API;
+      const method = id ? 'PUT' : 'POST';
+      const body = document.querySelector('main');
+      body.classList.add('loading');
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || (data.details ? data.details.join('\n') : 'Erro ao salvar'));
+          return;
+        }
+        alert(data.message || 'Salvo com sucesso!');
+        cancelarEdicao();
+        carregarClientes();
+      } catch (err) {
+        alert('Erro de conexão. Tente novamente.');
+      } finally {
+        body.classList.remove('loading');
+      }
+    }
+
+    async function editarCliente(id) {
+      try {
+        const res = await fetch(`${API}/${id}`);
+        const c = await res.json();
+        if (!res.ok) {
+          alert(c.error || 'Cliente não encontrado');
+          return;
+        }
+        document.getElementById('cliente-id').value = c.id;
+        document.getElementById('razao').value = c.razao || '';
+        document.getElementById('cnpj').value = c.cnpj || '';
+        document.getElementById('ie').value = c.ie || '';
+        document.getElementById('endereco').value = c.endereco || '';
+        document.getElementById('bairro').value = c.bairro || '';
+        document.getElementById('cidade').value = c.cidade || '';
+        document.getElementById('estado').value = c.estado || '';
+        document.getElementById('cep').value = c.cep || '';
+        document.getElementById('email').value = c.email || '';
+        document.getElementById('telefone').value = c.telefone || '';
+        document.getElementById('transporte').value = c.transporte || '';
+        document.getElementById('prazo').value = c.prazo || '';
+        document.getElementById('obs').value = c.obs || '';
+        document.getElementById('form-title').textContent = 'Editar Cliente';
+        document.getElementById('btn-cancelar').style.display = 'inline-flex';
+      } catch (err) {
+        alert('Erro ao carregar cliente.');
+      }
+    }
+
+    function cancelarEdicao() {
+      document.getElementById('cliente-id').value = '';
+      document.getElementById('cliente-form').reset();
+      document.getElementById('form-title').textContent = 'Cadastrar Novo Cliente';
+      document.getElementById('btn-cancelar').style.display = 'none';
+    }
+
+    async function excluirCliente(id, razao) {
+      if (!confirm(`Deseja realmente excluir o cliente "${razao}"?`)) return;
+      try {
+        const res = await fetch(`${API}/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || 'Erro ao excluir');
+          return;
+        }
+        alert(data.message || 'Cliente excluído!');
+        carregarClientes();
+      } catch (err) {
+        alert('Erro de conexão. Tente novamente.');
+      }
+    }
+  </script>
+</body>
+</html>

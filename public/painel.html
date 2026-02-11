@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LC Representações - Painel</title>
+  <link rel="icon" href="https://i.imgur.com/kNGKxVO.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="mobile.css" />
+  <link rel="stylesheet" href="modern-design.css" />
+  <style>
+    :root {
+      --lc-azul: #0065B3;
+      --lc-verde: #4CAB3F;
+      --lc-cinza: #2F2F2F;
+      --gradient-primary: linear-gradient(135deg, #0065B3 0%, #4CAB3F 100%);
+      --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+      --border-color: #e0e0e0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+      min-height: 100vh;
+      padding: 70px 20px 20px;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at 20% 80%, rgba(0, 101, 179, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(76, 171, 63, 0.05) 0%, transparent 50%);
+      z-index: -1;
+    }
+    .header-top {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 60px;
+      background: white;
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 1000;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .header-left img { height: 40px; }
+    .header-left span { font-size: 18px; font-weight: 600; color: var(--lc-cinza); }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #user-info {
+      font-size: 14px;
+      color: var(--lc-cinza);
+      font-weight: 500;
+      padding: 8px 14px;
+      background: #f5f7fa;
+      border-radius: 10px;
+    }
+    #logout-button {
+      background: var(--gradient-danger);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    #logout-button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239,68,68,0.3); }
+    main { max-width: 900px; margin: 0 auto; }
+    h1 {
+      font-size: 28px;
+      color: var(--lc-cinza);
+      margin-bottom: 30px;
+      font-weight: 700;
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+    .card-link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+    .card-link .card {
+      height: 100%;
+      padding: 28px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    .card-link .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(0, 101, 179, 0.15);
+      border-color: rgba(0, 101, 179, 0.2);
+    }
+    .card-link .card i {
+      font-size: 36px;
+      margin-bottom: 16px;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .card-link .card h3 {
+      font-size: 18px;
+      color: var(--lc-cinza);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .card-link .card p {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <header class="header-top">
+    <div class="header-left">
+      <img src="https://i.imgur.com/kNGKxVO.png" alt="LC Representações" />
+      <span>LC Representações</span>
+    </div>
+    <div class="header-right">
+      <span id="user-info">Usuário</span>
+      <button id="logout-button"><i class="fas fa-sign-out-alt"></i> Sair</button>
+    </div>
+  </header>
+
+  <main>
+    <h1>Painel Principal</h1>
+    <div class="cards-grid">
+      <a href="painel-clientes.html" class="card-link">
+        <div class="card">
+          <i class="fas fa-users"></i>
+          <h3>Clientes</h3>
+          <p>Gerenciar cadastro de clientes</p>
+        </div>
+      </a>
+      <a href="pedidos.html" class="card-link">
+        <div class="card">
+          <i class="fas fa-shopping-cart"></i>
+          <h3>Pedidos</h3>
+          <p>Visualizar e gerenciar pedidos</p>
+        </div>
+      </a>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = sessionStorage.getItem('loggedInUser');
+      if (!user) {
+        window.location.href = 'index.html';
+        return;
+      }
+      document.getElementById('user-info').textContent = `Olá, ${user}`;
+      document.getElementById('logout-button').addEventListener('click', () => {
+        sessionStorage.removeItem('loggedInUser');
+        window.location.href = 'index.html';
+      });
+    });
+  </script>
+</body>
+</html>

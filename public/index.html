@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - LC Representações</title>
+    <link rel="icon" href="https://i.imgur.com/kNGKxVO.png" type="image/png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0065B3" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="LC Representações" />
+    <link rel="apple-touch-icon" href="https://i.imgur.com/kNGKxVO.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="mobile.css">
+    <link rel="stylesheet" href="modern-design.css">
+    <style>
+      :root {
+        --lc-azul: #0065B3;
+        --lc-verde: #4CAB3F;
+        --lc-cinza: #2F2F2F;
+        --primary-color: #0065B3;
+        --primary-dark: #00508a;
+        --secondary-color: #4CAB3F;
+        --text-primary: #2F2F2F;
+        --text-muted: #666666;
+        --border: #e0e0e0;
+        --border-focus: #0065B3;
+        --shadow-primary: 0 0 0 4px rgba(0, 101, 179, 0.2);
+        --gradient-primary: linear-gradient(135deg, #0065B3 0%, #4CAB3F 100%);
+        --gradient-bg: linear-gradient(135deg, #0065B3 0%, #4CAB3F 100%);
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: var(--gradient-bg);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        position: relative;
+        overflow-x: hidden;
+        font-size: 0.9rem;
+        color: #fff;
+      }
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+          radial-gradient(circle at 80% 20%, rgba(255,255,255,0.05) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: 0;
+      }
+      .login-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        padding: 40px 35px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        width: 100%;
+        max-width: 400px;
+        position: relative;
+        z-index: 10;
+        animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .login-container:hover {
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        transform: translateY(-2px);
+      }
+      @keyframes slideUp {
+        from { opacity: 0; transform: translateY(40px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+      .logo { text-align: center; margin-bottom: 40px; }
+      .logo img {
+        width: 200px !important;
+        height: auto !important;
+        margin-bottom: 20px !important;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+      }
+      .logo h2 {
+        color: var(--lc-cinza);
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 30px;
+      }
+      .form-group { margin-bottom: 25px; }
+      .form-group label {
+        display: block;
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-bottom: 9px;
+        font-size: 12.6px;
+      }
+      .form-group input {
+        width: 100%;
+        padding: 16px 16px 16px 46px;
+        border: 2px solid var(--border);
+        border-radius: 14px;
+        font-size: 14px;
+        font-family: inherit;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--lc-cinza);
+      }
+      .form-group input[type="password"] { padding-right: 46px; }
+      .form-group input:focus {
+        outline: none;
+        border-color: var(--border-focus);
+        box-shadow: var(--shadow-primary);
+      }
+      .input-wrapper { position: relative; }
+      .input-wrapper i {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 16px;
+      }
+      .remember-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 25px;
+      }
+      .remember-group label {
+        color: var(--text-primary);
+        font-size: 13px;
+        cursor: pointer;
+        font-weight: 500;
+      }
+      .login-container table td {
+        color: #000;
+      }
+      .login-btn {
+        width: 100%;
+        padding: 16px;
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        border-radius: 14px;
+        font-size: 14px;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        position: relative;
+        overflow: hidden;
+        letter-spacing: 0.025em;
+        text-transform: uppercase;
+        box-shadow: 0 10px 30px rgba(0, 101, 179, 0.3);
+      }
+      .login-btn::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+      }
+      .login-btn:hover::before { left: 100%; }
+      .login-btn:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 101, 179, 0.4);
+      }
+      .login-btn:disabled {
+        background: var(--text-muted);
+        cursor: not-allowed;
+        transform: none;
+      }
+      .spinner {
+        display: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-left: 10px;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .error-message {
+        color: #ef4444;
+        font-size: 12.6px;
+        font-weight: 500;
+        margin-top: 18px;
+        text-align: center;
+        padding: 14px;
+        background: rgba(239, 68, 68, 0.1);
+        border-radius: 10px;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        display: none;
+      }
+      .success-message {
+        color: #10b981;
+        font-size: 12.6px;
+        font-weight: 500;
+        margin-top: 18px;
+        text-align: center;
+        padding: 14px;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 10px;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        display: none;
+      }
+      .footer {
+        width: 100%;
+        text-align: center;
+        padding: 20px 0;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 13px;
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        z-index: 5;
+      }
+      .footer a {
+        color: rgba(255, 255, 255, 1);
+        text-decoration: underline;
+        font-weight: 500;
+      }
+      @media (max-width: 768px) {
+        body { padding: 15px 10px 80px 10px; }
+        .login-container { padding: 25px 20px; max-width: 350px; }
+        .footer { position: relative; margin-top: auto; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="logo">
+        <img src="https://i.imgur.com/kNGKxVO.png" alt="Logo LC Representações" />
+        <h2>Acesso Restrito</h2>
+      </div>
+      
+      <form id="login-form">
+        <div class="form-group">
+          <label for="username">Usuário</label>
+          <div class="input-wrapper">
+            <input type="text" id="username" name="username" placeholder="Digite seu nome de usuário" required>
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Senha</label>
+          <div class="input-wrapper">
+            <input type="password" id="password" name="password" placeholder="Digite sua senha" required>
+            <i class="fas fa-lock"></i>
+          </div>
+        </div>
+
+        <table style="width: 100%; margin: 12px 0; border-collapse: collapse; text-align: left;">
+          <tr>
+            <td style="width: auto; padding: 0; vertical-align: middle;">
+              <input type="checkbox" id="remember-me" style="margin: 0;" />
+            </td>
+            <td style="width: 100%; padding-left: 8px; vertical-align: middle; font-size: 13px; cursor: pointer;">
+              Lembrar usuário e senha
+            </td>
+          </tr>
+        </table>
+        
+        <table style="width: 100%; margin: 12px 0; border-collapse: collapse; text-align: left;">
+          <tr>
+            <td style="width: auto; padding: 0; vertical-align: middle;">
+              <input type="checkbox" id="show-password" style="margin: 0;" />
+            </td>
+            <td style="width: 100%; padding-left: 8px; vertical-align: middle; font-size: 13px; cursor: pointer;">
+              Visualizar senha
+            </td>
+          </tr>
+        </table>
+        
+        <button type="submit" class="login-btn" id="login-btn">
+          <span class="spinner" id="spinner"></span>
+          <i class="fas fa-sign-in-alt" id="loginIcon"></i>
+          <span id="loginText">Entrar</span>
+        </button>
+      </form>
+      
+      <div id="error-message" class="error-message"></div>
+      <div id="success-message" class="success-message"></div>
+    </div>
+
+    <footer class="footer">
+      © 2026 J.P Sistemas. Todos os direitos reservados. | <a href="https://whatsa.me/5548996852138/?t=Ol%C3%A1,%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es%20sobre%20os%20sistemas." target="_blank" rel="noopener noreferrer">jp-sistemas.com</a>
+    </footer>
+
+    <script src="auth.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+          });
+        }
+
+        const usernameField = document.getElementById("username");
+        const passwordField = document.getElementById("password");
+        const rememberMeCheckbox = document.getElementById("remember-me");
+        const showPasswordCheckbox = document.getElementById("show-password");
+        const errorMessage = document.getElementById("error-message");
+        const successMessage = document.getElementById("success-message");
+        const loginBtn = document.getElementById("login-btn");
+        const spinner = document.getElementById("spinner");
+        const loginIcon = document.getElementById("loginIcon");
+        const loginText = document.getElementById("loginText");
+
+        const tables = document.querySelectorAll('table[style*="width: 100%"]');
+        const rememberText = tables[0] ? tables[0].querySelector('td:last-child') : null;
+        const showPasswordText = tables[1] ? tables[1].querySelector('td:last-child') : null;
+        
+        if (rememberText) {
+          rememberText.addEventListener('click', () => rememberMeCheckbox.checked = !rememberMeCheckbox.checked);
+        }
+        if (showPasswordText) {
+          showPasswordText.addEventListener('click', () => {
+            showPasswordCheckbox.checked = !showPasswordCheckbox.checked;
+            passwordField.type = showPasswordCheckbox.checked ? 'text' : 'password';
+          });
+        }
+
+        showPasswordCheckbox.addEventListener("change", () => {
+          passwordField.type = showPasswordCheckbox.checked ? "text" : "password";
+        });
+
+        const savedUsername = localStorage.getItem("savedUsername");
+        const savedPassword = localStorage.getItem("savedPassword");
+        if (savedUsername && savedPassword) {
+          usernameField.value = savedUsername;
+          passwordField.value = savedPassword;
+          rememberMeCheckbox.checked = true;
+        }
+
+        function setLoading(loading) {
+          if (loading) {
+            loginBtn.disabled = true;
+            spinner.style.display = 'inline-block';
+            loginIcon.style.display = 'none';
+            loginText.textContent = 'Entrando...';
+          } else {
+            loginBtn.disabled = false;
+            spinner.style.display = 'none';
+            loginIcon.style.display = 'inline-block';
+            loginText.textContent = 'Entrar';
+          }
+        }
+
+        function showMessage(element, message, type = 'error') {
+          element.textContent = message;
+          element.style.display = 'block';
+          if (type === 'success') errorMessage.style.display = 'none';
+          else successMessage.style.display = 'none';
+        }
+
+        document.getElementById("login-form").addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const usernameInput = usernameField.value.trim();
+          const passwordInput = passwordField.value;
+          const rememberMe = rememberMeCheckbox.checked;
+
+          if (!usernameInput || !passwordInput) {
+            showMessage(errorMessage, "Por favor, preencha todos os campos.");
+            return;
+          }
+
+          setLoading(true);
+          errorMessage.style.display = 'none';
+          successMessage.style.display = 'none';
+
+          try {
+            const authSystem = new AuthSystem();
+            const result = await authSystem.authenticate(usernameInput, passwordInput);
+            
+            if (result.success) {
+              showMessage(successMessage, 'Login realizado com sucesso! Redirecionando...', 'success');
+              if (rememberMe) {
+                localStorage.setItem("savedUsername", usernameInput);
+                localStorage.setItem("savedPassword", passwordInput);
+              } else {
+                localStorage.removeItem("savedUsername");
+                localStorage.removeItem("savedPassword");
+              }
+              sessionStorage.setItem("loggedInUser", usernameInput);
+              setTimeout(() => window.location.href = "painel.html", 1000);
+            } else {
+              showMessage(errorMessage, result.message || "Usuário ou senha inválidos.");
+              passwordField.value = '';
+              passwordField.focus();
+            }
+          } catch (error) {
+            showMessage(errorMessage, "Erro inesperado. Tente novamente.");
+          } finally {
+            setLoading(false);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
