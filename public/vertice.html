@@ -358,6 +358,7 @@
     window.pedidoItens = [];
     let clientesCadastrados = [];
     let pedidoEmEdicaoId = null;
+    let pedidoEmpresaOriginal = 'Vertice';
     const inputsCliente = {
       razao: () => document.getElementById('razao'),
       cnpj: () => document.getElementById('cnpj'),
@@ -817,7 +818,8 @@
       logoImg.onerror = () => { gerarPDFInterno(null); };
       logoImg.src = LC_LOGO;
 
-      const descricao = `Vértice - Cliente: ${getVal('razao')} | Itens: ${window.pedidoItens.map(i => i.REF + ' ' + i.tamanho + ' x' + i.quantidade).join(', ')} | Total: R$ ${total.toFixed(2)}`;
+      const prefixo = pedidoEmpresaOriginal === 'B2B-Vertice' ? 'Vértice B2B' : 'Vértice';
+      const descricao = `${prefixo} - Cliente: ${getVal('razao')} | Itens: ${window.pedidoItens.map(i => i.REF + ' ' + i.tamanho + ' x' + i.quantidade).join(', ')} | Total: R$ ${total.toFixed(2)}`;
       const dados = {
         cliente: Object.fromEntries(['razao','cnpj','ie','endereco','bairro','cidade','estado','cep','email','telefone','transporte','prazo','obs'].map(k => [k, getVal(k)])),
         itens: window.pedidoItens,
@@ -829,7 +831,7 @@
       fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ empresa: 'Vertice', descricao, dados })
+        body: JSON.stringify({ empresa: pedidoEmEdicaoId ? pedidoEmpresaOriginal : 'Vertice', descricao, dados })
       })
       .then(r => r.json())
       .then(() => { alert(pedidoEmEdicaoId ? 'Pedido atualizado com sucesso!' : 'Pedido enviado com sucesso!'); if (pedidoEmEdicaoId) window.location.href = 'pedidos.html'; })
@@ -876,6 +878,7 @@
           subtotal: Number(i.subtotal) || (Number(i.preco) || 0) * (Number(i.quantidade) || 0)
         }));
         pedidoEmEdicaoId = parseInt(id, 10);
+        pedidoEmpresaOriginal = (p.empresa || 'Vertice');
         atualizarPedido();
         const main = document.querySelector('main');
         if (main) {
