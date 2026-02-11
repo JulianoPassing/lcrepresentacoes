@@ -67,12 +67,8 @@ module.exports = async (req, res) => {
     }
 
     if (useJSON) {
-      if (req.method === 'GET' && !id) {
-        const clientes = carregarClientesJSON();
-        return res.status(200).json(clientes);
-      }
       return res.status(503).json({
-        error: 'Banco de dados não configurado. Configure DB_HOST, DB_USER, DB_PASSWORD e DB_NAME nas variáveis de ambiente.'
+        error: 'Falha ao conectar ao banco de dados. Verifique as variáveis DB_HOST, DB_USER, DB_PASSWORD e DB_NAME no Vercel, e se o usuário tem permissão no banco lc_representacoes.'
       });
     }
 
