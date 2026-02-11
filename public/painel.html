@@ -129,6 +129,95 @@
       color: #666;
       line-height: 1.5;
     }
+    .dashboard-section {
+      margin-bottom: 36px;
+    }
+    .dashboard-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .dashboard-header h2 {
+      font-size: 20px;
+      color: var(--lc-cinza);
+      font-weight: 600;
+      margin: 0;
+    }
+    .filtro-mes {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .filtro-mes label {
+      font-size: 14px;
+      color: #666;
+      font-weight: 500;
+    }
+    .filtro-mes select {
+      padding: 10px 14px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      background: white;
+      cursor: pointer;
+    }
+    .filtro-mes select:focus {
+      outline: none;
+      border-color: var(--lc-azul);
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .dashboard-card {
+      background: white;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+    .dashboard-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 101, 179, 0.12);
+    }
+    .dashboard-card i {
+      font-size: 28px;
+      margin-bottom: 12px;
+      opacity: 0.9;
+    }
+    .dashboard-card.cliente i { color: var(--lc-azul); }
+    .dashboard-card.pedidos i { color: var(--lc-verde); }
+    .dashboard-card.valor i { color: #059669; }
+    .dashboard-card-label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .dashboard-card-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--lc-cinza);
+    }
+    .dashboard-card-valor .dashboard-card-value {
+      color: var(--lc-verde);
+      font-size: 22px;
+    }
+    .dashboard-loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+    .dashboard-loading i {
+      font-size: 32px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
   </style>
 </head>
 <body>
@@ -145,6 +234,25 @@
 
   <main>
     <h1>Painel Principal</h1>
+
+    <section class="dashboard-section">
+      <div class="dashboard-header">
+        <h2>Dashboard</h2>
+        <div class="filtro-mes">
+          <label for="filtro-mes">Filtrar por mês:</label>
+          <select id="filtro-mes">
+            <!-- Preenchido via JS -->
+          </select>
+        </div>
+      </div>
+      <div id="dashboard-content">
+        <div class="dashboard-loading">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Carregando dados...</p>
+        </div>
+      </div>
+    </section>
+
     <div class="cards-grid">
       <a href="painel-clientes.html" class="card-link">
         <div class="card">
@@ -171,7 +279,7 @@
   </main>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       const user = sessionStorage.getItem('loggedInUser');
       if (!user) {
         window.location.href = 'index.html';
@@ -182,6 +290,102 @@
         sessionStorage.removeItem('loggedInUser');
         window.location.href = 'index.html';
       });
+
+      const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+      const hoje = new Date();
+      let anoAtual = hoje.getFullYear();
+      let mesAtual = hoje.getMonth();
+
+      const selectMes = document.getElementById('filtro-mes');
+      function popularFiltroMes() {
+        const opts = [];
+        const totalMeses = 36;
+        for (let i = 0; i < totalMeses; i++) {
+          const d = new Date(anoAtual, mesAtual - i, 1);
+          const a = d.getFullYear();
+          const m = d.getMonth();
+          const valor = `${a}-${String(m + 1).padStart(2, '0')}`;
+          const label = `${meses[m]} ${a}`;
+          const sel = i === 0;
+          opts.push({ valor, label, sel });
+        }
+        selectMes.innerHTML = opts.map(o => `<option value="${o.valor}"${o.sel ? ' selected' : ''}>${o.label}</option>`).join('');
+      }
+      popularFiltroMes();
+
+      let clientesCache = [];
+      let pedidosCache = [];
+
+      function extrairValorPedido(p) {
+        try {
+          const dados = p.dados ? (typeof p.dados === 'string' ? JSON.parse(p.dados) : p.dados) : {};
+          if (typeof dados.total === 'number') return dados.total;
+          if (dados.itens && Array.isArray(dados.itens)) {
+            return dados.itens.reduce((s, i) => s + (Number(i.subtotal) || 0), 0);
+          }
+        } catch (_) {}
+        return 0;
+      }
+
+      function pedidoNoMes(p, ano, mes) {
+        const dt = p.data_pedido || p.created_at;
+        if (!dt) return false;
+        const d = new Date(dt);
+        return d.getFullYear() === ano && d.getMonth() + 1 === mes;
+      }
+
+      async function carregarDashboard() {
+        const container = document.getElementById('dashboard-content');
+        try {
+          const [resClientes, resPedidos] = await Promise.all([
+            fetch('/api/clientes'),
+            fetch('/api/pedidos')
+          ]);
+          if (resClientes.ok) clientesCache = await resClientes.json();
+          else clientesCache = [];
+          if (resPedidos.ok) {
+            const raw = await resPedidos.json();
+            pedidosCache = raw.map(p => {
+              let dados = null;
+              try {
+                dados = p.dados ? (typeof p.dados === 'string' ? JSON.parse(p.dados) : p.dados) : null;
+              } catch (_) {}
+              return { ...p, dados };
+            });
+          } else pedidosCache = [];
+        } catch (e) {
+          clientesCache = [];
+          pedidosCache = [];
+        }
+
+        const [ano, mes] = selectMes.value.split('-').map(Number);
+        const pedidosDoMes = pedidosCache.filter(p => pedidoNoMes(p, ano, mes));
+        const totalPedidos = pedidosDoMes.length;
+        const totalValor = pedidosDoMes.reduce((s, p) => s + extrairValorPedido(p), 0);
+
+        container.innerHTML = `
+          <div class="dashboard-grid">
+            <div class="dashboard-card cliente">
+              <i class="fas fa-users"></i>
+              <div class="dashboard-card-label">Total de clientes</div>
+              <div class="dashboard-card-value">${clientesCache.length.toLocaleString('pt-BR')}</div>
+            </div>
+            <div class="dashboard-card pedidos">
+              <i class="fas fa-shopping-cart"></i>
+              <div class="dashboard-card-label">Pedidos em ${meses[mes - 1]} ${ano}</div>
+              <div class="dashboard-card-value">${totalPedidos.toLocaleString('pt-BR')}</div>
+            </div>
+            <div class="dashboard-card valor dashboard-card-valor">
+              <i class="fas fa-brazilian-real-sign"></i>
+              <div class="dashboard-card-label">Total R$ em ${meses[mes - 1]} ${ano}</div>
+              <div class="dashboard-card-value">R$ ${totalValor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      selectMes.addEventListener('change', carregarDashboard);
+      await carregarDashboard();
     });
   </script>
 </body>

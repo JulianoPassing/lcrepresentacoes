@@ -378,12 +378,19 @@
       const div = document.getElementById('sugestoes-clientes');
       div.innerHTML = '';
       if (!filtro || filtro.length < 2) { div.style.display = 'none'; return; }
-      const f = filtro.toLowerCase();
-      const list = clientesCadastrados.filter(c =>
-        (c.razao && String(c.razao).toLowerCase().includes(f)) ||
-        (c.cnpj && String(c.cnpj).replace(/\D/g,'').includes(f.replace(/\D/g,'').slice(0,14))) ||
-        (c.cidade && String(c.cidade).toLowerCase().includes(f))
-      ).slice(0, 8);
+      const f = filtro.toLowerCase().trim();
+      const fNumeros = filtro.replace(/\D/g, '');
+      const list = clientesCadastrados.filter(c => {
+        if (c.razao && String(c.razao).toLowerCase().includes(f)) return true;
+        if (c.cidade && String(c.cidade).toLowerCase().includes(f)) return true;
+        if (c.email && String(c.email).toLowerCase().includes(f)) return true;
+        if (c.telefone && String(c.telefone).includes(filtro)) return true;
+        if (fNumeros.length >= 2 && c.cnpj) {
+          const cnpjNum = String(c.cnpj).replace(/\D/g, '');
+          if (cnpjNum.includes(fNumeros.slice(0, 14))) return true;
+        }
+        return false;
+      }).slice(0, 8);
       if (list.length === 0) { div.style.display = 'none'; return; }
       div.style.display = 'block';
       list.forEach(c => {
