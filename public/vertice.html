@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LC Representações - Pedidos Vértice</title>
+  <link rel="icon" href="https://i.imgur.com/kNGKxVO.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+  <link rel="stylesheet" href="mobile.css" />
+  <link rel="stylesheet" href="modern-design.css" />
+  <style>
+    :root {
+      --lc-azul: #0065B3;
+      --lc-verde: #4CAB3F;
+      --lc-cinza: #2F2F2F;
+      --gradient-primary: linear-gradient(135deg, #0065B3 0%, #4CAB3F 100%);
+      --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+      --border-color: #e0e0e0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+      min-height: 100vh;
+      padding: 80px 20px 20px;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at 20% 80%, rgba(0, 101, 179, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(76, 171, 63, 0.05) 0%, transparent 50%);
+      z-index: -1;
+    }
+    .header-top {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 60px;
+      background: white;
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 1000;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .header-left img { height: 40px; }
+    .header-left span { font-size: 18px; font-weight: 600; color: var(--lc-cinza); }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    #user-info { font-size: 14px; color: var(--lc-cinza); font-weight: 500; padding: 8px 14px; background: #f5f7fa; border-radius: 10px; }
+    #logout-button {
+      background: var(--gradient-danger);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    #logout-button:hover { transform: translateY(-2px); }
+    .btn-back {
+      background: var(--lc-cinza);
+      color: white;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+    .btn-back:hover { opacity: 0.9; transform: translateY(-2px); }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .card {
+      background: white;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border-color);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--border-color);
+    }
+    .card-header h2 { font-size: 1.3rem; color: var(--lc-cinza); font-weight: 700; margin: 0; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .form-group { display: flex; flex-direction: column; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-weight: 600; margin-bottom: 6px; color: var(--lc-cinza); font-size: 14px; }
+    input[type="text"], input[type="number"], input[type="email"], select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--lc-azul);
+      box-shadow: 0 0 0 3px rgba(0, 101, 179, 0.15);
+    }
+    textarea { min-height: 70px; resize: vertical; }
+    .table-responsive { overflow-x: auto; border-radius: 10px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+    thead th {
+      background: linear-gradient(135deg, #f8fafc 0%, #e8eef5 100%);
+      font-weight: 600;
+      color: var(--lc-cinza);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+    tbody tr:hover { background: #f8fafc; }
+    .tamanho-input-container { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .tamanho-input-container > div { display: flex; align-items: center; gap: 4px; }
+    .tamanho-input-container label { font-size: 0.8em; font-weight: 500; }
+    .tamanho-input-container input[type="number"] { width: 50px; padding: 6px; text-align: center; }
+    .btn {
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary { background: var(--gradient-primary); color: white; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 101, 179, 0.3); }
+    .btn-success { background: var(--lc-verde); color: white; }
+    .btn-success:hover { opacity: 0.9; transform: translateY(-2px); }
+    .btn-danger { background: var(--gradient-danger); color: white; padding: 6px 12px; font-size: 12px; }
+    .pedido-item {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px;
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    #pedido-vazio {
+      text-align: center;
+      padding: 30px;
+      background: #f8fafc;
+      border: 2px dashed var(--border-color);
+      border-radius: 10px;
+      color: #666;
+    }
+    .politica-info {
+      font-size: 12px;
+      color: #666;
+      margin-top: 16px;
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border-left: 4px solid var(--lc-azul);
+    }
+    .erro-validacao { color: #ef4444; font-size: 13px; margin-top: 8px; }
+    #sugestoes-clientes {
+      position: absolute;
+      left: 0; right: 0;
+      top: 100%;
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 1001;
+      margin-top: 2px;
+      display: none;
+    }
+    .sugestao-cliente-item {
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background 0.2s;
+    }
+    .sugestao-cliente-item:hover { background: #f3f7fa; }
+    .form-group { position: relative; }
+    footer {
+      width: 100%;
+      text-align: center;
+      padding: 15px 0;
+      margin-top: 30px;
+      font-size: 13px;
+      color: #666;
+    }
+    footer a { color: var(--lc-azul); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <header class="header-top">
+    <div class="header-left">
+      <img src="https://i.imgur.com/kNGKxVO.png" alt="LC Representações" />
+      <span>LC Representações - Vértice</span>
+    </div>
+    <div class="header-right">
+      <span id="user-info">Usuário</span>
+      <a href="painel.html" class="btn-back"><i class="fas fa-arrow-left"></i> Voltar</a>
+      <button id="logout-button"><i class="fas fa-sign-out-alt"></i> Sair</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <div class="card-header">
+        <span style="font-size: 1.8em">👤</span>
+        <h2>Cliente</h2>
+      </div>
+      <div class="form-group">
+        <input type="text" id="busca-cliente" placeholder="Buscar cliente por razão social, CNPJ, cidade..." />
+        <div id="sugestoes-clientes"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <span style="font-size: 1.8em">📋</span>
+        <h2>Dados do Cliente</h2>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Razão Social *</label><input type="text" id="razao" required /></div>
+        <div class="form-group"><label>CNPJ</label><input type="text" id="cnpj" placeholder="00.000.000/0000-00" /></div>
+        <div class="form-group"><label>I.E.</label><input type="text" id="ie" /></div>
+        <div class="form-group"><label>Endereço</label><input type="text" id="endereco" /></div>
+        <div class="form-group"><label>Bairro</label><input type="text" id="bairro" /></div>
+        <div class="form-group"><label>Cidade</label><input type="text" id="cidade" /></div>
+        <div class="form-group"><label>Estado</label><input type="text" id="estado" placeholder="UF" maxlength="2" /></div>
+        <div class="form-group"><label>CEP</label><input type="text" id="cep" /></div>
+        <div class="form-group"><label>Email</label><input type="email" id="email" /></div>
+        <div class="form-group"><label>Telefone</label><input type="text" id="telefone" /></div>
+        <div class="form-group"><label>Transporte *</label><input type="text" id="transporte" required /></div>
+        <div class="form-group"><label>Prazo Pagamento *</label><input type="text" id="prazo" placeholder="Ex: 28/42/56" required /></div>
+        <div class="form-group full"><label>Observações</label><textarea id="obs"></textarea></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <span style="font-size: 1.8em">🛒</span>
+        <h2>Produtos Vértice - Linha Duas Rodas</h2>
+      </div>
+      <div class="form-group">
+        <label><input type="checkbox" id="logo-cliente" /> Logo do cliente (+R$6 peito / +R$9 costas)</label>
+      </div>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Ref.</th>
+              <th>Descrição</th>
+              <th>Material</th>
+              <th>Tabela</th>
+              <th>Tamanhos & Quantidades</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="produtos-tbody"></tbody>
+        </table>
+      </div>
+      <div class="politica-info">
+        <strong>Política comercial:</strong> Pedido mínimo R$ 1.500. Produtos GGX +15%. Estoque: min 12 unid/produto. Personalizado: min 60 unid/produto. Frete CIF acima de R$ 3.500.
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <span style="font-size: 1.8em">📦</span>
+        <h2>Seu Pedido</h2>
+      </div>
+      <div id="pedido-container">
+        <p id="pedido-vazio">Nenhum item adicionado ao pedido ainda.</p>
+      </div>
+      <div style="text-align: center; margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 10px;">
+        <h3 style="margin: 0 0 8px 0; color: var(--lc-cinza);">Total do Pedido: R$ <span id="total-pedido">0,00</span></h3>
+        <p id="frete-info" style="font-size: 13px; color: #666; margin: 0;">Frete CIF disponível para pedidos acima de R$ 3.500</p>
+      </div>
+      <div id="erro-validacao" class="erro-validacao" style="display:none;"></div>
+      <button id="gerar-pedido-btn" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 16px;">
+        <i class="fas fa-file-pdf"></i> Gerar Pedido em PDF e Enviar
+      </button>
+    </section>
+  </main>
+
+  <footer>
+    © 2025 J.P Sistemas. Todos os direitos reservados. | <a href="https://whatsa.me/5548996852138/?t=Ol%C3%A1,%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es%20sobre%20os%20sistemas." target="_blank" rel="noopener">jp-sistemas.com</a>
+  </footer>
+
+  <script>
+    // Produtos Vértice - PRECO: [até30, 31a100, 101a200, acima200]
+    // TABELA 1: pode mesclar para desconto | TABELA 2 e 3: não pode mesclar
+    const PRODUTOS_VERTICE = [
+      { REF: '1212L', DESC: 'Linha Light Masc.', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX'], PRECO: [144.14, 136.65, 129.50, 122.75], TABELA: 1 },
+      { REF: '1212P', DESC: 'Linha Plus Masc.', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX'], PRECO: [152.58, 144.65, 137.10, 129.93], TABELA: 1 },
+      { REF: '1212LC', DESC: 'Linha Light Color', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX'], PRECO: [166.45, 157.95, 149.55, 141.75], TABELA: 2 },
+      { REF: '1212PF', DESC: 'Linha Plus Fem.', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX'], PRECO: [146.24, 138.60, 131.69, 124.54], TABELA: 1 },
+      { REF: '1212PFC', DESC: 'Linha Plus Color Fem.', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX'], PRECO: [153.69, 145.68, 138.08, 130.89], TABELA: 2 },
+      { REF: '5000', DESC: 'Japona Casual com Gola', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX'], PRECO: [167.30, 158.60, 150.35, 142.45], TABELA: 3 }
+    ];
+
+    const getTierIndex = (qtd) => {
+      if (qtd <= 30) return 0;
+      if (qtd <= 100) return 1;
+      if (qtd <= 200) return 2;
+      return 3;
+    };
+
+    window.pedidoItens = [];
+    let clientesCadastrados = [];
+    const inputsCliente = {
+      razao: () => document.getElementById('razao'),
+      cnpj: () => document.getElementById('cnpj'),
+      ie: () => document.getElementById('ie'),
+      endereco: () => document.getElementById('endereco'),
+      bairro: () => document.getElementById('bairro'),
+      cidade: () => document.getElementById('cidade'),
+      estado: () => document.getElementById('estado'),
+      cep: () => document.getElementById('cep'),
+      email: () => document.getElementById('email'),
+      telefone: () => document.getElementById('telefone'),
+      transporte: () => document.getElementById('transporte'),
+      prazo: () => document.getElementById('prazo'),
+      obs: () => document.getElementById('obs')
+    };
+
+    function getVal(k) { return inputsCliente[k]().value; }
+
+    async function carregarClientes() {
+      try {
+        const res = await fetch('/api/clientes');
+        if (!res.ok) throw new Error('Erro API');
+        clientesCadastrados = await res.json();
+      } catch (e) {
+        try {
+          const r = await fetch('clientes.json');
+          clientesCadastrados = (await r.json()).length ? await r.json() : [];
+        } catch (_) { clientesCadastrados = []; }
+      }
+    }
+
+    function preencherCliente(c) {
+      ['razao','cnpj','ie','endereco','bairro','cidade','estado','cep','email','telefone','transporte','prazo','obs'].forEach(k => {
+        const el = document.getElementById(k);
+        if (el) el.value = c[k] || '';
+      });
+    }
+
+    function mostrarSugestoes(filtro) {
+      const div = document.getElementById('sugestoes-clientes');
+      div.innerHTML = '';
+      if (!filtro || filtro.length < 2) { div.style.display = 'none'; return; }
+      const f = filtro.toLowerCase();
+      const list = clientesCadastrados.filter(c =>
+        (c.razao && String(c.razao).toLowerCase().includes(f)) ||
+        (c.cnpj && String(c.cnpj).replace(/\D/g,'').includes(f.replace(/\D/g,'').slice(0,14))) ||
+        (c.cidade && String(c.cidade).toLowerCase().includes(f))
+      ).slice(0, 8);
+      if (list.length === 0) { div.style.display = 'none'; return; }
+      div.style.display = 'block';
+      list.forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'sugestao-cliente-item';
+        item.innerHTML = `<strong>${c.razao || ''}</strong><br><small>${c.cidade || ''} | ${c.cnpj || ''}</small>`;
+        item.onmousedown = (e) => { e.preventDefault(); preencherCliente(c); document.getElementById('busca-cliente').value = c.razao || ''; div.style.display = 'none'; };
+        div.appendChild(item);
+      });
+    }
+
+    document.addEventListener('mousedown', (e) => {
+      const div = document.getElementById('sugestoes-clientes');
+      if (!div.contains(e.target) && e.target.id !== 'busca-cliente') div.style.display = 'none';
+    });
+
+    function renderizarProdutos() {
+      const tbody = document.getElementById('produtos-tbody');
+      tbody.innerHTML = PRODUTOS_VERTICE.map(p => {
+        const precos = `Até 30: R$ ${p.PRECO[0].toFixed(2)} | 31-100: R$ ${p.PRECO[1].toFixed(2)} | 101-200: R$ ${p.PRECO[2].toFixed(2)} | +200: R$ ${p.PRECO[3].toFixed(2)}`;
+        const inputs = p.TAMANHOS.map(t =>
+          `<div><label>${t}</label><input type="number" min="0" value="0" id="q-${p.REF}-${t}"></div>`
+        ).join('');
+        return `<tr>
+          <td><strong>${p.REF}</strong></td>
+          <td>${p.DESC}<br><small style="color:#666">${precos}</small></td>
+          <td>${p.MATERIAL}</td>
+          <td>Tabela ${p.TABELA}</td>
+          <td><div class="tamanho-input-container">${inputs}</div></td>
+          <td><button class="btn btn-success" onclick="adicionarProduto('${p.REF}')">Adicionar</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function adicionarProduto(ref) {
+      const p = PRODUTOS_VERTICE.find(x => x.REF === ref);
+      if (!p) return;
+      const logoCliente = document.getElementById('logo-cliente')?.checked;
+      let precoBase;
+      if (p.TABELA === 1) {
+        const qtdTotalT1 = PRODUTOS_VERTICE.filter(x => x.TABELA === 1).reduce((s, px) => {
+          return s + px.TAMANHOS.reduce((s2, t2) => s2 + parseInt(document.getElementById(`q-${px.REF}-${t2}`)?.value || 0), 0);
+        }, 0);
+        const tier = getTierIndex(qtdTotalT1);
+        precoBase = p.PRECO[tier];
+      } else {
+        const qtdProd = p.TAMANHOS.reduce((s, t2) => s + parseInt(document.getElementById(`q-${ref}-${t2}`)?.value || 0), 0);
+        const tier = getTierIndex(qtdProd);
+        precoBase = p.PRECO[tier];
+      }
+      let itemAdicionado = false;
+      p.TAMANHOS.forEach(t => {
+        const qtd = parseInt(document.getElementById(`q-${ref}-${t}`)?.value || 0);
+        if (qtd <= 0) return;
+        itemAdicionado = true;
+        let preco = precoBase;
+        if (t === 'GGX') preco *= 1.15;
+        if (logoCliente) preco += 15;
+        const subtotal = preco * qtd;
+        const exist = window.pedidoItens.find(x => x.REF === ref && x.tamanho === t);
+        if (exist) {
+          exist.quantidade += qtd;
+          exist.subtotal = exist.preco * exist.quantidade;
+        } else {
+          window.pedidoItens.push({ REF: ref, DESC: p.DESC, tamanho: t, preco, quantidade: qtd, subtotal });
+        }
+      });
+      if (itemAdicionado) {
+        p.TAMANHOS.forEach(t => { const el = document.getElementById(`q-${ref}-${t}`); if (el) el.value = 0; });
+        atualizarPedido();
+      } else {
+        alert('Informe a quantidade para pelo menos um tamanho.');
+      }
+    }
+
+    function atualizarPedido() {
+      const container = document.getElementById('pedido-container');
+      const vazio = document.getElementById('pedido-vazio');
+      const totalEl = document.getElementById('total-pedido');
+      const freteEl = document.getElementById('frete-info');
+      container.innerHTML = '';
+      if (!Array.isArray(window.pedidoItens)) window.pedidoItens = [];
+      let total = 0;
+      if (window.pedidoItens.length === 0) {
+        vazio.style.display = 'block';
+        container.appendChild(vazio);
+      } else {
+        vazio.style.display = 'none';
+        window.pedidoItens.forEach((item, idx) => {
+          total += item.subtotal;
+          const div = document.createElement('div');
+          div.className = 'pedido-item';
+          div.innerHTML = `
+            <div>
+              <strong>${item.DESC}</strong> (Ref: ${item.REF}) - Tam: ${item.tamanho} | Qtd: ${item.quantidade} | R$ ${item.preco.toFixed(2)} un. = R$ ${item.subtotal.toFixed(2)}
+            </div>
+            <button class="btn btn-danger" onclick="removerItem(${idx})">Remover</button>
+          `;
+          container.appendChild(div);
+        });
+      }
+      totalEl.textContent = total.toFixed(2).replace('.', ',');
+      freteEl.textContent = total >= 3500 ? '✓ Frete CIF aplicável (pedido acima de R$ 3.500)' : 'Frete CIF disponível para pedidos acima de R$ 3.500';
+    }
+
+    function removerItem(idx) {
+      window.pedidoItens.splice(idx, 1);
+      atualizarPedido();
+    }
+
+    function validarPedido() {
+      const erros = [];
+      if (!getVal('razao').trim()) erros.push('Razão social é obrigatória.');
+      if (!getVal('transporte').trim()) erros.push('Transporte é obrigatório.');
+      if (!getVal('prazo').trim()) erros.push('Prazo de pagamento é obrigatório.');
+      if (window.pedidoItens.length === 0) erros.push('Adicione itens ao pedido.');
+      const total = window.pedidoItens.reduce((s, i) => s + i.subtotal, 0);
+      if (total < 1500) erros.push('Pedido mínimo de R$ 1.500,00.');
+      const logoCliente = document.getElementById('logo-cliente')?.checked;
+      const minPorProduto = logoCliente ? 60 : 12;
+      const qtdPorRef = {};
+      window.pedidoItens.forEach(i => {
+        qtdPorRef[i.REF] = (qtdPorRef[i.REF] || 0) + i.quantidade;
+      });
+      const refsAbaixo = Object.entries(qtdPorRef).filter(([, q]) => q < minPorProduto);
+      if (refsAbaixo.length > 0) {
+        const tipo = logoCliente ? 'personalizado (logo cliente)' : 'estoque (logo Vértice)';
+        erros.push(`Pedido mínimo por produto (${tipo}): ${minPorProduto} unid. Produtos abaixo: ${refsAbaixo.map(([r]) => r).join(', ')}.`);
+      }
+      return erros;
+    }
+
+    function gerarPedidoPDF() {
+      const erros = validarPedido();
+      const errDiv = document.getElementById('erro-validacao');
+      if (erros.length > 0) {
+        errDiv.textContent = erros.join(' ');
+        errDiv.style.display = 'block';
+        return;
+      }
+      errDiv.style.display = 'none';
+      const total = window.pedidoItens.reduce((s, i) => s + i.subtotal, 0);
+      const LC_LOGO = 'https://i.imgur.com/kNGKxVO.png';
+
+      const gerarPDFInterno = (logoImg) => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 15;
+        const LC_AZUL = [0, 101, 179];
+        const LC_CINZA = [47, 47, 47];
+
+        const drawHeaderAndFooter = (data) => {
+          try {
+            if (logoImg && logoImg.complete && logoImg.naturalWidth) doc.addImage(logoImg, 'PNG', margin, 10, 90, 15);
+          } catch (_) {}
+          doc.setFontSize(16);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(LC_AZUL[0], LC_AZUL[1], LC_AZUL[2]);
+          doc.text('Pedido de Venda - Vértice', pageWidth - margin, 18, { align: 'right' });
+          doc.setTextColor(0, 0, 0);
+          const hoje = new Date();
+          const dataAtual = `${hoje.getDate().toString().padStart(2, '0')}/${(hoje.getMonth() + 1).toString().padStart(2, '0')}/${hoje.getFullYear()}`;
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          doc.text(`Data: ${dataAtual}`, pageWidth - margin, 24, { align: 'right' });
+          doc.text('LC Representações', pageWidth - margin, 30, { align: 'right' });
+          const pageCount = doc.internal.getNumberOfPages();
+          doc.setFontSize(8);
+          doc.setTextColor(100, 100, 100);
+          doc.text(`Página ${data.pageNumber} de ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+          doc.setTextColor(0, 0, 0);
+        };
+
+        drawHeaderAndFooter({ pageNumber: 1 });
+
+      doc.autoTable({
+        startY: 35,
+        theme: 'grid',
+        head: [[{
+          content: 'DADOS DO CLIENTE',
+          colSpan: 4,
+          styles: { halign: 'center', fontStyle: 'bold', fillColor: [230, 240, 250], textColor: LC_CINZA }
+        }]],
+        body: [
+          ['Cliente:', { content: getVal('razao') || 'N/A', colSpan: 3 }],
+          ['CNPJ:', getVal('cnpj') || 'N/A', 'I.E.:', getVal('ie') || 'N/A'],
+          ['Telefone:', getVal('telefone') || 'N/A', 'E-mail:', getVal('email') || 'N/A'],
+          ['Endereço:', { content: `${getVal('endereco') || ''}, ${getVal('bairro') || ''}`, colSpan: 3 }],
+          ['Cidade/UF:', `${getVal('cidade') || ''}/${getVal('estado') || ''}`, 'CEP:', getVal('cep') || '']
+        ],
+        styles: { fontSize: 8, cellPadding: 1.5 },
+        columnStyles: { 0: { fontStyle: 'bold', cellWidth: 22 }, 2: { fontStyle: 'bold', cellWidth: 20 } },
+        margin: { left: margin, right: margin }
+      });
+
+      let startY = doc.autoTable.previous.finalY + 7;
+
+      const head = [['Ref.', 'Descrição', 'Tam', 'Qtd', 'Unit.', 'Total']];
+      const body = window.pedidoItens.map(i => [
+        i.REF, i.DESC, i.tamanho, i.quantidade,
+        `R$ ${i.preco.toFixed(2)}`, `R$ ${i.subtotal.toFixed(2)}`
+      ]);
+
+      doc.autoTable({
+        head, body,
+        startY,
+        theme: 'grid',
+        styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak', valign: 'middle' },
+        headStyles: {
+          fillColor: LC_AZUL,
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        columnStyles: {
+          0: { cellWidth: 15 },
+          1: { cellWidth: 'auto' },
+          2: { cellWidth: 15, halign: 'center' },
+          3: { cellWidth: 12, halign: 'center' },
+          4: { cellWidth: 22, halign: 'right' },
+          5: { cellWidth: 25, halign: 'right' }
+        },
+        didDrawPage: (data) => { if (data.pageNumber > 1) drawHeaderAndFooter(data); },
+        margin: { top: 30, bottom: 15 }
+      });
+
+      const finalY = doc.autoTable.previous.finalY + 8;
+      const obsText = `Transporte: ${getVal('transporte') || 'A combinar'}\nPrazo: ${getVal('prazo') || 'A combinar'}\n\nObservações:\n${getVal('obs') || 'Nenhuma.'}`;
+
+      const summaryData = [
+        ['Subtotal:', `R$ ${total.toFixed(2)}`],
+        ['', ''],
+        [{ content: 'Total do Pedido:', styles: { fontStyle: 'bold', fontSize: 10 } }, { content: `R$ ${total.toFixed(2)}`, styles: { fontStyle: 'bold', fontSize: 10 } }]
+      ];
+
+      const finalTableBody = [];
+      const leftColumn = { content: obsText, rowSpan: summaryData.length, styles: { valign: 'top', fontSize: 9 } };
+      for (let i = 0; i < summaryData.length; i++) {
+        const row = [];
+        if (i === 0) row.push(leftColumn);
+        row.push(summaryData[i][0]);
+        row.push(summaryData[i][1]);
+        finalTableBody.push(row);
+      }
+
+      doc.autoTable({
+        startY: finalY,
+        theme: 'plain',
+        body: finalTableBody,
+        margin: { left: margin, right: margin },
+        columnStyles: {
+          0: { cellWidth: pageWidth / 2 - margin },
+          1: { halign: 'right', fontStyle: 'bold' },
+          2: { halign: 'right' }
+        }
+      });
+
+        const nomeArquivo = `Pedido Vertice LC - ${getVal('razao').replace(/[\s\/]/g, '_')} - ${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`;
+        doc.save(nomeArquivo);
+      };
+
+      const logoImg = new Image();
+      logoImg.onload = () => { gerarPDFInterno(logoImg); };
+      logoImg.onerror = () => { gerarPDFInterno(null); };
+      logoImg.src = LC_LOGO;
+
+      const descricao = `Vértice - Cliente: ${getVal('razao')} | Itens: ${window.pedidoItens.map(i => i.REF + ' ' + i.tamanho + ' x' + i.quantidade).join(', ')} | Total: R$ ${total.toFixed(2)}`;
+      const dados = {
+        cliente: Object.fromEntries(['razao','cnpj','ie','endereco','bairro','cidade','estado','cep','email','telefone','transporte','prazo','obs'].map(k => [k, getVal(k)])),
+        itens: window.pedidoItens,
+        total,
+        data: new Date().toISOString()
+      };
+      fetch('/api/pedidos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ empresa: 'Vertice', descricao, dados })
+      })
+      .then(r => r.json())
+      .then(() => { alert('Pedido enviado com sucesso!'); })
+      .catch(() => { alert('Pedido salvo em PDF. Erro ao enviar para o servidor.'); });
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = sessionStorage.getItem('loggedInUser');
+      if (!user) { window.location.href = 'index.html'; return; }
+      document.getElementById('user-info').textContent = `Olá, ${user}`;
+      document.getElementById('logout-button').onclick = () => {
+        sessionStorage.removeItem('loggedInUser');
+        window.location.href = 'index.html';
+      };
+      await carregarClientes();
+      renderizarProdutos();
+      document.getElementById('busca-cliente').addEventListener('input', e => mostrarSugestoes(e.target.value));
+      document.getElementById('gerar-pedido-btn').addEventListener('click', gerarPedidoPDF);
+    });
+  </script>
+</body>
+</html>

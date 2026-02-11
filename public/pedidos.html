@@ -90,23 +90,6 @@
       border: 1px solid var(--border-color);
     }
     .card h2 { font-size: 18px; color: var(--lc-cinza); margin-bottom: 20px; font-weight: 600; }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
-    .form-group { display: flex; flex-direction: column; }
-    .form-group.full { grid-column: 1 / -1; }
-    .form-group label { font-weight: 600; margin-bottom: 6px; color: var(--lc-cinza); font-size: 14px; }
-    input[type="text"], textarea {
-      width: 100%;
-      padding: 10px 14px;
-      border: 2px solid var(--border-color);
-      border-radius: 10px;
-      font-size: 14px;
-      transition: all 0.3s ease;
-      font-family: inherit;
-    }
-    textarea { min-height: 80px; resize: vertical; }
-    input:focus, textarea:focus { outline: none; border-color: var(--lc-azul); box-shadow: 0 0 0 3px rgba(0, 101, 179, 0.15); }
-    .actions { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
     .btn {
       padding: 10px 20px;
       border-radius: 10px;
@@ -192,33 +175,11 @@
   </header>
 
   <main class="container">
-    <div class="card" id="form-card">
-      <h2 id="form-title">Novo Pedido</h2>
-      <form id="pedido-form">
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="empresa">Empresa / Cliente</label>
-            <input type="text" id="empresa" name="empresa" placeholder="Nome da empresa" />
-          </div>
-          <div class="form-group">
-            <label for="descricao">Descrição</label>
-            <input type="text" id="descricao" name="descricao" placeholder="Descrição do pedido" />
-          </div>
-          <div class="form-group full">
-            <label for="dados">Dados (JSON)</label>
-            <textarea id="dados" name="dados" placeholder='{"itens": [], "observacoes": ""}'></textarea>
-          </div>
-        </div>
-        <div class="actions">
-          <button type="submit" class="btn btn-primary" id="btn-salvar"><i class="fas fa-save"></i> Salvar</button>
-          <button type="button" class="btn btn-secondary" id="btn-cancelar" style="display:none;">Cancelar</button>
-        </div>
-        <input type="hidden" id="pedido-id" />
-      </form>
-    </div>
-
     <div class="card">
-      <h2>Lista de Pedidos</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+        <h2 style="margin: 0;">Lista de Pedidos</h2>
+        <a href="vertice.html" class="btn btn-primary"><i class="fas fa-motorcycle"></i> Novo Pedido Vértice</a>
+      </div>
       <input type="text" id="busca-pedido" class="search-box" placeholder="Buscar por empresa, descrição..." />
       <div id="erro-msg" class="error-msg" style="display:none;"></div>
       <div class="table-responsive">
@@ -265,8 +226,6 @@
         window.location.href = 'index.html';
       });
 
-      document.getElementById('pedido-form').addEventListener('submit', salvarPedido);
-      document.getElementById('btn-cancelar').addEventListener('click', cancelarEdicao);
       document.getElementById('busca-pedido').addEventListener('input', function() { filtrarPedidos(this.value); });
       document.getElementById('modal-fechar').addEventListener('click', () => {
         document.getElementById('modal-dados').classList.add('hidden');
@@ -358,7 +317,6 @@
           </td>
           <td>
             <div class="actions-cell">
-              <button class="btn btn-primary" onclick="editarPedido(${p.id})"><i class="fas fa-edit"></i></button>
               <button class="btn btn-danger" onclick="excluirPedido(${p.id})"><i class="fas fa-trash"></i></button>
             </div>
           </td>
@@ -372,83 +330,6 @@
           if (p && p.dados) abrirModalDados(p.dados);
         });
       });
-    }
-
-    async function salvarPedido(e) {
-      e.preventDefault();
-      const id = document.getElementById('pedido-id').value;
-      let dadosObj = {};
-      const dadosRaw = document.getElementById('dados').value.trim();
-      if (dadosRaw) {
-        try {
-          dadosObj = JSON.parse(dadosRaw);
-        } catch (er) {
-          alert('Dados inválidos: JSON inválido.');
-          return;
-        }
-      }
-      const payload = {
-        empresa: document.getElementById('empresa').value.trim() || null,
-        descricao: document.getElementById('descricao').value.trim() || null,
-        dados: dadosObj
-      };
-      const body = document.querySelector('main');
-      body.classList.add('loading');
-      try {
-        if (id) {
-          const res = await fetch(`${API}/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...payload, id: parseInt(id) })
-          });
-          const data = await res.json();
-          if (!res.ok) {
-            alert(data.error || 'Erro ao atualizar');
-            return;
-          }
-          alert(data.message || 'Pedido atualizado!');
-        } else {
-          const res = await fetch(API, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-          const data = await res.json();
-          if (!res.ok) {
-            alert(data.error || 'Erro ao cadastrar');
-            return;
-          }
-          alert(data.message || 'Pedido cadastrado com sucesso!');
-        }
-        cancelarEdicao();
-        carregarPedidos();
-      } catch (err) {
-        alert('Erro de conexão. Tente novamente.');
-      } finally {
-        body.classList.remove('loading');
-      }
-    }
-
-    async function editarPedido(id) {
-      const p = todosPedidos.find(x => x.id === id);
-      if (!p) {
-        alert('Pedido não encontrado na lista.');
-        return;
-      }
-      document.getElementById('pedido-id').value = p.id;
-      document.getElementById('empresa').value = p.empresa || '';
-      document.getElementById('descricao').value = p.descricao || '';
-      document.getElementById('dados').value = p.dados ? (typeof p.dados === 'string' ? p.dados : JSON.stringify(p.dados, null, 2)) : '{}';
-      document.getElementById('form-title').textContent = 'Editar Pedido';
-      document.getElementById('btn-cancelar').style.display = 'inline-flex';
-    }
-
-    function cancelarEdicao() {
-      document.getElementById('pedido-id').value = '';
-      document.getElementById('pedido-form').reset();
-      document.getElementById('dados').value = '';
-      document.getElementById('form-title').textContent = 'Novo Pedido';
-      document.getElementById('btn-cancelar').style.display = 'none';
     }
 
     async function excluirPedido(id) {
