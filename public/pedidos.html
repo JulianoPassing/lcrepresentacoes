@@ -488,8 +488,18 @@
         }
       });
 
+      const razao = (get('razao') || 'N/A').replace(/[\s\/]/g, '_');
+      const dataStr = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+      const nomeArquivo = `Pedido Vertice LC - ${razao} - ${dataStr}.pdf`;
       const blob = doc.output('blob');
       const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = nomeArquivo;
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
       window.open(url, '_blank', 'noopener');
       setTimeout(() => URL.revokeObjectURL(url), 5000);
     }

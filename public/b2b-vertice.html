@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LC Representações - B2B Pedidos Vértice</title>
+  <link rel="icon" href="https://i.imgur.com/kNGKxVO.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+  <link rel="stylesheet" href="mobile.css" />
+  <link rel="stylesheet" href="modern-design.css" />
+  <style>
+    :root {
+      --lc-azul: #0065B3;
+      --lc-verde: #4CAB3F;
+      --lc-cinza: #2F2F2F;
+      --gradient-primary: linear-gradient(135deg, #0065B3 0%, #4CAB3F 100%);
+      --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+      --border-color: #e0e0e0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+      min-height: 100vh;
+      padding: 80px 20px 20px;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at 20% 80%, rgba(0, 101, 179, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(76, 171, 63, 0.05) 0%, transparent 50%);
+      z-index: -1;
+    }
+    .header-top {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 60px;
+      background: white;
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 1000;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .header-left img { height: 40px; }
+    .header-left span { font-size: 18px; font-weight: 600; color: var(--lc-cinza); }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    #user-info { font-size: 14px; color: var(--lc-cinza); font-weight: 500; padding: 8px 14px; background: #f5f7fa; border-radius: 10px; }
+    #logout-button {
+      background: var(--gradient-danger);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    #logout-button:hover { transform: translateY(-2px); }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .card {
+      background: white;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border-color);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--border-color);
+    }
+    .card-header h2 { font-size: 1.3rem; color: var(--lc-cinza); font-weight: 700; margin: 0; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .form-group { display: flex; flex-direction: column; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-weight: 600; margin-bottom: 6px; color: var(--lc-cinza); font-size: 14px; }
+    input[type="text"], input[type="number"], input[type="email"], select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--lc-azul);
+      box-shadow: 0 0 0 3px rgba(0, 101, 179, 0.15);
+    }
+    input[readonly], input.b2b-readonly {
+      background: #f5f7fa;
+      color: #666;
+      cursor: not-allowed;
+    }
+    textarea { min-height: 70px; resize: vertical; }
+    .table-responsive { overflow-x: auto; border-radius: 10px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+    thead th {
+      background: linear-gradient(135deg, #f8fafc 0%, #e8eef5 100%);
+      font-weight: 600;
+      color: var(--lc-cinza);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+    tbody tr:hover { background: #f8fafc; }
+    .tamanho-input-container { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .tamanho-input-container > div { display: flex; align-items: center; gap: 4px; }
+    .tamanho-input-container label { font-size: 0.8em; font-weight: 500; }
+    .tamanho-input-container input[type="number"] { width: 50px; padding: 6px; text-align: center; }
+    .btn {
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary { background: var(--gradient-primary); color: white; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 101, 179, 0.3); }
+    .btn-success { background: var(--lc-verde); color: white; }
+    .btn-success:hover { opacity: 0.9; transform: translateY(-2px); }
+    .btn-danger { background: var(--gradient-danger); color: white; padding: 6px 12px; font-size: 12px; }
+    .pedido-item {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px;
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      gap: 12px;
+    }
+    .pedido-item-info { flex: 1; min-width: 200px; }
+    .pedido-item-campos {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+    .pedido-item-campos label { font-size: 11px; color: #666; display: block; margin-bottom: 2px; }
+    .pedido-item-campos input { width: 70px; padding: 6px 8px; font-size: 13px; text-align: center; }
+    #pedido-vazio {
+      text-align: center;
+      padding: 30px;
+      background: #f8fafc;
+      border: 2px dashed var(--border-color);
+      border-radius: 10px;
+      color: #666;
+    }
+    .politica-info {
+      font-size: 12px;
+      color: #666;
+      margin-top: 16px;
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border-left: 4px solid var(--lc-azul);
+    }
+    .categoria-produtos { margin-bottom: 32px; }
+    .categoria-produtos:last-of-type { margin-bottom: 0; }
+    .categoria-titulo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--lc-azul);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--lc-azul);
+    }
+    .erro-validacao { color: #ef4444; font-size: 13px; margin-top: 8px; }
+    .form-group { position: relative; }
+    footer {
+      width: 100%;
+      text-align: center;
+      padding: 15px 0;
+      margin-top: 30px;
+      font-size: 13px;
+      color: #666;
+    }
+    footer a { color: var(--lc-azul); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <header class="header-top">
+    <div class="header-left">
+      <img src="https://i.imgur.com/kNGKxVO.png" alt="LC Representações" />
+      <span>LC Representações - B2B Vértice</span>
+    </div>
+    <div class="header-right">
+      <span id="user-info">Cliente</span>
+      <a href="b2b-painel.html" class="btn" style="background:var(--lc-cinza);color:white;text-decoration:none;padding:10px 18px;border-radius:10px;font-size:14px;"><i class="fas fa-arrow-left"></i> Voltar</a>
+      <button id="logout-button"><i class="fas fa-sign-out-alt"></i> Sair</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <div class="card-header">
+        <span style="font-size: 1.8em">📋</span>
+        <h2>Dados do Cliente</h2>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Razão Social</label><input type="text" id="razao" readonly /></div>
+        <div class="form-group"><label>CNPJ</label><input type="text" id="cnpj" readonly /></div>
+        <div class="form-group"><label>I.E.</label><input type="text" id="ie" readonly /></div>
+        <div class="form-group"><label>Endereço</label><input type="text" id="endereco" readonly /></div>
+        <div class="form-group"><label>Bairro</label><input type="text" id="bairro" readonly /></div>
+        <div class="form-group"><label>Cidade</label><input type="text" id="cidade" readonly /></div>
+        <div class="form-group"><label>Estado</label><input type="text" id="estado" readonly /></div>
+        <div class="form-group"><label>CEP</label><input type="text" id="cep" readonly /></div>
+        <div class="form-group"><label>Email</label><input type="email" id="email" readonly /></div>
+        <div class="form-group"><label>Telefone</label><input type="text" id="telefone" readonly /></div>
+        <div class="form-group"><label>Transporte</label><input type="text" id="transporte" readonly /></div>
+        <div class="form-group"><label>Prazo Pagamento</label><input type="text" id="prazo" readonly /></div>
+        <div class="form-group full"><label>Observações</label><textarea id="obs" readonly></textarea></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <span style="font-size: 1.8em">🛒</span>
+        <h2>Produtos Vértice - Linha Duas Rodas</h2>
+      </div>
+      <div class="form-group">
+        <label><input type="checkbox" id="logo-cliente" /> Logo do cliente (+R$6 peito / +R$9 costas)</label>
+      </div>
+      <div id="produtos-container"></div>
+      <div class="politica-info">
+        <strong>Política comercial:</strong> Pedido mínimo R$ 1.500. Tamanho ESP +15% no valor. Estoque: min 12 unid/produto. Personalizado: min 60 unid/produto. Frete CIF acima de R$ 3.500.
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <span style="font-size: 1.8em">📦</span>
+        <h2>Seu Pedido</h2>
+      </div>
+      <p style="font-size: 13px; color: #666; margin-bottom: 12px;">Você pode alterar apenas a quantidade. O valor unitário é calculado automaticamente conforme a tabela de descontos.</p>
+      <div id="pedido-container">
+        <p id="pedido-vazio">Nenhum item adicionado ao pedido ainda.</p>
+      </div>
+      <div style="text-align: center; margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 10px;">
+        <h3 style="margin: 0 0 8px 0; color: var(--lc-cinza);">Total do Pedido: R$ <span id="total-pedido">0,00</span></h3>
+        <p id="frete-info" style="font-size: 13px; color: #666; margin: 0;">Frete CIF disponível para pedidos acima de R$ 3.500</p>
+      </div>
+      <div id="erro-validacao" class="erro-validacao" style="display:none;"></div>
+      <button id="gerar-pedido-btn" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 16px;">
+        <i class="fas fa-file-pdf"></i> Gerar Pedido em PDF e Enviar
+      </button>
+    </section>
+  </main>
+
+  <footer>
+    © 2025 J.P Sistemas. Todos os direitos reservados. | <a href="https://whatsa.me/5548996852138/?t=Ol%C3%A1,%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es%20sobre%20os%20sistemas." target="_blank" rel="noopener">jp-sistemas.com</a>
+  </footer>
+
+  <script>
+    const CATEGORIAS = [
+      { id: 1, nome: 'Tabela 01 – Linha Combate', produtos: [
+        { REF: '1212L', DESC: 'Conjunto de Moto Light', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [144.14, 136.65, 129.50, 122.75], TABELA: 1 },
+        { REF: '1212LB', DESC: 'Conjunto de Moto Light c/ bolso', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [149.10, 141.33, 133.96, 126.98], TABELA: 1 },
+        { REF: '1212P', DESC: 'Conjunto de Moto Plus', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [152.58, 144.65, 137.10, 129.93], TABELA: 1 },
+        { REF: '1212PF', DESC: 'Conjunto Moto Plus Feminino', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [146.24, 138.60, 131.69, 124.54], TABELA: 1 },
+        { REF: 'CALCA', DESC: 'Calça Impermeável', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [64.95, 60.30, 57.10, 53.90], TABELA: 1 }
+      ]},
+      { id: 2, nome: 'Tabela 02 – Produtos Especiais', produtos: [
+        { REF: '1212PFC', DESC: 'Conjunto Plus Feminino - Color', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [153.69, 145.68, 138.08, 130.89], TABELA: 2 },
+        { REF: '1212LC', DESC: 'Conjunto Light Color', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [166.45, 157.95, 149.55, 141.75], TABELA: 2 },
+        { REF: '1212PRE', DESC: 'Conjunto Premium', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [320.00, 301.25, 285.54, 270.66], TABELA: 2 },
+        { REF: '1212PFOR', DESC: 'Conjunto Plus Forrado', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [187.62, 177.84, 168.57, 159.78], TABELA: 2 }
+      ]},
+      { id: 3, nome: 'Tabela 03 – Japonas Forradas', produtos: [
+        { REF: '5000', DESC: 'Japona com Gola', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [167.30, 158.60, 150.35, 142.45], TABELA: 3 },
+        { REF: '5000C', DESC: 'Japona com Capuz', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [185.45, 176.90, 168.30, 160.48], TABELA: 3 }
+      ]}
+    ];
+    const PRODUTOS_VERTICE = CATEGORIAS.flatMap(c => c.produtos);
+
+    const getTierIndex = (qtd) => {
+      if (qtd <= 30) return 0;
+      if (qtd <= 100) return 1;
+      if (qtd <= 200) return 2;
+      return 3;
+    };
+
+    window.pedidoItens = [];
+    const inputsCliente = {
+      razao: () => document.getElementById('razao'),
+      cnpj: () => document.getElementById('cnpj'),
+      ie: () => document.getElementById('ie'),
+      endereco: () => document.getElementById('endereco'),
+      bairro: () => document.getElementById('bairro'),
+      cidade: () => document.getElementById('cidade'),
+      estado: () => document.getElementById('estado'),
+      cep: () => document.getElementById('cep'),
+      email: () => document.getElementById('email'),
+      telefone: () => document.getElementById('telefone'),
+      transporte: () => document.getElementById('transporte'),
+      prazo: () => document.getElementById('prazo'),
+      obs: () => document.getElementById('obs')
+    };
+
+    function getVal(k) { return inputsCliente[k]().value; }
+
+    function renderizarProdutos() {
+      const container = document.getElementById('produtos-container');
+      const isMobile = window.innerWidth <= 768;
+      container.innerHTML = CATEGORIAS.map(cat => {
+        if (isMobile) {
+          const cards = cat.produtos.map(p => {
+            const precos = `Até 30: R$ ${p.PRECO[0].toFixed(2)} | 31-100: R$ ${p.PRECO[1].toFixed(2)} | 101-200: R$ ${p.PRECO[2].toFixed(2)} | +200: R$ ${p.PRECO[3].toFixed(2)}`;
+            const inputs = p.TAMANHOS.map(t =>
+              `<div class="produto-tam-item"><label>${t}</label><input type="number" min="0" value="0" id="q-${p.REF}-${t}" data-ref="${p.REF}" data-tam="${t}"></div>`
+            ).join('');
+            return `
+              <div class="produto-card-mobile">
+                <div class="produto-card-header">
+                  <span class="produto-ref-badge">${p.REF}</span>
+                  <span class="produto-preco-badge">R$ ${p.PRECO[0].toFixed(2)}</span>
+                </div>
+                <div class="produto-card-desc">
+                  <strong>${p.DESC}</strong>
+                  <small>${p.MATERIAL}</small>
+                  <small class="produto-precos-info">${precos}</small>
+                </div>
+                <div class="produto-card-tamanhos">
+                  <span class="produto-card-tam-label">Tamanhos & Quantidades</span>
+                  <div class="tamanho-input-container">${inputs}</div>
+                </div>
+                <button class="btn btn-success produto-card-btn" onclick="adicionarProduto('${p.REF}')">Adicionar</button>
+              </div>`;
+          }).join('');
+          return `<div class="categoria-produtos"><div class="categoria-titulo">${cat.nome}</div><div class="produtos-cards-mobile">${cards}</div></div>`;
+        }
+        const rows = cat.produtos.map(p => {
+          const precos = `Até 30: R$ ${p.PRECO[0].toFixed(2)} | 31-100: R$ ${p.PRECO[1].toFixed(2)} | 101-200: R$ ${p.PRECO[2].toFixed(2)} | +200: R$ ${p.PRECO[3].toFixed(2)}`;
+          const inputs = p.TAMANHOS.map(t =>
+            `<div><label>${t}</label><input type="number" min="0" value="0" id="q-${p.REF}-${t}" data-ref="${p.REF}" data-tam="${t}"></div>`
+          ).join('');
+          return `<tr>
+            <td><strong>${p.REF}</strong></td>
+            <td>${p.DESC}<br><small style="color:#666">${precos}</small></td>
+            <td>${p.MATERIAL}</td>
+            <td><div class="tamanho-input-container">${inputs}</div></td>
+            <td><button class="btn btn-success" onclick="adicionarProduto('${p.REF}')">Adicionar</button></td>
+          </tr>`;
+        }).join('');
+        return `
+          <div class="categoria-produtos">
+            <div class="categoria-titulo">${cat.nome}</div>
+            <div class="table-responsive">
+              <table>
+                <thead><tr><th>Ref.</th><th>Descrição</th><th>Material</th><th>Tamanhos & Quantidades</th><th>Ação</th></tr></thead>
+                <tbody>${rows}</tbody>
+              </table>
+            </div>
+          </div>`;
+      }).join('');
+      attachQtyListeners();
+    }
+
+    function attachQtyListeners() {
+      document.querySelectorAll('[id^="q-"]').forEach(el => {
+        el.removeEventListener('input', window._qtyHandler);
+        el.removeEventListener('change', window._qtyHandler);
+      });
+      window._qtyHandler = () => recalcPrecosPedido();
+      document.querySelectorAll('[id^="q-"]').forEach(el => {
+        el.addEventListener('input', window._qtyHandler);
+        el.addEventListener('change', window._qtyHandler);
+      });
+    }
+
+    function adicionarProduto(ref) {
+      const p = PRODUTOS_VERTICE.find(x => x.REF === ref);
+      if (!p) return;
+      const logoCliente = document.getElementById('logo-cliente')?.checked;
+      let precoBase;
+      if (p.TABELA === 1) {
+        const qtdTotalT1 = PRODUTOS_VERTICE.filter(x => x.TABELA === 1).reduce((s, px) => {
+          return s + px.TAMANHOS.reduce((s2, t2) => s2 + parseInt(document.getElementById(`q-${px.REF}-${t2}`)?.value || 0), 0);
+        }, 0);
+        const tier = getTierIndex(qtdTotalT1);
+        precoBase = p.PRECO[tier];
+      } else {
+        const qtdProd = p.TAMANHOS.reduce((s, t2) => s + parseInt(document.getElementById(`q-${ref}-${t2}`)?.value || 0), 0);
+        const tier = getTierIndex(qtdProd);
+        precoBase = p.PRECO[tier];
+      }
+      let itemAdicionado = false;
+      p.TAMANHOS.forEach(t => {
+        const qtd = parseInt(document.getElementById(`q-${ref}-${t}`)?.value || 0);
+        if (qtd <= 0) return;
+        itemAdicionado = true;
+        let preco = precoBase;
+        if (t === 'ESP') preco *= 1.15;
+        if (logoCliente) preco += 15;
+        const subtotal = preco * qtd;
+        const exist = window.pedidoItens.find(x => x.REF === ref && x.tamanho === t);
+        if (exist) {
+          exist.quantidade += qtd;
+          exist.subtotal = exist.preco * exist.quantidade;
+        } else {
+          window.pedidoItens.push({ REF: ref, DESC: p.DESC, tamanho: t, preco, quantidade: qtd, subtotal });
+        }
+      });
+      if (itemAdicionado) {
+        p.TAMANHOS.forEach(t => { const el = document.getElementById(`q-${ref}-${t}`); if (el) el.value = 0; });
+        recalcPrecosPedido();
+      } else {
+        alert('Informe a quantidade para pelo menos um tamanho.');
+      }
+    }
+
+    function getQtdForm(ref, tam) {
+      const el = document.getElementById(`q-${ref}-${tam}`);
+      return parseInt(el?.value || 0, 10);
+    }
+    function getQtdCart(ref) {
+      return (window.pedidoItens || []).filter(i => i.REF === ref).reduce((s, i) => s + i.quantidade, 0);
+    }
+    function recalcPrecosPedido() {
+      if (!Array.isArray(window.pedidoItens) || window.pedidoItens.length === 0) return;
+      const logoCliente = document.getElementById('logo-cliente')?.checked;
+      const qtdTotalT1 = PRODUTOS_VERTICE.filter(x => x.TABELA === 1).reduce((s, px) => {
+        const form = px.TAMANHOS.reduce((s2, t2) => s2 + getQtdForm(px.REF, t2), 0);
+        return s + getQtdCart(px.REF) + form;
+      }, 0);
+      window.pedidoItens.forEach(item => {
+        const p = PRODUTOS_VERTICE.find(x => x.REF === item.REF);
+        if (!p) return;
+        let precoBase;
+        if (p.TABELA === 1) {
+          precoBase = p.PRECO[getTierIndex(qtdTotalT1)];
+        } else {
+          const qtdProd = getQtdCart(p.REF) + p.TAMANHOS.reduce((s, t2) => s + getQtdForm(p.REF, t2), 0);
+          precoBase = p.PRECO[getTierIndex(qtdProd)];
+        }
+        let preco = precoBase;
+        if (item.tamanho === 'ESP') preco *= 1.15;
+        if (logoCliente) preco += 15;
+        item.preco = preco;
+        item.subtotal = preco * item.quantidade;
+      });
+      atualizarPedido();
+    }
+
+    function atualizarPedido() {
+      const container = document.getElementById('pedido-container');
+      const vazio = document.getElementById('pedido-vazio');
+      const totalEl = document.getElementById('total-pedido');
+      const freteEl = document.getElementById('frete-info');
+      if (!container || !totalEl || !freteEl) return;
+      container.querySelectorAll('.pedido-item').forEach(el => el.remove());
+      if (!Array.isArray(window.pedidoItens)) window.pedidoItens = [];
+      let total = 0;
+      if (window.pedidoItens.length === 0) {
+        if (vazio) vazio.style.display = 'block';
+      } else {
+        if (vazio) vazio.style.display = 'none';
+        window.pedidoItens.forEach((item, idx) => {
+          total += item.subtotal;
+          const div = document.createElement('div');
+          div.className = 'pedido-item';
+          div.dataset.idx = idx;
+          div.innerHTML = `
+            <div class="pedido-item-info">
+              <strong>${item.DESC}</strong> (Ref: ${item.REF}) - Tam: ${item.tamanho}
+            </div>
+            <div class="pedido-item-campos">
+              <div>
+                <label>Qtd</label>
+                <input type="number" min="1" value="${item.quantidade}" data-idx="${idx}" data-field="qty" title="Quantidade">
+              </div>
+              <div style="min-width: 70px; padding-top: 18px;">
+                <span style="font-size: 12px; color: #666;">R$ ${item.preco.toFixed(2)} un.</span>
+              </div>
+              <div style="min-width: 80px; padding-top: 18px;">
+                <strong>R$ <span class="pedido-subtotal">${item.subtotal.toFixed(2)}</span></strong>
+              </div>
+            </div>
+            <button class="btn btn-danger" onclick="removerItem(${idx})">Remover</button>
+          `;
+          container.appendChild(div);
+        });
+        container.querySelectorAll('.pedido-item input[data-field="qty"]').forEach(inp => {
+          inp.addEventListener('change', (e) => atualizarItemPedido(e.target));
+        });
+      }
+      totalEl.textContent = total.toFixed(2).replace('.', ',');
+      freteEl.textContent = total >= 3500 ? '✓ Frete CIF aplicável (pedido acima de R$ 3.500)' : 'Frete CIF disponível para pedidos acima de R$ 3.500';
+    }
+
+    function atualizarItemPedido(inputEl) {
+      const idx = parseInt(inputEl.dataset.idx, 10);
+      const item = window.pedidoItens[idx];
+      if (!item) return;
+      const val = parseInt(inputEl.value, 10) || 0;
+      if (val < 1) {
+        removerItem(idx);
+        return;
+      }
+      item.quantidade = val;
+      inputEl.value = val;
+      recalcPrecosPedido();
+    }
+
+    function removerItem(idx) {
+      window.pedidoItens.splice(idx, 1);
+      if (window.pedidoItens.length === 0) atualizarPedido();
+      else recalcPrecosPedido();
+    }
+
+    function validarPedido() {
+      const erros = [];
+      if (!getVal('razao').trim()) erros.push('Razão social é obrigatória.');
+      if (!getVal('transporte').trim()) erros.push('Transporte é obrigatório.');
+      if (!getVal('prazo').trim()) erros.push('Prazo de pagamento é obrigatório.');
+      if (window.pedidoItens.length === 0) erros.push('Adicione itens ao pedido.');
+      const total = window.pedidoItens.reduce((s, i) => s + i.subtotal, 0);
+      if (total < 1500) erros.push('Pedido mínimo de R$ 1.500,00.');
+      const logoCliente = document.getElementById('logo-cliente')?.checked;
+      const minPorProduto = logoCliente ? 60 : 12;
+      const qtdPorRef = {};
+      window.pedidoItens.forEach(i => {
+        qtdPorRef[i.REF] = (qtdPorRef[i.REF] || 0) + i.quantidade;
+      });
+      const refsAbaixo = Object.entries(qtdPorRef).filter(([, q]) => q < minPorProduto);
+      if (refsAbaixo.length > 0) {
+        const tipo = logoCliente ? 'personalizado (logo cliente)' : 'estoque (logo Vértice)';
+        erros.push(`Pedido mínimo por produto (${tipo}): ${minPorProduto} unid. Produtos abaixo: ${refsAbaixo.map(([r]) => r).join(', ')}.`);
+      }
+      return erros;
+    }
+
+    function gerarPedidoPDF() {
+      const erros = validarPedido();
+      const errDiv = document.getElementById('erro-validacao');
+      if (erros.length > 0) {
+        errDiv.textContent = erros.join(' ');
+        errDiv.style.display = 'block';
+        return;
+      }
+      errDiv.style.display = 'none';
+      const total = window.pedidoItens.reduce((s, i) => s + i.subtotal, 0);
+      const LC_LOGO = 'https://i.imgur.com/kNGKxVO.png';
+
+      const gerarPDFInterno = (logoImg) => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 15;
+        const LC_AZUL = [0, 101, 179];
+        const LC_CINZA = [47, 47, 47];
+
+        const LOGO_ORIG_W = 781;
+        const LOGO_ORIG_H = 473;
+        const LOGO_DISPLAY_H = 22;
+        const LOGO_DISPLAY_W = Math.round(LOGO_DISPLAY_H * (LOGO_ORIG_W / LOGO_ORIG_H));
+        const drawHeaderAndFooter = (data) => {
+          try {
+            if (logoImg && logoImg.complete && logoImg.naturalWidth) doc.addImage(logoImg, 'PNG', margin, 10, LOGO_DISPLAY_W, LOGO_DISPLAY_H);
+          } catch (_) {}
+          doc.setFontSize(16);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(LC_AZUL[0], LC_AZUL[1], LC_AZUL[2]);
+          doc.text('Pedido de Venda - Vértice', pageWidth - margin, 18, { align: 'right' });
+          doc.setTextColor(0, 0, 0);
+          const hoje = new Date();
+          const dataAtual = `${hoje.getDate().toString().padStart(2, '0')}/${(hoje.getMonth() + 1).toString().padStart(2, '0')}/${hoje.getFullYear()}`;
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          doc.text(`Data: ${dataAtual}`, pageWidth - margin, 24, { align: 'right' });
+          doc.text('LC Representações', pageWidth - margin, 30, { align: 'right' });
+          const pageCount = doc.internal.getNumberOfPages();
+          doc.setFontSize(8);
+          doc.setTextColor(100, 100, 100);
+          doc.text(`Página ${data.pageNumber} de ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+          doc.setTextColor(0, 0, 0);
+        };
+
+        drawHeaderAndFooter({ pageNumber: 1 });
+
+        doc.autoTable({
+          startY: 35,
+          theme: 'grid',
+          head: [[{ content: 'DADOS DO CLIENTE', colSpan: 4, styles: { halign: 'center', fontStyle: 'bold', fillColor: [230, 240, 250], textColor: LC_CINZA } }]],
+          body: [
+            ['Cliente:', { content: getVal('razao') || 'N/A', colSpan: 3 }],
+            ['CNPJ:', getVal('cnpj') || 'N/A', 'I.E.:', getVal('ie') || 'N/A'],
+            ['Telefone:', getVal('telefone') || 'N/A', 'E-mail:', getVal('email') || 'N/A'],
+            ['Endereço:', { content: `${getVal('endereco') || ''}, ${getVal('bairro') || ''}`, colSpan: 3 }],
+            ['Cidade/UF:', `${getVal('cidade') || ''}/${getVal('estado') || ''}`, 'CEP:', getVal('cep') || '']
+          ],
+          styles: { fontSize: 8, cellPadding: 1.5 },
+          columnStyles: { 0: { fontStyle: 'bold', cellWidth: 22 }, 2: { fontStyle: 'bold', cellWidth: 20 } },
+          margin: { left: margin, right: margin }
+        });
+
+        let startY = doc.autoTable.previous.finalY + 7;
+        const head = [['Ref.', 'Descrição', 'Tam', 'Qtd', 'Unit.', 'Total']];
+        const body = window.pedidoItens.map(i => [i.REF, i.DESC, i.tamanho, i.quantidade, `R$ ${i.preco.toFixed(2)}`, `R$ ${i.subtotal.toFixed(2)}`]);
+
+        doc.autoTable({
+          head, body, startY,
+          theme: 'grid',
+          styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak', valign: 'middle' },
+          headStyles: { fillColor: LC_AZUL, textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' },
+          columnStyles: { 0: { cellWidth: 15 }, 1: { cellWidth: 'auto' }, 2: { cellWidth: 15, halign: 'center' }, 3: { cellWidth: 12, halign: 'center' }, 4: { cellWidth: 22, halign: 'right' }, 5: { cellWidth: 25, halign: 'right' } },
+          didDrawPage: (data) => { if (data.pageNumber > 1) drawHeaderAndFooter(data); },
+          margin: { top: 30, bottom: 15 }
+        });
+
+        const finalY = doc.autoTable.previous.finalY + 8;
+        const obsText = `Transporte: ${getVal('transporte') || 'A combinar'}\nPrazo: ${getVal('prazo') || 'A combinar'}\n\nObservações:\n${getVal('obs') || 'Nenhuma.'}`;
+        const summaryData = [
+          ['Subtotal:', `R$ ${total.toFixed(2)}`],
+          ['', ''],
+          [{ content: 'Total do Pedido:', styles: { fontStyle: 'bold', fontSize: 10 } }, { content: `R$ ${total.toFixed(2)}`, styles: { fontStyle: 'bold', fontSize: 10 } }]
+        ];
+        const finalTableBody = [];
+        const leftColumn = { content: obsText, rowSpan: summaryData.length, styles: { valign: 'top', fontSize: 9 } };
+        for (let i = 0; i < summaryData.length; i++) {
+          const row = [];
+          if (i === 0) row.push(leftColumn);
+          row.push(summaryData[i][0], summaryData[i][1]);
+          finalTableBody.push(row);
+        }
+        doc.autoTable({
+          startY: finalY,
+          theme: 'plain',
+          body: finalTableBody,
+          margin: { left: margin, right: margin },
+          columnStyles: { 0: { cellWidth: pageWidth / 2 - margin }, 1: { halign: 'right', fontStyle: 'bold' }, 2: { halign: 'right' } }
+        });
+
+        const nomeArquivo = `Pedido Vertice LC - ${getVal('razao').replace(/[\s\/]/g, '_')} - ${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`;
+        doc.save(nomeArquivo);
+      };
+
+      const logoImg = new Image();
+      logoImg.onload = () => { gerarPDFInterno(logoImg); };
+      logoImg.onerror = () => { gerarPDFInterno(null); };
+      logoImg.src = LC_LOGO;
+
+      const descricao = `Vértice B2B - Cliente: ${getVal('razao')} | Itens: ${window.pedidoItens.map(i => i.REF + ' ' + i.tamanho + ' x' + i.quantidade).join(', ')} | Total: R$ ${total.toFixed(2)}`;
+      const dados = {
+        cliente: Object.fromEntries(['razao','cnpj','ie','endereco','bairro','cidade','estado','cep','email','telefone','transporte','prazo','obs'].map(k => [k, getVal(k)])),
+        itens: window.pedidoItens,
+        total,
+        data: new Date().toISOString()
+      };
+      fetch('/api/pedidos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ empresa: 'Vertice', descricao, dados })
+      })
+      .then(r => r.json())
+      .then(() => { alert('Pedido enviado com sucesso!'); })
+      .catch(() => { alert('Pedido salvo em PDF. Erro ao enviar para o servidor.'); });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const clienteB2B = localStorage.getItem('clienteB2B');
+      if (!clienteB2B) {
+        window.location.href = 'b2b-login.html';
+        return;
+      }
+
+      let cliente;
+      try {
+        cliente = JSON.parse(clienteB2B);
+      } catch (e) {
+        localStorage.removeItem('clienteB2B');
+        window.location.href = 'b2b-login.html';
+        return;
+      }
+
+      document.getElementById('user-info').textContent = cliente.razao || 'Cliente';
+
+      ['razao','cnpj','ie','endereco','bairro','cidade','estado','cep','email','telefone','transporte','prazo','obs'].forEach(k => {
+        const el = document.getElementById(k);
+        if (el) el.value = (cliente[k] ?? '').toString();
+      });
+
+      document.getElementById('logout-button').onclick = () => {
+        localStorage.removeItem('clienteB2B');
+        window.location.href = 'b2b-login.html';
+      };
+
+      renderizarProdutos();
+      window.addEventListener('resize', () => {
+        const wasMobile = document.querySelector('.produtos-cards-mobile');
+        const isMobile = window.innerWidth <= 768;
+        if ((wasMobile && !isMobile) || (!wasMobile && isMobile)) renderizarProdutos();
+      });
+
+      document.getElementById('logo-cliente').addEventListener('change', recalcPrecosPedido);
+      document.getElementById('gerar-pedido-btn').addEventListener('click', gerarPedidoPDF);
+    });
+  </script>
+  <script src="mobile-menu.js"></script>
+</body>
+</html>

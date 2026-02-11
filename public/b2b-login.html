@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LC Representações - Portal B2B</title>
+  <link rel="icon" href="https://i.imgur.com/kNGKxVO.png" type="image/png" />
+  <link rel="stylesheet" href="modern-design.css" />
+  <style>
+    :root {
+      --lc-azul: #0065B3;
+      --lc-verde: #4CAB3F;
+      --lc-cinza: #2F2F2F;
+      --gradient-primary: linear-gradient(135deg, #0065B3 0%, #4CAB3F 100%);
+    }
+    body {
+      background: linear-gradient(135deg, #0065B3 0%, #2d7a50 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at 20% 80%, rgba(0, 101, 179, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(76, 171, 63, 0.08) 0%, transparent 50%);
+      z-index: -1;
+    }
+    .login-container {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+    .login-container:hover {
+      border-color: var(--lc-azul);
+      box-shadow: 0 20px 50px rgba(0, 101, 179, 0.25);
+    }
+    .login-container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: var(--gradient-primary);
+    }
+    .logo { margin-bottom: 20px; }
+    .logo img { width: 100%; max-width: 280px; height: auto; }
+    .subtitle { color: #666; margin-bottom: 30px; font-size: 1.1rem; }
+    .form-group { margin-bottom: 20px; text-align: left; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e1e5e9;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--lc-azul);
+      box-shadow: 0 0 0 3px rgba(0, 101, 179, 0.15);
+    }
+    .btn-login {
+      width: 100%;
+      padding: 15px;
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 101, 179, 0.3);
+    }
+    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .error-message {
+      background: #fee;
+      color: #c53030;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid #c53030;
+      display: none;
+    }
+    .info-box {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 25px;
+      text-align: left;
+    }
+    .info-box h3 { margin: 0 0 10px 0; color: var(--lc-cinza); font-size: 1.1rem; }
+    .info-box p { margin: 0; color: #4a5568; font-size: 0.9rem; }
+    .remember-group { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 14px; text-align: left; }
+    .remember-group input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--lc-azul); }
+    .remember-group label { cursor: pointer; font-weight: 500; margin-bottom: 0; }
+    .loading { display: none; margin-top: 10px; }
+    .loading-spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--lc-azul);
+      border-radius: 50%;
+      width: 20px; height: 20px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .footer {
+      width: 100%;
+      text-align: center;
+      padding: 20px 0;
+      color: rgba(255,255,255,0.9);
+      font-size: 13px;
+      margin-top: 30px;
+    }
+    .footer a { color: #fff; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo">
+      <img src="https://i.imgur.com/kNGKxVO.png" alt="LC Representações" />
+    </div>
+    <div class="subtitle">Portal B2B - Área do Cliente</div>
+
+    <div class="info-box">
+      <h3>🏢 Acesso para Clientes</h3>
+      <p>Digite seu CNPJ e a senha fornecida para acessar o sistema de pedidos Vértice.</p>
+    </div>
+
+    <div id="errorMessage" class="error-message"></div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="cnpj">CNPJ</label>
+        <input type="text" id="cnpj" placeholder="00.000.000/0001-00" required maxlength="18" />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input type="password" id="password" placeholder="Digite sua senha" required />
+      </div>
+
+      <div class="remember-group">
+        <input type="checkbox" id="remember-me" />
+        <label for="remember-me">Lembrar CNPJ e senha</label>
+      </div>
+      <div class="remember-group">
+        <input type="checkbox" id="show-password" />
+        <label for="show-password">Visualizar senha</label>
+      </div>
+
+      <button type="submit" class="btn-login" id="loginBtn">Entrar no Sistema</button>
+    </form>
+
+    <div id="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Verificando credenciais...</p>
+    </div>
+  </div>
+
+  <script>
+    const cnpjField = document.getElementById('cnpj');
+    const passwordField = document.getElementById('password');
+    const rememberMeCheckbox = document.getElementById('remember-me');
+    const showPasswordCheckbox = document.getElementById('show-password');
+
+    cnpjField.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length <= 14) {
+        value = value.replace(/(\d{2})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1/$2');
+        value = value.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+        e.target.value = value;
+      }
+    });
+
+    showPasswordCheckbox.addEventListener('change', function() {
+      passwordField.setAttribute('type', this.checked ? 'text' : 'password');
+    });
+
+    const savedCnpj = localStorage.getItem('savedCnpjB2B_LC');
+    const savedPassword = localStorage.getItem('savedPasswordB2B_LC');
+    if (savedCnpj && savedPassword) {
+      cnpjField.value = savedCnpj;
+      passwordField.value = savedPassword;
+      rememberMeCheckbox.checked = true;
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const cnpj = document.getElementById('cnpj').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const errorDiv = document.getElementById('errorMessage');
+      const loadingDiv = document.getElementById('loading');
+      const loginBtn = document.getElementById('loginBtn');
+
+      if (!cnpj || !password) {
+        showError('Por favor, preencha todos os campos.');
+        return;
+      }
+
+      loadingDiv.style.display = 'block';
+      loginBtn.disabled = true;
+      errorDiv.style.display = 'none';
+
+      try {
+        const response = await fetch('/api/auth-b2b', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cnpj, password })
+        });
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Resposta do servidor inválida');
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          localStorage.setItem('clienteB2B', JSON.stringify(data.cliente));
+          if (rememberMeCheckbox.checked) {
+            localStorage.setItem('savedCnpjB2B_LC', cnpj);
+            localStorage.setItem('savedPasswordB2B_LC', password);
+          } else {
+            localStorage.removeItem('savedCnpjB2B_LC');
+            localStorage.removeItem('savedPasswordB2B_LC');
+          }
+          window.location.href = 'b2b-painel.html';
+        } else {
+          showError(data.message || 'Erro ao fazer login. Verifique suas credenciais.');
+        }
+      } catch (error) {
+        showError('Erro de conexão. Tente novamente.');
+      } finally {
+        loadingDiv.style.display = 'none';
+        loginBtn.disabled = false;
+      }
+    });
+
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+    }
+
+    if (localStorage.getItem('clienteB2B')) {
+      window.location.href = 'b2b-painel.html';
+    }
+  </script>
+
+  <footer class="footer">
+    © 2025 J.P Sistemas. | <a href="https://whatsa.me/5548996852138/?t=Ol%C3%A1,%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es%20sobre%20os%20sistemas." target="_blank" rel="noopener">jp-sistemas.com</a>
+  </footer>
+</body>
+</html>
