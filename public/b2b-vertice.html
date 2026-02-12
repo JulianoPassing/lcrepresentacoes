@@ -194,6 +194,9 @@
       border-bottom: 2px solid var(--lc-azul);
     }
     .erro-validacao { color: #ef4444; font-size: 13px; margin-top: 8px; }
+    .vestimenta-bota-grid { margin-top: 8px; }
+    .vestimenta-bota-row { margin-bottom: 12px; padding: 8px; background: #f8fafc; border-radius: 8px; }
+    .vestimenta-bota-row .tamanho-input-container { flex-wrap: wrap; }
     .form-group { position: relative; }
     footer {
       width: 100%;
@@ -319,9 +322,9 @@
         { REF: '5100', DESC: 'Japona com capuz', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [185.45, 176.90, 168.30, 160.48], TABELA: 3 }
       ]},
       { id: 4, nome: 'Linha Vestimentas com Botas', produtos: [
-        { REF: '0020CB', DESC: 'Calça com botas', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['G','GGX'], PRECO: [142.40, 134.90, 127.95, 121.25], TABELA: 3 },
-        { REF: '0190CB', DESC: 'Jardineira com botas (ESTOQUE)', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['G','GGX'], PRECO: [175.55, 166.40, 157.70, 149.50], TABELA: 3 },
-        { REF: '0023CB', DESC: 'Perneira com botas', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['G','GGX'], PRECO: [136.40, 129.30, 122.55, 116.20], TABELA: 3 }
+        { REF: '0020CB', DESC: 'Calça com botas', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['G','GGX'], NUMERACOES_BOTA: ['34/35','36','37','38','39','40','41','42','43','44','45','46'], PRECO: [142.40, 134.90, 127.95, 121.25], TABELA: 3, COM_BOTAS: true },
+        { REF: '0190CB', DESC: 'Jardineira com botas (ESTOQUE)', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['GGX'], NUMERACOES_BOTA: ['38','39','40','41','42','43','44','45','46'], PRECO: [175.55, 166.40, 157.70, 149.50], TABELA: 3, COM_BOTAS: true },
+        { REF: '0023CB', DESC: 'Perneira com botas', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['G','GGX'], NUMERACOES_BOTA: ['34/35','36','37','38','39','40','41','42','43','44','45','46'], PRECO: [136.40, 129.30, 122.55, 116.20], TABELA: 3, COM_BOTAS: true }
       ]},
       { id: 5, nome: 'Linha Vestimentas Especiais', produtos: [
         { REF: '4100', DESC: 'Capa Tipo Poncho', MATERIAL: 'Nylon Emborrachado', TAMANHOS: ['P','M','G','GG','GGX','ESP'], PRECO: [168.94, 160.14, 151.79, 143.88], TABELA: 3 },
@@ -345,6 +348,7 @@
       if (qtd <= 30) return 1;
       return 2;
     };
+    const safeId = (s) => (s || '').replace(/\//g, '_');
 
     window.pedidoItens = [];
     const inputsCliente = {
@@ -372,9 +376,21 @@
         if (isMobile) {
           const cards = cat.produtos.map(p => {
             const precos = p.BOTAS ? `Até 10: R$ ${p.PRECO[0].toFixed(2)} | 11-30: R$ ${p.PRECO[1].toFixed(2)} | +30: R$ ${p.PRECO[2].toFixed(2)}` : `Até 30: R$ ${p.PRECO[0].toFixed(2)} | 31-100: R$ ${p.PRECO[1].toFixed(2)} | 101-200: R$ ${p.PRECO[2].toFixed(2)} | +200: R$ ${p.PRECO[3].toFixed(2)}`;
-            const inputs = p.TAMANHOS.map(t =>
-              `<div class="produto-tam-item"><label>${t}</label><input type="number" min="0" value="0" id="q-${p.REF}-${t}" data-ref="${p.REF}" data-tam="${t}"></div>`
-            ).join('');
+            let inputs;
+            if (p.COM_BOTAS) {
+              const grid = p.TAMANHOS.map(tam => {
+                const cells = p.NUMERACOES_BOTA.map(num => {
+                  const sid = safeId(num);
+                  return `<div class="produto-tam-item"><label>${tam}/${num}</label><input type="number" min="0" value="0" id="q-${p.REF}-${tam}-${sid}" data-ref="${p.REF}" data-tam="${tam}" data-num="${num}"></div>`;
+                }).join('');
+                return `<div class="vestimenta-bota-row"><strong>Conj. ${tam}</strong><div class="tamanho-input-container">${cells}</div></div>`;
+              }).join('');
+              inputs = `<div class="vestimenta-bota-grid"><small>Conjunto + Numeração Bota (Bracol)</small>${grid}</div>`;
+            } else {
+              inputs = p.TAMANHOS.map(t =>
+                `<div class="produto-tam-item"><label>${t}</label><input type="number" min="0" value="0" id="q-${p.REF}-${t}" data-ref="${p.REF}" data-tam="${t}"></div>`
+              ).join('');
+            }
             return `
               <div class="produto-card-mobile">
                 <div class="produto-card-header">
@@ -387,7 +403,7 @@
                   <small class="produto-precos-info">${precos}</small>
                 </div>
                 <div class="produto-card-tamanhos">
-                  <span class="produto-card-tam-label">Tamanhos & Quantidades</span>
+                  <span class="produto-card-tam-label">${p.COM_BOTAS ? 'Tamanho conjunto + Numeração bota' : 'Tamanhos & Quantidades'}</span>
                   <div class="tamanho-input-container">${inputs}</div>
                 </div>
                 <button class="btn btn-success produto-card-btn" onclick="adicionarProduto('${p.REF}')">Adicionar</button>
@@ -397,9 +413,21 @@
         }
         const rows = cat.produtos.map(p => {
           const precos = p.BOTAS ? `Até 10: R$ ${p.PRECO[0].toFixed(2)} | 11-30: R$ ${p.PRECO[1].toFixed(2)} | +30: R$ ${p.PRECO[2].toFixed(2)}` : `Até 30: R$ ${p.PRECO[0].toFixed(2)} | 31-100: R$ ${p.PRECO[1].toFixed(2)} | 101-200: R$ ${p.PRECO[2].toFixed(2)} | +200: R$ ${p.PRECO[3].toFixed(2)}`;
-          const inputs = p.TAMANHOS.map(t =>
-            `<div><label>${t}</label><input type="number" min="0" value="0" id="q-${p.REF}-${t}" data-ref="${p.REF}" data-tam="${t}"></div>`
-          ).join('');
+          let inputs;
+          if (p.COM_BOTAS) {
+            const grid = p.TAMANHOS.map(tam => {
+              const cells = p.NUMERACOES_BOTA.map(num => {
+                const sid = safeId(num);
+                return `<div class="produto-tam-item"><label>${tam}/${num}</label><input type="number" min="0" value="0" id="q-${p.REF}-${tam}-${sid}" data-ref="${p.REF}" data-tam="${tam}" data-num="${num}"></div>`;
+              }).join('');
+              return `<div class="vestimenta-bota-row"><strong>Conj. ${tam}</strong><div class="tamanho-input-container">${cells}</div></div>`;
+            }).join('');
+            inputs = `<div class="vestimenta-bota-grid"><small style="color:#666">Conjunto (G/GGX) + Numeração Bota (34/35 a 46)</small>${grid}</div>`;
+          } else {
+            inputs = p.TAMANHOS.map(t =>
+              `<div><label>${t}</label><input type="number" min="0" value="0" id="q-${p.REF}-${t}" data-ref="${p.REF}" data-tam="${t}"></div>`
+            ).join('');
+          }
           return `<tr>
             <td><strong>${p.REF}</strong></td>
             <td>${p.DESC}<br><small style="color:#666">${precos}</small></td>
@@ -439,12 +467,15 @@
       if (!p) return;
       const logoCliente = document.getElementById('logo-cliente')?.checked;
       let precoBase;
-      if (p.BOTAS) {
+      if (p.COM_BOTAS) {
+        const qtdProd = getQtdFormComBotasTotal(ref, p);
+        precoBase = p.PRECO[getTierIndex(qtdProd)];
+      } else if (p.BOTAS) {
         const qtdProd = p.TAMANHOS.reduce((s, t2) => s + parseInt(document.getElementById(`q-${ref}-${t2}`)?.value || 0), 0);
         const tier = getTierIndexBotas(qtdProd);
         precoBase = p.PRECO[tier];
       } else if (p.TABELA === 1) {
-        const qtdTotalT1 = PRODUTOS_VERTICE.filter(x => x.TABELA === 1 && !x.BOTAS).reduce((s, px) => {
+        const qtdTotalT1 = PRODUTOS_VERTICE.filter(x => x.TABELA === 1 && !x.BOTAS && !x.COM_BOTAS).reduce((s, px) => {
           return s + px.TAMANHOS.reduce((s2, t2) => s2 + parseInt(document.getElementById(`q-${px.REF}-${t2}`)?.value || 0), 0);
         }, 0);
         const tier = getTierIndex(qtdTotalT1);
@@ -455,28 +486,71 @@
         precoBase = p.PRECO[tier];
       }
       let itemAdicionado = false;
-      p.TAMANHOS.forEach(t => {
-        const qtd = parseInt(document.getElementById(`q-${ref}-${t}`)?.value || 0);
-        if (qtd <= 0) return;
-        itemAdicionado = true;
-        let preco = precoBase;
-        if (!p.BOTAS && t === 'ESP') preco *= 1.15;
-        if (logoCliente && !p.BOTAS) preco += 15;
-        const subtotal = preco * qtd;
-        const exist = window.pedidoItens.find(x => x.REF === ref && x.tamanho === t);
-        if (exist) {
-          exist.quantidade += qtd;
-          exist.subtotal = exist.preco * exist.quantidade;
-        } else {
-          window.pedidoItens.push({ REF: ref, DESC: p.DESC, tamanho: t, preco, quantidade: qtd, subtotal });
+      if (p.COM_BOTAS) {
+        p.TAMANHOS.forEach(tam => {
+          p.NUMERACOES_BOTA.forEach(num => {
+            const sid = safeId(num);
+            const qtd = parseInt(document.getElementById(`q-${ref}-${tam}-${sid}`)?.value || 0);
+            if (qtd <= 0) return;
+            itemAdicionado = true;
+            const preco = precoBase;
+            const subtotal = preco * qtd;
+            const exist = window.pedidoItens.find(x => x.REF === ref && x.tamanho === tam && x.numBota === num);
+            if (exist) {
+              exist.quantidade += qtd;
+              exist.subtotal = exist.preco * exist.quantidade;
+            } else {
+              window.pedidoItens.push({ REF: ref, DESC: p.DESC, tamanho: tam, numBota: num, preco, quantidade: qtd, subtotal });
+            }
+          });
+        });
+        if (itemAdicionado) {
+          p.TAMANHOS.forEach(tam => {
+            p.NUMERACOES_BOTA.forEach(num => {
+              const el = document.getElementById(`q-${ref}-${tam}-${safeId(num)}`);
+              if (el) el.value = 0;
+            });
+          });
+          recalcPrecosPedido();
         }
-      });
-      if (itemAdicionado) {
-        p.TAMANHOS.forEach(t => { const el = document.getElementById(`q-${ref}-${t}`); if (el) el.value = 0; });
-        recalcPrecosPedido();
       } else {
-        alert('Informe a quantidade para pelo menos um tamanho.');
+        p.TAMANHOS.forEach(t => {
+          const qtd = parseInt(document.getElementById(`q-${ref}-${t}`)?.value || 0);
+          if (qtd <= 0) return;
+          itemAdicionado = true;
+          let preco = precoBase;
+          if (!p.BOTAS && t === 'ESP') preco *= 1.15;
+          if (logoCliente && !p.BOTAS) preco += 15;
+          const subtotal = preco * qtd;
+          const exist = window.pedidoItens.find(x => x.REF === ref && x.tamanho === t && !x.numBota);
+          if (exist) {
+            exist.quantidade += qtd;
+            exist.subtotal = exist.preco * exist.quantidade;
+          } else {
+            window.pedidoItens.push({ REF: ref, DESC: p.DESC, tamanho: t, preco, quantidade: qtd, subtotal });
+          }
+        });
+        if (itemAdicionado) {
+          p.TAMANHOS.forEach(t => { const el = document.getElementById(`q-${ref}-${t}`); if (el) el.value = 0; });
+          recalcPrecosPedido();
+        }
       }
+      if (!itemAdicionado) {
+        alert(p.COM_BOTAS ? 'Informe a quantidade para pelo menos uma combinação (conjunto + bota).' : 'Informe a quantidade para pelo menos um tamanho.');
+      }
+    }
+
+    function getQtdFormComBotasTotal(ref, p) {
+      let total = 0;
+      if (!p.COM_BOTAS) return 0;
+      const inCart = (window.pedidoItens || []).filter(i => i.REF === ref).reduce((s, i) => s + i.quantidade, 0);
+      p.TAMANHOS.forEach(tam => {
+        p.NUMERACOES_BOTA.forEach(num => {
+          const el = document.getElementById(`q-${ref}-${tam}-${safeId(num)}`);
+          total += parseInt(el?.value || 0, 10);
+        });
+      });
+      return inCart + total;
     }
 
     function getQtdForm(ref, tam) {
@@ -489,7 +563,7 @@
     function recalcPrecosPedido() {
       if (!Array.isArray(window.pedidoItens) || window.pedidoItens.length === 0) return;
       const logoCliente = document.getElementById('logo-cliente')?.checked;
-      const qtdTotalT1 = PRODUTOS_VERTICE.filter(x => x.TABELA === 1 && !x.BOTAS).reduce((s, px) => {
+      const qtdTotalT1 = PRODUTOS_VERTICE.filter(x => x.TABELA === 1 && !x.BOTAS && !x.COM_BOTAS).reduce((s, px) => {
         const form = px.TAMANHOS.reduce((s2, t2) => s2 + getQtdForm(px.REF, t2), 0);
         return s + getQtdCart(px.REF) + form;
       }, 0);
@@ -497,7 +571,10 @@
         const p = PRODUTOS_VERTICE.find(x => x.REF === item.REF);
         if (!p) return;
         let precoBase;
-        if (p.BOTAS) {
+        if (p.COM_BOTAS) {
+          const qtdProd = getQtdFormComBotasTotal(p.REF, p);
+          precoBase = p.PRECO[getTierIndex(qtdProd)];
+        } else if (p.BOTAS) {
           const qtdProd = getQtdCart(p.REF) + p.TAMANHOS.reduce((s, t2) => s + getQtdForm(p.REF, t2), 0);
           precoBase = p.PRECO[getTierIndexBotas(qtdProd)];
         } else if (p.TABELA === 1) {
@@ -507,8 +584,8 @@
           precoBase = p.PRECO[getTierIndex(qtdProd)];
         }
         let preco = precoBase;
-        if (!p.BOTAS && item.tamanho === 'ESP') preco *= 1.15;
-        if (logoCliente && !p.BOTAS) preco += 15;
+        if (!p.BOTAS && !p.COM_BOTAS && item.tamanho === 'ESP') preco *= 1.15;
+        if (logoCliente && !p.BOTAS && !p.COM_BOTAS) preco += 15;
         item.preco = preco;
         item.subtotal = preco * item.quantidade;
       });
@@ -533,9 +610,10 @@
           const div = document.createElement('div');
           div.className = 'pedido-item';
           div.dataset.idx = idx;
+          const tamDisplay = item.numBota ? `Conj. ${item.tamanho} - Bota ${item.numBota}` : item.tamanho;
           div.innerHTML = `
             <div class="pedido-item-info">
-              <strong>${item.DESC}</strong> (Ref: ${item.REF}) - Tam: ${item.tamanho}
+              <strong>${item.DESC}</strong> (Ref: ${item.REF}) - ${tamDisplay}
             </div>
             <div class="pedido-item-campos">
               <div>
@@ -670,7 +748,7 @@
 
         let startY = doc.autoTable.previous.finalY + 7;
         const head = [['Ref.', 'Descrição', 'Tam', 'Qtd', 'Unit.', 'Total']];
-        const body = window.pedidoItens.map(i => [i.REF, i.DESC, i.tamanho, i.quantidade, `R$ ${i.preco.toFixed(2)}`, `R$ ${i.subtotal.toFixed(2)}`]);
+        const body = window.pedidoItens.map(i => [i.REF, i.DESC, i.numBota ? `Conj.${i.tamanho} Bota${i.numBota}` : i.tamanho, i.quantidade, `R$ ${i.preco.toFixed(2)}`, `R$ ${i.subtotal.toFixed(2)}`]);
 
         doc.autoTable({
           head, body, startY,
@@ -714,7 +792,7 @@
       logoImg.onerror = () => { gerarPDFInterno(null); };
       logoImg.src = LC_LOGO;
 
-      const descricao = `Vértice B2B - Cliente: ${getVal('razao')} | Itens: ${window.pedidoItens.map(i => i.REF + ' ' + i.tamanho + ' x' + i.quantidade).join(', ')} | Total: R$ ${total.toFixed(2)}`;
+      const descricao = `Vértice B2B - Cliente: ${getVal('razao')} | Itens: ${window.pedidoItens.map(i => i.REF + ' ' + (i.numBota ? i.tamanho + '/' + i.numBota : i.tamanho) + ' x' + i.quantidade).join(', ')} | Total: R$ ${total.toFixed(2)}`;
       const dados = {
         cliente: Object.fromEntries(['razao','cnpj','ie','endereco','bairro','cidade','estado','cep','email','telefone','transporte','prazo','obs'].map(k => [k, getVal(k)])),
         itens: window.pedidoItens,
