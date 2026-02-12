@@ -282,9 +282,15 @@
       <div id="pedido-container">
         <p id="pedido-vazio">Nenhum item adicionado ao pedido ainda.</p>
       </div>
-      <div style="text-align: center; margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 10px;">
-        <h3 style="margin: 0 0 8px 0; color: var(--lc-cinza);">Total do Pedido: R$ <span id="total-pedido">0,00</span></h3>
-        <p id="frete-info" style="font-size: 13px; color: #666; margin: 0;">Frete CIF disponível para pedidos acima de R$ 3.500</p>
+      <div style="margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 10px;">
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label><input type="checkbox" id="pagamento-vista" /> Pagamento à vista (2,5% de desconto)</label>
+        </div>
+        <div style="text-align: center;">
+          <p id="desconto-info" style="font-size: 13px; color: var(--lc-verde); margin: 0 0 4px 0; display: none;">Desconto de 2,5% aplicado: -R$ <span id="valor-desconto">0,00</span></p>
+          <h3 style="margin: 0 0 8px 0; color: var(--lc-cinza);">Total do Pedido: R$ <span id="total-pedido">0,00</span></h3>
+          <p id="frete-info" style="font-size: 13px; color: #666; margin: 0;">Frete CIF disponível para pedidos acima de R$ 3.500</p>
+        </div>
       </div>
       <div id="erro-validacao" class="erro-validacao" style="display:none;"></div>
       <button id="gerar-pedido-btn" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 16px;">
@@ -635,7 +641,20 @@
           inp.addEventListener('change', (e) => atualizarItemPedido(e.target));
         });
       }
-      totalEl.textContent = total.toFixed(2).replace('.', ',');
+      const aVista = document.getElementById('pagamento-vista')?.checked;
+      const descontoInfo = document.getElementById('desconto-info');
+      const valorDescontoEl = document.getElementById('valor-desconto');
+      let totalFinal = total;
+      let valorDesconto = 0;
+      if (aVista && total > 0) {
+        valorDesconto = total * 0.025;
+        totalFinal = total - valorDesconto;
+        if (descontoInfo) descontoInfo.style.display = 'block';
+        if (valorDescontoEl) valorDescontoEl.textContent = valorDesconto.toFixed(2).replace('.', ',');
+      } else {
+        if (descontoInfo) descontoInfo.style.display = 'none';
+      }
+      totalEl.textContent = totalFinal.toFixed(2).replace('.', ',');
       freteEl.textContent = total >= 3500 ? '✓ Frete CIF aplicável (pedido acima de R$ 3.500)' : 'Frete CIF disponível para pedidos acima de R$ 3.500';
     }
 
@@ -690,7 +709,10 @@
         return;
       }
       errDiv.style.display = 'none';
-      const total = window.pedidoItens.reduce((s, i) => s + i.subtotal, 0);
+      const subtotal = window.pedidoItens.reduce((s, i) => s + i.subtotal, 0);
+      const aVista = document.getElementById('pagamento-vista')?.checked;
+      const valorDesconto = aVista && subtotal > 0 ? subtotal * 0.025 : 0;
+      const total = subtotal - valorDesconto;
       const LC_LOGO = 'https://i.imgur.com/kNGKxVO.png';
 
       const gerarPDFInterno = (logoImg) => {
@@ -761,12 +783,19 @@
         });
 
         const finalY = doc.autoTable.previous.finalY + 8;
-        const obsText = `Transporte: ${getVal('transporte') || 'A combinar'}\nPrazo: ${getVal('prazo') || 'A combinar'}\n\nObservações:\n${getVal('obs') || 'Nenhuma.'}`;
-        const summaryData = [
-          ['Subtotal:', `R$ ${total.toFixed(2)}`],
-          ['', ''],
-          [{ content: 'Total do Pedido:', styles: { fontStyle: 'bold', fontSize: 10 } }, { content: `R$ ${total.toFixed(2)}`, styles: { fontStyle: 'bold', fontSize: 10 } }]
-        ];
+        const obsText = `Transporte: ${getVal('transporte') || 'A combinar'}\nPrazo: ${getVal('prazo') || 'A combinar'}\nCondição: ${aVista ? 'À vista (2,5% desconto)' : 'A prazo'}\n\nObservações:\n${getVal('obs') || 'Nenhuma.'}`;
+        const summaryData = valorDesconto > 0
+          ? [
+              ['Subtotal:', `R$ ${subtotal.toFixed(2)}`],
+              ['Desconto à vista (2,5%):', `-R$ ${valorDesconto.toFixed(2)}`],
+              ['', ''],
+              [{ content: 'Total do Pedido:', styles: { fontStyle: 'bold', fontSize: 10 } }, { content: `R$ ${total.toFixed(2)}`, styles: { fontStyle: 'bold', fontSize: 10 } }]
+            ]
+          : [
+              ['Subtotal:', `R$ ${total.toFixed(2)}`],
+              ['', ''],
+              [{ content: 'Total do Pedido:', styles: { fontStyle: 'bold', fontSize: 10 } }, { content: `R$ ${total.toFixed(2)}`, styles: { fontStyle: 'bold', fontSize: 10 } }]
+            ];
         const finalTableBody = [];
         const leftColumn = { content: obsText, rowSpan: summaryData.length, styles: { valign: 'top', fontSize: 9 } };
         for (let i = 0; i < summaryData.length; i++) {
@@ -796,6 +825,9 @@
       const dados = {
         cliente: Object.fromEntries(['razao','cnpj','ie','endereco','bairro','cidade','estado','cep','email','telefone','transporte','prazo','obs'].map(k => [k, getVal(k)])),
         itens: window.pedidoItens,
+        subtotal,
+        aVista: !!aVista,
+        valorDesconto,
         total,
         data: new Date().toISOString()
       };
@@ -845,6 +877,7 @@
       });
 
       document.getElementById('logo-cliente').addEventListener('change', recalcPrecosPedido);
+      document.getElementById('pagamento-vista').addEventListener('change', () => { recalcPrecosPedido(); });
       document.getElementById('gerar-pedido-btn').addEventListener('click', gerarPedidoPDF);
     });
   </script>

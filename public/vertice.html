@@ -313,9 +313,20 @@
       <div id="pedido-container">
         <p id="pedido-vazio">Nenhum item adicionado ao pedido ainda.</p>
       </div>
-      <div style="text-align: center; margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 10px;">
-        <h3 style="margin: 0 0 8px 0; color: var(--lc-cinza);">Total do Pedido: R$ <span id="total-pedido">0,00</span></h3>
-        <p id="frete-info" style="font-size: 13px; color: #666; margin: 0;">Frete CIF disponível para pedidos acima de R$ 3.500</p>
+      <div style="margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 10px;">
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label><input type="checkbox" id="pagamento-vista" /> Pagamento à vista (2,5% de desconto)</label>
+        </div>
+        <div class="form-group" style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+          <label for="desconto-extra" style="margin: 0;">Desconto extra (%):</label>
+          <input type="number" id="desconto-extra" min="0" max="100" step="0.1" value="0" placeholder="0" style="width: 80px;" />
+        </div>
+        <div style="text-align: center;">
+          <p id="desconto-info" style="font-size: 13px; color: var(--lc-verde); margin: 0 0 4px 0; display: none;">Desconto de 2,5% aplicado: -R$ <span id="valor-desconto">0,00</span></p>
+          <p id="desconto-extra-info" style="font-size: 13px; color: var(--lc-verde); margin: 0 0 4px 0; display: none;">Desconto extra aplicado: -R$ <span id="valor-desconto-extra">0,00</span></p>
+          <h3 style="margin: 0 0 8px 0; color: var(--lc-cinza);">Total do Pedido: R$ <span id="total-pedido">0,00</span></h3>
+          <p id="frete-info" style="font-size: 13px; color: #666; margin: 0;">Frete CIF disponível para pedidos acima de R$ 3.500</p>
+        </div>
       </div>
       <div id="erro-validacao" class="erro-validacao" style="display:none;"></div>
       <button id="gerar-pedido-btn" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 16px;">
@@ -728,7 +739,33 @@
           inp.addEventListener('change', (e) => atualizarItemPedido(e.target));
         });
       }
-      totalEl.textContent = total.toFixed(2).replace('.', ',');
+      const aVista = document.getElementById('pagamento-vista')?.checked;
+      const pctExtra = Math.min(100, Math.max(0, parseFloat(document.getElementById('desconto-extra')?.value) || 0));
+      const descontoInfo = document.getElementById('desconto-info');
+      const valorDescontoEl = document.getElementById('valor-desconto');
+      const descontoExtraInfo = document.getElementById('desconto-extra-info');
+      const valorDescontoExtraEl = document.getElementById('valor-desconto-extra');
+      let valorDesconto = 0;
+      let totalAposVista = total;
+      if (aVista && total > 0) {
+        valorDesconto = total * 0.025;
+        totalAposVista = total - valorDesconto;
+        if (descontoInfo) descontoInfo.style.display = 'block';
+        if (valorDescontoEl) valorDescontoEl.textContent = valorDesconto.toFixed(2).replace('.', ',');
+      } else {
+        if (descontoInfo) descontoInfo.style.display = 'none';
+      }
+      let valorDescontoExtra = 0;
+      let totalFinal = totalAposVista;
+      if (pctExtra > 0 && totalAposVista > 0) {
+        valorDescontoExtra = totalAposVista * (pctExtra / 100);
+        totalFinal = totalAposVista - valorDescontoExtra;
+        if (descontoExtraInfo) descontoExtraInfo.style.display = 'block';
+        if (valorDescontoExtraEl) valorDescontoExtraEl.textContent = valorDescontoExtra.toFixed(2).replace('.', ',');
+      } else {
+        if (descontoExtraInfo) descontoExtraInfo.style.display = 'none';
+      }
+      totalEl.textContent = totalFinal.toFixed(2).replace('.', ',');
       freteEl.textContent = total >= 3500 ? '✓ Frete CIF aplicável (pedido acima de R$ 3.500)' : 'Frete CIF disponível para pedidos acima de R$ 3.500';
     }
 
@@ -756,10 +793,24 @@
         if (subtotalEl) subtotalEl.textContent = item.subtotal.toFixed(2);
       }
       const total = window.pedidoItens.reduce((s, i) => s + i.subtotal, 0);
+      const aVista = document.getElementById('pagamento-vista')?.checked;
+      const pctExtra = Math.min(100, Math.max(0, parseFloat(document.getElementById('desconto-extra')?.value) || 0));
+      let totalAposVista = aVista && total > 0 ? total - total * 0.025 : total;
+      const valorDesconto = aVista && total > 0 ? total * 0.025 : 0;
+      const valorDescontoExtra = pctExtra > 0 && totalAposVista > 0 ? totalAposVista * (pctExtra / 100) : 0;
+      const totalFinal = totalAposVista - valorDescontoExtra;
       const totalEl = document.getElementById('total-pedido');
       const freteEl = document.getElementById('frete-info');
-      if (totalEl) totalEl.textContent = total.toFixed(2).replace('.', ',');
+      const descontoInfo = document.getElementById('desconto-info');
+      const valorDescontoEl = document.getElementById('valor-desconto');
+      const descontoExtraInfo = document.getElementById('desconto-extra-info');
+      const valorDescontoExtraEl = document.getElementById('valor-desconto-extra');
+      if (totalEl) totalEl.textContent = totalFinal.toFixed(2).replace('.', ',');
       if (freteEl) freteEl.textContent = total >= 3500 ? '✓ Frete CIF aplicável (pedido acima de R$ 3.500)' : 'Frete CIF disponível para pedidos acima de R$ 3.500';
+      if (descontoInfo) descontoInfo.style.display = valorDesconto > 0 ? 'block' : 'none';
+      if (valorDescontoEl && valorDesconto > 0) valorDescontoEl.textContent = valorDesconto.toFixed(2).replace('.', ',');
+      if (descontoExtraInfo) descontoExtraInfo.style.display = valorDescontoExtra > 0 ? 'block' : 'none';
+      if (valorDescontoExtraEl && valorDescontoExtra > 0) valorDescontoExtraEl.textContent = valorDescontoExtra.toFixed(2).replace('.', ',');
     }
 
     function removerItem(idx) {
@@ -799,7 +850,13 @@
         return;
       }
       errDiv.style.display = 'none';
-      const total = window.pedidoItens.reduce((s, i) => s + i.subtotal, 0);
+      const subtotal = window.pedidoItens.reduce((s, i) => s + i.subtotal, 0);
+      const aVista = document.getElementById('pagamento-vista')?.checked;
+      const pctExtra = Math.min(100, Math.max(0, parseFloat(document.getElementById('desconto-extra')?.value) || 0));
+      const valorDesconto = aVista && subtotal > 0 ? subtotal * 0.025 : 0;
+      const totalAposVista = subtotal - valorDesconto;
+      const valorDescontoExtra = pctExtra > 0 && totalAposVista > 0 ? totalAposVista * (pctExtra / 100) : 0;
+      const total = totalAposVista - valorDescontoExtra;
       const LC_LOGO = 'https://i.imgur.com/kNGKxVO.png';
 
       const gerarPDFInterno = (logoImg) => {
@@ -891,13 +948,14 @@
       });
 
       const finalY = doc.autoTable.previous.finalY + 8;
-      const obsText = `Transporte: ${getVal('transporte') || 'A combinar'}\nPrazo: ${getVal('prazo') || 'A combinar'}\n\nObservações:\n${getVal('obs') || 'Nenhuma.'}`;
+      const obsText = `Transporte: ${getVal('transporte') || 'A combinar'}\nPrazo: ${getVal('prazo') || 'A combinar'}\nCondição: ${aVista ? 'À vista (2,5% desconto)' : 'A prazo'}${valorDescontoExtra > 0 ? `\nDesconto extra: ${pctExtra}%` : ''}\n\nObservações:\n${getVal('obs') || 'Nenhuma.'}`;
 
-      const summaryData = [
-        ['Subtotal:', `R$ ${total.toFixed(2)}`],
-        ['', ''],
-        [{ content: 'Total do Pedido:', styles: { fontStyle: 'bold', fontSize: 10 } }, { content: `R$ ${total.toFixed(2)}`, styles: { fontStyle: 'bold', fontSize: 10 } }]
-      ];
+      const summaryData = [];
+      summaryData.push(['Subtotal:', `R$ ${subtotal.toFixed(2)}`]);
+      if (valorDesconto > 0) summaryData.push(['Desconto à vista (2,5%):', `-R$ ${valorDesconto.toFixed(2)}`]);
+      if (valorDescontoExtra > 0) summaryData.push([`Desconto extra (${pctExtra}%):`, `-R$ ${valorDescontoExtra.toFixed(2)}`]);
+      summaryData.push(['', '']);
+      summaryData.push([{ content: 'Total do Pedido:', styles: { fontStyle: 'bold', fontSize: 10 } }, { content: `R$ ${total.toFixed(2)}`, styles: { fontStyle: 'bold', fontSize: 10 } }]);
 
       const finalTableBody = [];
       const leftColumn = { content: obsText, rowSpan: summaryData.length, styles: { valign: 'top', fontSize: 9 } };
@@ -935,6 +993,11 @@
       const dados = {
         cliente: Object.fromEntries(['razao','cnpj','ie','endereco','bairro','cidade','estado','cep','email','telefone','transporte','prazo','obs'].map(k => [k, getVal(k)])),
         itens: window.pedidoItens,
+        subtotal,
+        aVista: !!aVista,
+        valorDesconto,
+        descontoExtraPct: pctExtra,
+        valorDescontoExtra,
         total,
         data: new Date().toISOString()
       };
@@ -981,6 +1044,10 @@
         });
         const buscaEl = document.getElementById('busca-cliente');
         if (buscaEl) buscaEl.value = (cliente.razao ?? '').toString();
+        const pagVistaEl = document.getElementById('pagamento-vista');
+        if (pagVistaEl) pagVistaEl.checked = !!dados.aVista;
+        const descontoExtraEl = document.getElementById('desconto-extra');
+        if (descontoExtraEl) descontoExtraEl.value = (dados.descontoExtraPct ?? 0).toString();
         window.pedidoItens = itens.map(i => ({
           REF: i.REF,
           DESC: i.DESC,
@@ -1026,6 +1093,9 @@
       if (idPedido) await carregarPedidoParaEdicao(idPedido);
       document.getElementById('busca-cliente').addEventListener('input', e => mostrarSugestoes(e.target.value));
       document.getElementById('logo-cliente').addEventListener('change', recalcPrecosPedido);
+      document.getElementById('pagamento-vista').addEventListener('change', () => { recalcPrecosPedido(); });
+      document.getElementById('desconto-extra').addEventListener('input', () => { recalcPrecosPedido(); });
+      document.getElementById('desconto-extra').addEventListener('change', () => { recalcPrecosPedido(); });
       document.getElementById('gerar-pedido-btn').addEventListener('click', gerarPedidoPDF);
     });
   </script>
