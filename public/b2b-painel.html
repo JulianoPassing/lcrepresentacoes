@@ -204,7 +204,7 @@
           <p>Tabela Pantaneiro</p>
         </div>
       </a>
-      <a href="b2b-pantaneiro7.html" class="card-link">
+      <a href="b2b-pantaneiro7.html" class="card-link" id="card-pantaneiro7">
         <div class="card">
           <i class="fas fa-box"></i>
           <h3>Pedidos Pantaneiro 7</h3>
@@ -504,9 +504,10 @@
 
       document.getElementById('user-info').textContent = clienteB2B.razao || 'Cliente';
       const card5 = document.getElementById('card-pantaneiro5');
-      if (card5 && clienteB2B.acessos && clienteB2B.acessos.pantaneiro5) {
-        card5.style.display = '';
-      }
+      const card7 = document.getElementById('card-pantaneiro7');
+      const temAcesso5 = clienteB2B.acessos && clienteB2B.acessos.pantaneiro5;
+      if (card5) card5.style.display = temAcesso5 ? '' : 'none';
+      if (card7) card7.style.display = temAcesso5 ? 'none' : '';
       document.getElementById('logout-button').onclick = () => {
         localStorage.removeItem('clienteB2B');
         window.location.href = 'b2b-login.html';
