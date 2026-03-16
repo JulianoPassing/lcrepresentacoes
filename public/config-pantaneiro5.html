@@ -94,6 +94,10 @@
     .btn-remover { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
     .btn-remover:hover { background: #dc2626; }
     .info-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px; margin-bottom: 24px; font-size: 14px; color: #1e40af; }
+    .modo-arquivo-box { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 10px; padding: 14px; margin-bottom: 20px; font-size: 14px; color: #92400e; }
+    .modo-arquivo-box strong { display: block; margin-bottom: 8px; }
+    .btn-publicar { background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; }
+    .btn-publicar:hover { opacity: 0.9; }
     .empty-msg { color: #6b7280; font-style: italic; padding: 16px; }
     .busca-container { position: relative; margin-bottom: 16px; }
     .busca-container input { width: 100%; padding: 12px 14px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; }
@@ -128,6 +132,12 @@
         <strong>Como funciona:</strong> A tabela Pantaneiro 7 é visível para todos. A tabela Pantaneiro 5 fica oculta por padrão. Aqui você <strong>libera</strong> ou <strong>remove</strong> o acesso dos CNPJs que podem ver a tabela 5 no portal B2B.
       </div>
 
+      <div id="modo-arquivo-box" class="modo-arquivo-box" style="display:none;">
+        <strong><i class="fas fa-file-export"></i> Modo sem banco de dados</strong>
+        Edite a lista abaixo e clique em <strong>Publicar</strong> para baixar o arquivo. Depois substitua o arquivo <code>public/acessos-pantaneiro5.json</code> no repositório, faça commit e push. O B2B verificará o acesso no próximo login.
+        <button type="button" class="btn-publicar" id="btn-publicar"><i class="fas fa-download"></i> Publicar (baixar arquivo)</button>
+      </div>
+
       <h2><i class="fas fa-building"></i> CNPJs com acesso à tabela 5</h2>
       <p style="color:#666;font-size:14px;margin-bottom:12px;">Busque um cliente cadastrado ou digite o CNPJ manualmente.</p>
 
@@ -146,26 +156,15 @@
       <div class="lista" id="lista-cnpjs">
         <div class="empty-msg" id="empty-cnpjs">Nenhum CNPJ cadastrado.</div>
       </div>
-
-      <h2 style="margin-top: 32px;"><i class="fas fa-user"></i> Usuários com acesso (Painel interno)</h2>
-      <p style="color:#666;font-size:14px;margin-bottom:12px;">Adicione os nomes de usuário (login) que podem ver a tabela Pantaneiro 5 no painel interno.</p>
-      <div class="add-form">
-        <select id="tipo-usuario">
-          <option value="usuario">Usuário</option>
-        </select>
-        <input type="text" id="valor-usuario" placeholder="Ex: joao, maria, admin" />
-        <button type="button" class="btn-add" id="btn-add-usuario"><i class="fas fa-plus"></i> Adicionar</button>
-      </div>
-      <div class="lista" id="lista-usuarios">
-        <div class="empty-msg" id="empty-usuarios">Nenhum usuário cadastrado.</div>
-      </div>
     </div>
   </main>
 
   <script>
     const API = '/api/acessos-pantaneiro5';
+    const API_JSON = '/acessos-pantaneiro5.json';
     const API_CLIENTES = '/api/clientes';
     let acessos = { cnpjs: [], usuarios: [] };
+    let modoArquivo = false;
     let clientesCadastrados = [];
 
     async function carregarClientes() {
@@ -255,23 +254,42 @@
     };
 
     async function carregar() {
+      modoArquivo = false;
       try {
         const res = await fetch(API);
-        if (res.ok) acessos = await res.json();
+        const data = await res.json();
+        if (res.ok) {
+          acessos = data;
+          modoArquivo = res.headers.get('X-Data-Source') === 'file';
+        } else if (res.status === 501 && data.modoArquivo) {
+          acessos = data.acessos || { cnpjs: [], usuarios: [] };
+          modoArquivo = true;
+        } else if (res.status === 503) {
+          const resJson = await fetch(API_JSON);
+          if (resJson.ok) {
+            const raw = await resJson.json();
+            acessos = { cnpjs: Array.isArray(raw.cnpj) ? raw.cnpj : [], usuarios: [] };
+            modoArquivo = true;
+          }
+        }
       } catch (e) {
-        console.error('Erro ao carregar:', e);
+        try {
+          const res = await fetch(API_JSON);
+          if (res.ok) {
+            const raw = await res.json();
+            acessos = { cnpjs: Array.isArray(raw.cnpj) ? raw.cnpj : [], usuarios: [] };
+            modoArquivo = true;
+          }
+        } catch (_) {}
       }
+      document.getElementById('modo-arquivo-box').style.display = modoArquivo ? 'block' : 'none';
       renderizar();
     }
 
     function renderizar() {
       const listaCnpjs = document.getElementById('lista-cnpjs');
       const emptyCnpjs = document.getElementById('empty-cnpjs');
-      const listaUsuarios = document.getElementById('lista-usuarios');
-      const emptyUsuarios = document.getElementById('empty-usuarios');
-
       const cnpjs = acessos.cnpjs || [];
-      const usuarios = acessos.usuarios || [];
 
       emptyCnpjs.style.display = cnpjs.length ? 'none' : 'block';
       const itemsCnpj = listaCnpjs.querySelectorAll('.lista-item');
@@ -283,20 +301,7 @@
         listaCnpjs.insertBefore(div, emptyCnpjs);
       });
 
-      emptyUsuarios.style.display = usuarios.length ? 'none' : 'block';
-      const itemsUsuario = listaUsuarios.querySelectorAll('.lista-item');
-      itemsUsuario.forEach(el => el.remove());
-      usuarios.forEach(u => {
-        const div = document.createElement('div');
-        div.className = 'lista-item';
-        div.innerHTML = `<span>${u}</span><button class="btn-remover" data-tipo="usuario" data-valor="${u}"><i class="fas fa-trash"></i> Remover</button>`;
-        listaUsuarios.insertBefore(div, emptyUsuarios);
-      });
-
       listaCnpjs.querySelectorAll('.btn-remover').forEach(btn => {
-        btn.onclick = () => remover(btn.dataset.tipo, btn.dataset.valor);
-      });
-      listaUsuarios.querySelectorAll('.btn-remover').forEach(btn => {
         btn.onclick = () => remover(btn.dataset.tipo, btn.dataset.valor);
       });
     }
@@ -304,9 +309,20 @@
     async function adicionar(tipo, valor) {
       const v = (valor || '').toString().trim();
       if (!v) { alert('Informe o valor.'); return; }
-      if (tipo === 'cnpj' && normalizarCnpj(v).length < 14) {
-        alert('CNPJ inválido. Use 14 dígitos.');
-        return;
+      if (tipo === 'cnpj') {
+        const cnpjNorm = normalizarCnpj(v);
+        if (cnpjNorm.length < 14) {
+          alert('CNPJ inválido. Use 14 dígitos.');
+          return;
+        }
+        if (modoArquivo) {
+          if (!acessos.cnpjs.includes(cnpjNorm)) {
+            acessos.cnpjs = [...(acessos.cnpjs || []), cnpjNorm];
+            document.getElementById('valor-cnpj').value = '';
+            renderizar();
+          }
+          return;
+        }
       }
       try {
         const res = await fetch(API, {
@@ -317,8 +333,7 @@
         const data = await res.json();
         if (res.ok) {
           acessos = data.acessos || acessos;
-          if (tipo === 'cnpj') document.getElementById('valor-cnpj').value = '';
-          else document.getElementById('valor-usuario').value = '';
+          document.getElementById('valor-cnpj').value = '';
           renderizar();
         } else {
           alert(data.error || 'Erro ao adicionar.');
@@ -330,6 +345,11 @@
 
     async function remover(tipo, valor) {
       if (!confirm('Remover este item?')) return;
+      if (modoArquivo) {
+        acessos.cnpjs = (acessos.cnpjs || []).filter(c => c !== valor);
+        renderizar();
+        return;
+      }
       try {
         const res = await fetch(API + `?tipo=${tipo}&valor=${encodeURIComponent(valor)}`, { method: 'DELETE' });
         const data = await res.json();
@@ -342,6 +362,16 @@
       } catch (e) {
         alert('Erro de conexão.');
       }
+    }
+
+    function publicarArquivo() {
+      const json = JSON.stringify({ cnpj: acessos.cnpjs || [] }, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'acessos-pantaneiro5.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -361,15 +391,10 @@
       document.getElementById('btn-add-cnpj').onclick = () => {
         adicionar('cnpj', document.getElementById('valor-cnpj').value);
       };
-      document.getElementById('btn-add-usuario').onclick = () => {
-        adicionar('usuario', document.getElementById('valor-usuario').value);
-      };
       document.getElementById('valor-cnpj').onkeypress = (e) => {
         if (e.key === 'Enter') document.getElementById('btn-add-cnpj').click();
       };
-      document.getElementById('valor-usuario').onkeypress = (e) => {
-        if (e.key === 'Enter') document.getElementById('btn-add-usuario').click();
-      };
+      document.getElementById('btn-publicar').onclick = publicarArquivo;
     });
   </script>
   <script src="mobile-menu.js"></script>

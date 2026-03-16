@@ -1,5 +1,8 @@
-// API para gerenciar acessos à tabela Pantaneiro 5 (usa MySQL - Vercel tem filesystem read-only)
+// API para gerenciar acessos à tabela Pantaneiro 5
+// Usa MySQL se configurado; senão usa arquivo JSON (public/acessos-pantaneiro5.json)
 const mysql = require('mysql2/promise');
+const fs = require('fs');
+const path = require('path');
 
 const addSecurityHeaders = (res) => {
   res.setHeader('Content-Type', 'application/json');
@@ -24,6 +27,41 @@ async function getConnection() {
   }
 }
 
+function carregarDoArquivo() {
+  try {
+    const jsonPath = path.join(process.cwd(), 'public', 'acessos-pantaneiro5.json');
+    if (fs.existsSync(jsonPath)) {
+      const data = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+      return { cnpjs: Array.isArray(data.cnpj) ? data.cnpj : [], usuarios: [] };
+    }
+    const altPath = path.join(__dirname, '..', 'public', 'acessos-pantaneiro5.json');
+    if (fs.existsSync(altPath)) {
+      const data = JSON.parse(fs.readFileSync(altPath, 'utf8'));
+      return { cnpjs: Array.isArray(data.cnpj) ? data.cnpj : [], usuarios: [] };
+    }
+  } catch (e) {
+    console.error('Erro ao ler acessos-pantaneiro5.json:', e.message);
+  }
+  return { cnpjs: [], usuarios: [] };
+}
+
+const CREATE_TABLE_SQL = `
+  CREATE TABLE IF NOT EXISTS acessos_pantaneiro5 (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tipo ENUM('cnpj','usuario') NOT NULL,
+    valor VARCHAR(255) NOT NULL,
+    UNIQUE KEY uk_tipo_valor (tipo, valor)
+  )
+`;
+
+async function garantirTabela(conn) {
+  try {
+    await conn.execute(CREATE_TABLE_SQL);
+  } catch (e) {
+    console.error('Erro ao criar tabela acessos_pantaneiro5:', e.message);
+  }
+}
+
 async function carregarAcessos(conn) {
   try {
     const [rows] = await conn.execute(
@@ -43,20 +81,31 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   let connection = null;
+  let usaArquivo = false;
 
   try {
     connection = await getConnection();
-    if (!connection) {
-      return res.status(503).json({
-        error: 'Banco de dados indisponível. Configure DB_HOST, DB_USER, DB_PASSWORD e DB_NAME no Vercel.',
-        acessos: { cnpjs: [], usuarios: [] }
-      });
+    let acessos;
+
+    if (connection) {
+      await garantirTabela(connection);
+      acessos = await carregarAcessos(connection);
+    } else {
+      usaArquivo = true;
+      acessos = carregarDoArquivo();
     }
 
-    let acessos = await carregarAcessos(connection);
-
     if (req.method === 'GET') {
+      if (usaArquivo) res.setHeader('X-Data-Source', 'file');
       return res.status(200).json(acessos);
+    }
+
+    if (usaArquivo) {
+      return res.status(501).json({
+        error: 'Sem banco de dados. Edite a lista e clique em "Publicar" para baixar o arquivo. Depois substitua public/acessos-pantaneiro5.json no repositório e faça deploy.',
+        acessos,
+        modoArquivo: true
+      });
     }
 
     if (req.method === 'POST') {

@@ -14,6 +14,22 @@ async function carregarAcessosPantaneiro5(connection) {
   }
 }
 
+function carregarAcessosDoArquivo() {
+  try {
+    const paths = [
+      path.join(process.cwd(), 'public', 'acessos-pantaneiro5.json'),
+      path.join(__dirname, '..', 'public', 'acessos-pantaneiro5.json')
+    ];
+    for (const p of paths) {
+      if (fs.existsSync(p)) {
+        const data = JSON.parse(fs.readFileSync(p, 'utf8'));
+        return Array.isArray(data.cnpj) ? data.cnpj : [];
+      }
+    }
+  } catch (e) {}
+  return [];
+}
+
 // SENHA PADRÃO: 123456
 // CNPJs com senhas personalizadas (opcional)
 const senhasPersonalizadas = {
@@ -85,6 +101,7 @@ module.exports = async (req, res) => {
         if (!cliente) {
           cliente = clientes.find(c => c.cnpj === cnpj);
         }
+        cnpjsComAcesso = carregarAcessosDoArquivo();
       } catch (_) {}
     } finally {
       if (connection) await connection.end();
