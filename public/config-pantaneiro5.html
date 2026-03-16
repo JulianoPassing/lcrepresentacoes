@@ -88,10 +88,15 @@
     .add-form input[type="text"] { flex: 1; min-width: 180px; }
     .btn-add { background: linear-gradient(135deg, #0065B3 0%, #4CAB3F 100%); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; }
     .btn-add:hover { opacity: 0.9; }
-    .lista { background: #f9fafb; border-radius: 12px; padding: 16px; margin-top: 12px; }
-    .lista-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: white; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e5e7eb; }
+    .lista { background: #f9fafb; border-radius: 12px; padding: 16px; margin-top: 12px; overflow-x: auto; }
+    .lista-header { display: grid; grid-template-columns: 60px 1fr 140px 90px; gap: 12px; padding: 10px 14px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; border-bottom: 2px solid #e5e7eb; margin-bottom: 8px; }
+    .lista-item { display: grid; grid-template-columns: 60px 1fr 140px 90px; gap: 12px; align-items: center; padding: 12px 14px; background: white; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e5e7eb; font-size: 14px; }
     .lista-item:last-child { margin-bottom: 0; }
-    .btn-remover { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    .lista-item-id { font-weight: 600; color: var(--lc-azul); }
+    .lista-item-razao { font-weight: 500; color: var(--lc-cinza); }
+    .lista-item-cnpj { font-family: monospace; font-size: 13px; color: #4b5563; }
+    .lista-item-nao-cadastrado { font-style: italic; color: #9ca3af; }
+    .btn-remover { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; justify-self: end; }
     .btn-remover:hover { background: #dc2626; }
     .info-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px; margin-bottom: 24px; font-size: 14px; color: #1e40af; }
     .modo-arquivo-box { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 10px; padding: 14px; margin-bottom: 20px; font-size: 14px; color: #92400e; }
@@ -111,6 +116,11 @@
     .sugestao-item .btn-add-sugestao { background: var(--lc-azul); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
     .sugestao-item .btn-add-sugestao:hover { opacity: 0.9; }
     .sugestao-item .btn-add-sugestao.ja-tem { background: #9ca3af; cursor: default; }
+    @media (max-width: 600px) {
+      .lista-header, .lista-item { grid-template-columns: 1fr 90px 70px; gap: 8px; padding: 10px; }
+      .lista-header span:first-child, .lista-item .lista-item-id { display: none; }
+      .lista-item-cnpj { font-size: 12px; }
+    }
   </style>
 </head>
 <body>
@@ -154,6 +164,12 @@
         <button type="button" class="btn-add" id="btn-add-cnpj"><i class="fas fa-plus"></i> Adicionar</button>
       </div>
       <div class="lista" id="lista-cnpjs">
+        <div class="lista-header" id="lista-header" style="display:none;">
+          <span>ID</span>
+          <span>Razão Social</span>
+          <span>CNPJ</span>
+          <span></span>
+        </div>
         <div class="empty-msg" id="empty-cnpjs">Nenhum CNPJ cadastrado.</div>
       </div>
     </div>
@@ -186,6 +202,16 @@
 
     function normalizarCnpj(v) {
       return (v || '').toString().replace(/[.\-\/\s]/g, '');
+    }
+
+    function formatarCnpj(cnpj) {
+      const n = normalizarCnpj(cnpj);
+      if (n.length !== 14) return cnpj;
+      return n.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+    }
+
+    function buscarClientePorCnpj(cnpjNorm) {
+      return clientesCadastrados.find(c => normalizarCnpj(c.cnpj) === cnpjNorm);
     }
 
     function mostrarSugestoesClientes(filtro) {
@@ -288,16 +314,30 @@
 
     function renderizar() {
       const listaCnpjs = document.getElementById('lista-cnpjs');
+      const listaHeader = document.getElementById('lista-header');
       const emptyCnpjs = document.getElementById('empty-cnpjs');
       const cnpjs = acessos.cnpjs || [];
 
       emptyCnpjs.style.display = cnpjs.length ? 'none' : 'block';
+      listaHeader.style.display = cnpjs.length ? 'grid' : 'none';
+
       const itemsCnpj = listaCnpjs.querySelectorAll('.lista-item');
       itemsCnpj.forEach(el => el.remove());
-      cnpjs.forEach(c => {
+
+      cnpjs.forEach(cnpjNorm => {
+        const cliente = buscarClientePorCnpj(cnpjNorm);
+        const id = cliente ? (cliente.id || '-') : '-';
+        const razao = cliente ? (cliente.razao || '-') : 'Não cadastrado';
+        const razaoClass = cliente ? 'lista-item-razao' : 'lista-item-razao lista-item-nao-cadastrado';
+
         const div = document.createElement('div');
         div.className = 'lista-item';
-        div.innerHTML = `<span>${c}</span><button class="btn-remover" data-tipo="cnpj" data-valor="${c}"><i class="fas fa-trash"></i> Remover</button>`;
+        div.innerHTML = `
+          <span class="lista-item-id">${(id + '').escapeHtml()}</span>
+          <span class="${razaoClass}">${razao.escapeHtml()}</span>
+          <span class="lista-item-cnpj">${formatarCnpj(cnpjNorm) || cnpjNorm}</span>
+          <button class="btn-remover" data-tipo="cnpj" data-valor="${cnpjNorm}"><i class="fas fa-trash"></i> Remover</button>
+        `;
         listaCnpjs.insertBefore(div, emptyCnpjs);
       });
 
