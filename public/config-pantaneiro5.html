@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LC Representações - Liberar Acesso Tabela 5</title>
+  <link rel="icon" href="https://i.imgur.com/kNGKxVO.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="mobile.css" />
+  <link rel="stylesheet" href="modern-design.css" />
+  <style>
+    :root { --lc-azul: #0065B3; --lc-verde: #4CAB3F; --lc-cinza: #2F2F2F; }
+    .config-card { max-width: 700px; margin: 0 auto; }
+    .config-card h2 { margin-bottom: 20px; color: var(--lc-cinza); }
+    .add-form { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .add-form input, .add-form select { padding: 10px 14px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; }
+    .add-form select { min-width: 140px; }
+    .add-form input[type="text"] { flex: 1; min-width: 180px; }
+    .btn-add { background: linear-gradient(135deg, #0065B3 0%, #4CAB3F 100%); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+    .btn-add:hover { opacity: 0.9; }
+    .lista { background: #f9fafb; border-radius: 12px; padding: 16px; margin-top: 12px; }
+    .lista-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: white; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e5e7eb; }
+    .lista-item:last-child { margin-bottom: 0; }
+    .btn-remover { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    .btn-remover:hover { background: #dc2626; }
+    .info-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px; margin-bottom: 24px; font-size: 14px; color: #1e40af; }
+    .empty-msg { color: #6b7280; font-style: italic; padding: 16px; }
+    .busca-container { position: relative; margin-bottom: 16px; }
+    .busca-container input { width: 100%; padding: 12px 14px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; }
+    .busca-container input:focus { outline: none; border-color: var(--lc-azul); }
+    #sugestoes-clientes { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 2px solid #e0e0e0; border-top: none; border-radius: 0 0 10px 10px; max-height: 220px; overflow-y: auto; z-index: 100; box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+    .sugestao-item { padding: 12px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .sugestao-item:hover { background: #f5f7fa; }
+    .sugestao-item:last-child { border-bottom: none; }
+    .sugestao-item .razao { font-weight: 600; color: var(--lc-cinza); }
+    .sugestao-item .cnpj { font-size: 12px; color: #666; }
+    .sugestao-item .btn-add-sugestao { background: var(--lc-azul); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    .sugestao-item .btn-add-sugestao:hover { opacity: 0.9; }
+    .sugestao-item .btn-add-sugestao.ja-tem { background: #9ca3af; cursor: default; }
+  </style>
+</head>
+<body>
+  <header class="header-top">
+    <div class="header-left">
+      <img src="https://i.imgur.com/kNGKxVO.png" alt="LC" style="height:40px;" />
+      <span style="font-size:18px;font-weight:600;color:var(--lc-cinza);">Liberar Acesso Tabela 5</span>
+    </div>
+    <div class="header-right">
+      <a href="painel.html" class="btn" style="background:var(--lc-cinza);color:white;text-decoration:none;padding:10px 18px;border-radius:10px;"><i class="fas fa-arrow-left"></i> Voltar</a>
+    </div>
+  </header>
+
+  <main style="padding: 90px 20px 40px; max-width: 800px; margin: 0 auto;">
+    <div class="config-card card">
+      <div class="info-box">
+        <strong>Como funciona:</strong> A tabela Pantaneiro 7 é visível para todos. A tabela Pantaneiro 5 fica oculta por padrão. Aqui você <strong>libera</strong> ou <strong>remove</strong> o acesso dos CNPJs que podem ver a tabela 5 no portal B2B.
+      </div>
+
+      <h2><i class="fas fa-building"></i> CNPJs com acesso à tabela 5</h2>
+      <p style="color:#666;font-size:14px;margin-bottom:12px;">Busque um cliente cadastrado ou digite o CNPJ manualmente.</p>
+
+      <div class="busca-container">
+        <input type="text" id="busca-cliente" placeholder="Buscar cliente por razão social ou CNPJ..." autocomplete="off" />
+        <div id="sugestoes-clientes" style="display:none;"></div>
+      </div>
+
+      <div class="add-form">
+        <select id="tipo-cnpj">
+          <option value="cnpj">CNPJ (B2B)</option>
+        </select>
+        <input type="text" id="valor-cnpj" placeholder="Ex: 12.345.678/0001-99 ou 12345678000199" />
+        <button type="button" class="btn-add" id="btn-add-cnpj"><i class="fas fa-plus"></i> Adicionar</button>
+      </div>
+      <div class="lista" id="lista-cnpjs">
+        <div class="empty-msg" id="empty-cnpjs">Nenhum CNPJ cadastrado.</div>
+      </div>
+
+      <h2 style="margin-top: 32px;"><i class="fas fa-user"></i> Usuários com acesso (Painel interno)</h2>
+      <p style="color:#666;font-size:14px;margin-bottom:12px;">Adicione os nomes de usuário (login) que podem ver a tabela Pantaneiro 5 no painel interno.</p>
+      <div class="add-form">
+        <select id="tipo-usuario">
+          <option value="usuario">Usuário</option>
+        </select>
+        <input type="text" id="valor-usuario" placeholder="Ex: joao, maria, admin" />
+        <button type="button" class="btn-add" id="btn-add-usuario"><i class="fas fa-plus"></i> Adicionar</button>
+      </div>
+      <div class="lista" id="lista-usuarios">
+        <div class="empty-msg" id="empty-usuarios">Nenhum usuário cadastrado.</div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const API = '/api/acessos-pantaneiro5';
+    const API_CLIENTES = '/api/clientes';
+    let acessos = { cnpjs: [], usuarios: [] };
+    let clientesCadastrados = [];
+
+    async function carregarClientes() {
+      try {
+        const res = await fetch(API_CLIENTES);
+        if (res.ok) clientesCadastrados = await res.json();
+        else {
+          const resJson = await fetch('clientes.json');
+          if (resJson.ok) clientesCadastrados = await resJson.json();
+        }
+      } catch (e) {
+        try {
+          const res = await fetch('clientes.json');
+          if (res.ok) clientesCadastrados = await res.json();
+        } catch (_) {}
+      }
+      if (!Array.isArray(clientesCadastrados)) clientesCadastrados = [];
+    }
+
+    function normalizarCnpj(v) {
+      return (v || '').toString().replace(/[.\-\/\s]/g, '');
+    }
+
+    function mostrarSugestoesClientes(filtro) {
+      const div = document.getElementById('sugestoes-clientes');
+      const input = document.getElementById('busca-cliente');
+      div.innerHTML = '';
+      div.style.display = 'none';
+      if (!filtro || filtro.trim().length < 2) return;
+
+      const f = filtro.trim().toLowerCase();
+      const cnpjsComAcesso = (acessos.cnpjs || []).map(c => normalizarCnpj(c));
+      const filtrados = clientesCadastrados.filter(c => {
+        const razao = (c.razao || '').toLowerCase();
+        const cnpj = normalizarCnpj(c.cnpj);
+        const cnpjFormat = (c.cnpj || '').toLowerCase();
+        return razao.includes(f) || cnpj.includes(f) || cnpjFormat.includes(f);
+      }).slice(0, 10);
+
+      if (filtrados.length === 0) {
+        div.innerHTML = '<div class="sugestao-item" style="cursor:default;color:#666;">Nenhum cliente encontrado.</div>';
+        div.style.display = 'block';
+        return;
+      }
+
+      filtrados.forEach(c => {
+        const cnpjNorm = normalizarCnpj(c.cnpj);
+        const jaTem = cnpjNorm && cnpjNorm.length >= 14 && cnpjsComAcesso.includes(cnpjNorm);
+        const item = document.createElement('div');
+        item.className = 'sugestao-item';
+        item.innerHTML = `
+          <div>
+            <div class="razao">${(c.razao || '-').escapeHtml()}</div>
+            <div class="cnpj">CNPJ: ${(c.cnpj || '-')}</div>
+          </div>
+          <button class="btn-add-sugestao ${jaTem ? 'ja-tem' : ''}" ${jaTem ? 'disabled' : ''} data-cnpj="${cnpjNorm}">
+            ${jaTem ? 'Já tem acesso' : 'Liberar acesso'}
+          </button>
+        `;
+        if (!jaTem && cnpjNorm && cnpjNorm.length >= 14) {
+          item.querySelector('.btn-add-sugestao').onclick = (e) => {
+            e.stopPropagation();
+            adicionar('cnpj', cnpjNorm);
+            input.value = '';
+            div.style.display = 'none';
+          };
+        }
+        div.appendChild(item);
+      });
+      div.style.display = 'block';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener('mousedown', (e) => {
+        const div = document.getElementById('sugestoes-clientes');
+        const input = document.getElementById('busca-cliente');
+        if (div && input && !div.contains(e.target) && e.target !== input) {
+          div.style.display = 'none';
+        }
+      });
+    });
+
+    String.prototype.escapeHtml = function() {
+      const div = document.createElement('div');
+      div.textContent = this;
+      return div.innerHTML;
+    };
+
+    async function carregar() {
+      try {
+        const res = await fetch(API);
+        if (res.ok) acessos = await res.json();
+      } catch (e) {
+        console.error('Erro ao carregar:', e);
+      }
+      renderizar();
+    }
+
+    function renderizar() {
+      const listaCnpjs = document.getElementById('lista-cnpjs');
+      const emptyCnpjs = document.getElementById('empty-cnpjs');
+      const listaUsuarios = document.getElementById('lista-usuarios');
+      const emptyUsuarios = document.getElementById('empty-usuarios');
+
+      const cnpjs = acessos.cnpjs || [];
+      const usuarios = acessos.usuarios || [];
+
+      emptyCnpjs.style.display = cnpjs.length ? 'none' : 'block';
+      const itemsCnpj = listaCnpjs.querySelectorAll('.lista-item');
+      itemsCnpj.forEach(el => el.remove());
+      cnpjs.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'lista-item';
+        div.innerHTML = `<span>${c}</span><button class="btn-remover" data-tipo="cnpj" data-valor="${c}"><i class="fas fa-trash"></i> Remover</button>`;
+        listaCnpjs.insertBefore(div, emptyCnpjs);
+      });
+
+      emptyUsuarios.style.display = usuarios.length ? 'none' : 'block';
+      const itemsUsuario = listaUsuarios.querySelectorAll('.lista-item');
+      itemsUsuario.forEach(el => el.remove());
+      usuarios.forEach(u => {
+        const div = document.createElement('div');
+        div.className = 'lista-item';
+        div.innerHTML = `<span>${u}</span><button class="btn-remover" data-tipo="usuario" data-valor="${u}"><i class="fas fa-trash"></i> Remover</button>`;
+        listaUsuarios.insertBefore(div, emptyUsuarios);
+      });
+
+      listaCnpjs.querySelectorAll('.btn-remover').forEach(btn => {
+        btn.onclick = () => remover(btn.dataset.tipo, btn.dataset.valor);
+      });
+      listaUsuarios.querySelectorAll('.btn-remover').forEach(btn => {
+        btn.onclick = () => remover(btn.dataset.tipo, btn.dataset.valor);
+      });
+    }
+
+    async function adicionar(tipo, valor) {
+      const v = (valor || '').toString().trim();
+      if (!v) { alert('Informe o valor.'); return; }
+      if (tipo === 'cnpj' && normalizarCnpj(v).length < 14) {
+        alert('CNPJ inválido. Use 14 dígitos.');
+        return;
+      }
+      try {
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tipo, valor: v })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          acessos = data.acessos || acessos;
+          if (tipo === 'cnpj') document.getElementById('valor-cnpj').value = '';
+          else document.getElementById('valor-usuario').value = '';
+          renderizar();
+        } else {
+          alert(data.error || 'Erro ao adicionar.');
+        }
+      } catch (e) {
+        alert('Erro de conexão.');
+      }
+    }
+
+    async function remover(tipo, valor) {
+      if (!confirm('Remover este item?')) return;
+      try {
+        const res = await fetch(API + `?tipo=${tipo}&valor=${encodeURIComponent(valor)}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (res.ok) {
+          acessos = data.acessos || acessos;
+          renderizar();
+        } else {
+          alert(data.error || 'Erro ao remover.');
+        }
+      } catch (e) {
+        alert('Erro de conexão.');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = sessionStorage.getItem('loggedInUser');
+      if (!user) {
+        window.location.href = 'index.html';
+        return;
+      }
+      await carregarClientes();
+      await carregar();
+      document.getElementById('busca-cliente').addEventListener('input', (e) => mostrarSugestoesClientes(e.target.value));
+      document.getElementById('btn-add-cnpj').onclick = () => {
+        adicionar('cnpj', document.getElementById('valor-cnpj').value);
+      };
+      document.getElementById('btn-add-usuario').onclick = () => {
+        adicionar('usuario', document.getElementById('valor-usuario').value);
+      };
+      document.getElementById('valor-cnpj').onkeypress = (e) => {
+        if (e.key === 'Enter') document.getElementById('btn-add-cnpj').click();
+      };
+      document.getElementById('valor-usuario').onkeypress = (e) => {
+        if (e.key === 'Enter') document.getElementById('btn-add-usuario').click();
+      };
+    });
+  </script>
+</body>
+</html>

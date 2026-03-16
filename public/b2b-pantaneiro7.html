@@ -854,7 +854,7 @@
       </div>
       <div style="margin-bottom:24px;">
         <h1 style="font-size:28px;color:var(--lc-cinza);margin-bottom:8px;">Pantaneiro 7</h1>
-        <p style="color:#666;font-size:14px;">Tabela B2B com comissão de 7%</p>
+        <p style="color:#666;font-size:14px;">Tabela Pantaneiro</p>
       </div>
       <section class="card">
         <div class="card-header">
@@ -976,12 +976,7 @@
         
         clienteData = JSON.parse(clienteStr);
         
-        // Verificar se tem acesso ao Pantaneiro 7
-        if (!clienteData.acessos || !clienteData.acessos.pantaneiro7) {
-          alert('Você não tem acesso a esta tabela.');
-          window.location.href = 'b2b-painel.html';
-          return false;
-        }
+        // Pantaneiro 7: todos têm acesso por padrão
         
         return true;
       }

@@ -1,24 +1,26 @@
 // LC Representações - Service Worker
+// Network-first: sempre busca a versão mais recente quando online
 const CACHE_NAME = 'lc-representacoes-v1';
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll([
-    '/',
-    '/index.html',
-    '/painel.html',
-    '/painel-clientes.html',
-    '/pedidos.html',
-    '/auth.js',
-    '/modern-design.css',
-    '/mobile.css',
-    '/manifest.json'
-  ])).then(() => self.skipWaiting()).catch(() => {}));
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', (e) => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
 
 self.addEventListener('fetch', (e) => {
-  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+  // Network-first: tenta rede primeiro, usa cache só se offline
+  e.respondWith(
+    fetch(e.request)
+      .then(res => {
+        const clone = res.clone();
+        if (res.ok && (e.request.method === 'GET') && !e.request.url.includes('/api/')) {
+          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+        }
+        return res;
+      })
+      .catch(() => caches.match(e.request))
+  );
 });

@@ -751,7 +751,7 @@
         </div>
         <div class="page-header-text">
           <h1 class="dashboard-title">Pantaneiro 5</h1>
-          <p class="dashboard-subtitle">Tabela com comissão de 5%</p>
+          <p class="dashboard-subtitle">Tabela Pantaneiro</p>
         </div>
       </div>
       <section class="card">
@@ -3240,14 +3240,26 @@ window.produtosData = [
         // --- Início da lógica de autenticação ---
         const loggedInUser = sessionStorage.getItem("loggedInUser");
 
-        if (loggedInUser) {
-          document.getElementById(
-            "user-info"
-          ).textContent = `Bem-vindo(a), ${loggedInUser}!`;
-        } else {
+        if (!loggedInUser) {
           alert("Acesso negado. Por favor, realize o login.");
-          window.location.href = "index.html"; // Mude "index.html" se sua página de login tiver outro nome
+          window.location.href = "index.html";
+          return;
         }
+
+        try {
+          const res = await fetch("/api/acessos-pantaneiro5");
+          if (res.ok) {
+            const acessos = await res.json();
+            const usuarios = (acessos.usuarios || []).map(u => (u || "").toString().toLowerCase());
+            if (!usuarios.includes((loggedInUser || "").toString().toLowerCase())) {
+              alert("Você não tem acesso à tabela Pantaneiro 5.");
+              window.location.href = "painel.html";
+              return;
+            }
+          }
+        } catch (_) {}
+
+        document.getElementById("user-info").textContent = `Bem-vindo(a), ${loggedInUser}!`;
 
         document
           .getElementById("logout-button")

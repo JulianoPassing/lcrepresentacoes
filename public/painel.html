@@ -298,18 +298,25 @@
           <p>Lançar pedidos da linha Vértice (Duas Rodas)</p>
         </div>
       </a>
-      <a href="pantaneiro5.html" class="card-link">
+      <a href="pantaneiro5.html" class="card-link" id="card-pantaneiro5" style="display:none;">
         <div class="card">
           <i class="fas fa-box"></i>
           <h3>Pedidos Pantaneiro 5</h3>
-          <p>Tabela Pantaneiro com comissão de 5%</p>
+          <p>Tabela Pantaneiro</p>
         </div>
       </a>
       <a href="pantaneiro7.html" class="card-link">
         <div class="card">
           <i class="fas fa-box"></i>
           <h3>Pedidos Pantaneiro 7</h3>
-          <p>Tabela Pantaneiro com comissão de 7%</p>
+          <p>Tabela Pantaneiro</p>
+        </div>
+      </a>
+      <a href="config-pantaneiro5.html" class="card-link">
+        <div class="card">
+          <i class="fas fa-key"></i>
+          <h3>Liberar Acesso Tabela 5</h3>
+          <p>Adicionar ou remover CNPJs com acesso à tabela Pantaneiro 5</p>
         </div>
       </a>
     </div>
@@ -323,6 +330,19 @@
         return;
       }
       document.getElementById('user-info').textContent = `Olá, ${user}`;
+
+      try {
+        const res = await fetch('/api/acessos-pantaneiro5');
+        if (res.ok) {
+          const acessos = await res.json();
+          const usuarios = (acessos.usuarios || []).map(u => (u || '').toString().toLowerCase());
+          if (usuarios.includes((user || '').toString().toLowerCase())) {
+            const card5 = document.getElementById('card-pantaneiro5');
+            if (card5) card5.style.display = '';
+          }
+        }
+      } catch (_) {}
+
       document.getElementById('logout-button').addEventListener('click', () => {
         sessionStorage.removeItem('loggedInUser');
         window.location.href = 'index.html';

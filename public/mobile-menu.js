@@ -63,6 +63,7 @@ function createMobileMenuElements() {
       <a href="vertice.html" class="mobile-menu-item"><span class="icon">🛵</span><span>Pedidos Vértice</span></a>
       <a href="pantaneiro5.html" class="mobile-menu-item"><span class="icon">📦</span><span>Pantaneiro 5</span></a>
       <a href="pantaneiro7.html" class="mobile-menu-item"><span class="icon">📦</span><span>Pantaneiro 7</span></a>
+      <a href="config-pantaneiro5.html" class="mobile-menu-item"><span class="icon">🔑</span><span>Liberar Acesso Tabela 5</span></a>
     `;
   }
 
@@ -73,6 +74,7 @@ function createMobileMenuElements() {
       <a href="vertice.html" class="mobile-menu-item"><span class="icon">🛵</span><span>Pedidos Vértice</span></a>
       <a href="pantaneiro5.html" class="mobile-menu-item"><span class="icon">📦</span><span>Pantaneiro 5</span></a>
       <a href="pantaneiro7.html" class="mobile-menu-item"><span class="icon">📦</span><span>Pantaneiro 7</span></a>
+      <a href="config-pantaneiro5.html" class="mobile-menu-item"><span class="icon">🔑</span><span>Liberar Acesso Tabela 5</span></a>
     `;
   }
 
@@ -83,14 +85,16 @@ function createMobileMenuElements() {
       <a href="vertice.html" class="mobile-menu-item"><span class="icon">🛵</span><span>Novo Pedido Vértice</span></a>
       <a href="pantaneiro5.html" class="mobile-menu-item"><span class="icon">📦</span><span>Pantaneiro 5</span></a>
       <a href="pantaneiro7.html" class="mobile-menu-item"><span class="icon">📦</span><span>Pantaneiro 7</span></a>
+      <a href="config-pantaneiro5.html" class="mobile-menu-item"><span class="icon">🔑</span><span>Liberar Acesso Tabela 5</span></a>
     `;
   }
 
-  if (path.includes('vertice') || path.includes('pantaneiro')) {
+  if (path.includes('vertice') || path.includes('pantaneiro') || path.includes('config-pantaneiro5')) {
     menuItems += `
       <a href="painel.html" class="mobile-menu-item"><span class="icon">🏠</span><span>Painel Principal</span></a>
       <a href="painel-clientes.html" class="mobile-menu-item"><span class="icon">👥</span><span>Clientes</span></a>
       <a href="pedidos.html" class="mobile-menu-item"><span class="icon">📋</span><span>Pedidos</span></a>
+      <a href="config-pantaneiro5.html" class="mobile-menu-item"><span class="icon">🔑</span><span>Liberar Acesso Tabela 5</span></a>
     `;
   }
 

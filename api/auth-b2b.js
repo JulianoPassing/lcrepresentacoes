@@ -3,6 +3,17 @@ const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql2/promise');
 
+function carregarAcessosPantaneiro5() {
+  try {
+    const p = path.join(__dirname, '../public/acessos-pantaneiro5.json');
+    const data = fs.readFileSync(p, 'utf8');
+    const parsed = JSON.parse(data);
+    return Array.isArray(parsed.cnpjs) ? parsed.cnpjs : [];
+  } catch (e) {
+    return [];
+  }
+}
+
 // SENHA PADRÃO: 123456
 // CNPJs com senhas personalizadas (opcional)
 const senhasPersonalizadas = {
@@ -76,6 +87,10 @@ module.exports = async (req, res) => {
     }
 
     if (cliente) {
+      const cnpjNorm = (cliente.cnpj || '').toString().replace(/[.\-\/\s]/g, '');
+      const cnpjsComAcesso = carregarAcessosPantaneiro5();
+      const temAcesso5 = cnpjsComAcesso.includes(cnpjNorm);
+
       return res.status(200).json({
         success: true,
         message: 'Login realizado com sucesso',
@@ -93,7 +108,11 @@ module.exports = async (req, res) => {
           telefone: cliente.telefone,
           transporte: cliente.transporte,
           prazo: cliente.prazo,
-          obs: cliente.obs
+          obs: cliente.obs,
+          acessos: {
+            pantaneiro7: true,
+            pantaneiro5: temAcesso5
+          }
         }
       });
     }

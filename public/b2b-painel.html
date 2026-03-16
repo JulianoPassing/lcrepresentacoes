@@ -197,18 +197,18 @@
           <p>Fazer novo pedido da linha Vértice (Duas Rodas)</p>
         </div>
       </a>
-      <a href="b2b-pantaneiro5.html" class="card-link">
+      <a href="b2b-pantaneiro5.html" class="card-link" id="card-pantaneiro5" style="display:none;">
         <div class="card">
           <i class="fas fa-box"></i>
           <h3>Pedidos Pantaneiro 5</h3>
-          <p>Tabela B2B Pantaneiro com comissão de 5%</p>
+          <p>Tabela Pantaneiro</p>
         </div>
       </a>
       <a href="b2b-pantaneiro7.html" class="card-link">
         <div class="card">
           <i class="fas fa-box"></i>
           <h3>Pedidos Pantaneiro 7</h3>
-          <p>Tabela B2B Pantaneiro com comissão de 7%</p>
+          <p>Tabela Pantaneiro</p>
         </div>
       </a>
     </div>
@@ -503,6 +503,10 @@
       }
 
       document.getElementById('user-info').textContent = clienteB2B.razao || 'Cliente';
+      const card5 = document.getElementById('card-pantaneiro5');
+      if (card5 && clienteB2B.acessos && clienteB2B.acessos.pantaneiro5) {
+        card5.style.display = '';
+      }
       document.getElementById('logout-button').onclick = () => {
         localStorage.removeItem('clienteB2B');
         window.location.href = 'b2b-login.html';
