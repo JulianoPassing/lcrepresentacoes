@@ -197,6 +197,20 @@
           <p>Fazer novo pedido da linha Vértice (Duas Rodas)</p>
         </div>
       </a>
+      <a href="b2b-pantaneiro5.html" class="card-link">
+        <div class="card">
+          <i class="fas fa-box"></i>
+          <h3>Pedidos Pantaneiro 5</h3>
+          <p>Tabela B2B Pantaneiro com comissão de 5%</p>
+        </div>
+      </a>
+      <a href="b2b-pantaneiro7.html" class="card-link">
+        <div class="card">
+          <i class="fas fa-box"></i>
+          <h3>Pedidos Pantaneiro 7</h3>
+          <p>Tabela B2B Pantaneiro com comissão de 7%</p>
+        </div>
+      </a>
     </div>
 
     <section class="card-pedidos">
@@ -273,12 +287,13 @@
       const LC_LOGO = 'https://i.imgur.com/kNGKxVO.png';
       const logoImg = new Image();
       logoImg.crossOrigin = 'anonymous';
-      logoImg.onload = () => gerarPDFPedido(logoImg, cliente, itens, total, p);
-      logoImg.onerror = () => gerarPDFPedido(null, cliente, itens, total, p);
+      logoImg.onload = () => gerarPDFPedido(logoImg, cliente, itens, total, p, dados);
+      logoImg.onerror = () => gerarPDFPedido(null, cliente, itens, total, p, dados);
       logoImg.src = LC_LOGO;
     }
 
-    function gerarPDFPedido(logoImg, cliente, itens, total, pedido) {
+    function gerarPDFPedido(logoImg, cliente, itens, total, pedido, dados) {
+      dados = dados || {};
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF('p', 'mm', 'a4');
       const pageWidth = doc.internal.pageSize.getWidth();
@@ -292,19 +307,33 @@
       const LOGO_DISPLAY_H = 22;
       const LOGO_DISPLAY_W = Math.round(LOGO_DISPLAY_H * (LOGO_ORIG_W / LOGO_ORIG_H));
 
-      try { if (logoImg && logoImg.complete && logoImg.naturalWidth) doc.addImage(logoImg, 'PNG', margin, 10, LOGO_DISPLAY_W, LOGO_DISPLAY_H); } catch (_) {}
-      doc.setFontSize(16);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(LC_AZUL[0], LC_AZUL[1], LC_AZUL[2]);
-      doc.text('Pedido de Venda - Vértice', pageWidth - margin, 18, { align: 'right' });
-      doc.setTextColor(0, 0, 0);
+      const empresa = (pedido.empresa || '').toString();
+      const titulo = empresa.includes('Pantaneiro7') ? 'Pedido de Venda - Pantaneiro 7'
+        : empresa.includes('Pantaneiro5') ? 'Pedido de Venda - Pantaneiro 5'
+        : 'Pedido de Venda - Vértice';
+      const nomeBase = empresa.includes('Pantaneiro7') ? 'Pantaneiro 7' : empresa.includes('Pantaneiro5') ? 'Pantaneiro 5' : 'Vertice';
       const dt = pedido.data_pedido || pedido.created_at;
       const d = dt ? new Date(dt) : new Date();
       const dataAtual = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-      doc.text(`Data: ${dataAtual}`, pageWidth - margin, 24, { align: 'right' });
-      doc.text('LC Representações', pageWidth - margin, 30, { align: 'right' });
+
+      const drawHeaderAndFooter = (data) => {
+        try { if (logoImg && logoImg.complete && logoImg.naturalWidth) doc.addImage(logoImg, 'PNG', margin, 10, LOGO_DISPLAY_W, LOGO_DISPLAY_H); } catch (_) {}
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(LC_AZUL[0], LC_AZUL[1], LC_AZUL[2]);
+        doc.text(titulo, pageWidth - margin, 18, { align: 'right' });
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Data: ${dataAtual}`, pageWidth - margin, 24, { align: 'right' });
+        doc.text('LC Representações', pageWidth - margin, 30, { align: 'right' });
+        const pageCount = doc.internal.getNumberOfPages();
+        doc.setFontSize(8);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Página ${data.pageNumber} de ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+        doc.setTextColor(0, 0, 0);
+      };
+      drawHeaderAndFooter({ pageNumber: 1 });
 
       doc.autoTable({
         startY: 35,
@@ -323,29 +352,60 @@
       });
 
       let startY = doc.autoTable.previous.finalY + 7;
-      const head = [['Ref.', 'Descrição', 'Tam', 'Qtd', 'Unit.', 'Total']];
-      const body = itens.map(i => [
-        i.REF || '-', i.DESC || '-', i.tamanho || '-', i.quantidade || 0,
-        `R$ ${(i.preco || 0).toFixed(2)}`, `R$ ${(i.subtotal || 0).toFixed(2)}`
-      ]);
+      const isPantaneiro = empresa.includes('Pantaneiro5') || empresa.includes('Pantaneiro7');
+      let head, body, columnStyles;
+      if (isPantaneiro) {
+        head = [['Ref.', 'Descrição', 'Tam/Cor', 'Qtd', 'Unit.', 'Desc.%', 'Total']];
+        body = itens.map(i => {
+          const ref = i.REFERENCIA || i.REF || '-';
+          const desc = i.DESCRIÇÃO || i.DESC || '-';
+          const tamCor = (i.tamanho || '') + (i.cor ? `, Cor: ${i.cor}` : '');
+          const subtotal = i.subtotal ?? ((i.preco || 0) * (i.quantidade || 0) * (1 - (i.descontoExtra || 0) / 100));
+          return [ref, desc, tamCor || '-', i.quantidade || 0, `R$ ${(i.preco || 0).toFixed(2)}`, `${i.descontoExtra ?? 0}%`, `R$ ${subtotal.toFixed(2)}`];
+        });
+        columnStyles = { 0: { cellWidth: 15 }, 1: { cellWidth: 'auto' }, 2: { cellWidth: 30, halign: 'center' }, 3: { cellWidth: 10, halign: 'center' }, 4: { cellWidth: 20, halign: 'right' }, 5: { cellWidth: 15, halign: 'center' }, 6: { cellWidth: 22, halign: 'right' } };
+      } else {
+        head = [['Ref.', 'Descrição', 'Tam', 'Qtd', 'Unit.', 'Total']];
+        body = itens.map(i => {
+          const ref = i.REFERENCIA || i.REF || '-';
+          const desc = i.DESCRIÇÃO || i.DESC || '-';
+          const subtotal = i.subtotal ?? ((i.preco || 0) * (i.quantidade || 0));
+          return [ref, desc, i.tamanho || '-', i.quantidade || 0, `R$ ${(i.preco || 0).toFixed(2)}`, `R$ ${subtotal.toFixed(2)}`];
+        });
+        columnStyles = { 0: { cellWidth: 15 }, 1: { cellWidth: 'auto' }, 2: { cellWidth: 15, halign: 'center' }, 3: { cellWidth: 12, halign: 'center' }, 4: { cellWidth: 22, halign: 'right' }, 5: { cellWidth: 25, halign: 'right' } };
+      }
       doc.autoTable({
         head, body, startY,
         theme: 'grid',
         styles: { fontSize: 8, cellPadding: 2 },
         headStyles: { fillColor: LC_AZUL, textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' },
-        columnStyles: { 0: { cellWidth: 15 }, 1: { cellWidth: 'auto' }, 2: { cellWidth: 15, halign: 'center' }, 3: { cellWidth: 12, halign: 'center' }, 4: { cellWidth: 22, halign: 'right' }, 5: { cellWidth: 25, halign: 'right' } },
+        columnStyles,
+        didDrawPage: (data) => { if (data.pageNumber > 1) drawHeaderAndFooter(data); },
         margin: { top: 30, bottom: 15 }
       });
 
       const finalY = doc.autoTable.previous.finalY + 8;
-      const obsText = `Transporte: ${get('transporte') || 'A combinar'}\nPrazo: ${get('prazo') || 'A combinar'}\n\nObservações:\n${get('obs') || 'Nenhuma.'}`;
-      const summaryData = [
-        ['Subtotal:', `R$ ${total.toFixed(2)}`],
-        ['', ''],
-        [{ content: 'Total do Pedido:', styles: { fontStyle: 'bold', fontSize: 10 } }, { content: `R$ ${total.toFixed(2)}`, styles: { fontStyle: 'bold', fontSize: 10 } }]
-      ];
+      const transporte = dados.transporte || get('transporte') || 'A combinar';
+      const prazo = dados.prazo || get('prazo') || 'A combinar';
+      const obs = dados.observacoes || get('obs') || 'Nenhuma.';
+      const obsText = `Transporte: ${transporte}\nPrazo: ${prazo}\n\nObservações:\n${obs}`;
+      const descontos = dados.descontos || {};
+      let summaryData = [];
+      if (isPantaneiro && (descontos.prazo > 0 || descontos.volume > 0)) {
+        const subtotalSemDesconto = itens.reduce((s, i) => s + (i.preco || 0) * (i.quantidade || 0), 0);
+        summaryData.push(['Subtotal sem Desconto:', `R$ ${subtotalSemDesconto.toFixed(2)}`]);
+        if (descontos.prazo > 0) summaryData.push([`Desconto Prazo (${descontos.prazo}%):`, `- R$ ${(subtotalSemDesconto * descontos.prazo / 100).toFixed(2)}`]);
+        if (descontos.volume > 0) {
+          const base = subtotalSemDesconto * (1 - (descontos.prazo || 0) / 100);
+          summaryData.push([`Desconto Volume (${descontos.volume}%):`, `- R$ ${(base * descontos.volume / 100).toFixed(2)}`]);
+        }
+      } else {
+        summaryData.push(['Subtotal:', `R$ ${total.toFixed(2)}`]);
+      }
+      summaryData.push(['', '']);
+      summaryData.push([{ content: 'Total do Pedido:', styles: { fontStyle: 'bold', fontSize: 10 } }, { content: `R$ ${total.toFixed(2)}`, styles: { fontStyle: 'bold', fontSize: 10 } }]);
       const finalTableBody = [];
-      const leftColumn = { content: obsText, rowSpan: 3, styles: { valign: 'top', fontSize: 9 } };
+      const leftColumn = { content: obsText, rowSpan: summaryData.length, styles: { valign: 'top', fontSize: 9 } };
       for (let i = 0; i < summaryData.length; i++) {
         const row = [];
         if (i === 0) row.push(leftColumn);
@@ -361,7 +421,7 @@
       });
 
       const razao = (get('razao') || 'N/A').replace(/[\s\/]/g, '_');
-      const nomeArquivo = `Pedido Vertice LC - ${razao} - ${dataAtual.replace(/\//g, '-')}.pdf`;
+      const nomeArquivo = `Pedido ${nomeBase} LC - ${razao} - ${dataAtual.replace(/\//g, '-')}.pdf`;
       const blob = doc.output('blob');
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');

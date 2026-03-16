@@ -61,6 +61,8 @@ function createMobileMenuElements() {
       <a href="painel-clientes.html" class="mobile-menu-item"><span class="icon">👥</span><span>Clientes</span></a>
       <a href="pedidos.html" class="mobile-menu-item"><span class="icon">📋</span><span>Pedidos</span></a>
       <a href="vertice.html" class="mobile-menu-item"><span class="icon">🛵</span><span>Pedidos Vértice</span></a>
+      <a href="pantaneiro5.html" class="mobile-menu-item"><span class="icon">📦</span><span>Pantaneiro 5</span></a>
+      <a href="pantaneiro7.html" class="mobile-menu-item"><span class="icon">📦</span><span>Pantaneiro 7</span></a>
     `;
   }
 
@@ -69,6 +71,8 @@ function createMobileMenuElements() {
       <a href="painel.html" class="mobile-menu-item"><span class="icon">🏠</span><span>Painel Principal</span></a>
       <a href="pedidos.html" class="mobile-menu-item"><span class="icon">📋</span><span>Pedidos</span></a>
       <a href="vertice.html" class="mobile-menu-item"><span class="icon">🛵</span><span>Pedidos Vértice</span></a>
+      <a href="pantaneiro5.html" class="mobile-menu-item"><span class="icon">📦</span><span>Pantaneiro 5</span></a>
+      <a href="pantaneiro7.html" class="mobile-menu-item"><span class="icon">📦</span><span>Pantaneiro 7</span></a>
     `;
   }
 
@@ -77,10 +81,12 @@ function createMobileMenuElements() {
       <a href="painel.html" class="mobile-menu-item"><span class="icon">🏠</span><span>Painel Principal</span></a>
       <a href="painel-clientes.html" class="mobile-menu-item"><span class="icon">👥</span><span>Clientes</span></a>
       <a href="vertice.html" class="mobile-menu-item"><span class="icon">🛵</span><span>Novo Pedido Vértice</span></a>
+      <a href="pantaneiro5.html" class="mobile-menu-item"><span class="icon">📦</span><span>Pantaneiro 5</span></a>
+      <a href="pantaneiro7.html" class="mobile-menu-item"><span class="icon">📦</span><span>Pantaneiro 7</span></a>
     `;
   }
 
-  if (path.includes('vertice')) {
+  if (path.includes('vertice') || path.includes('pantaneiro')) {
     menuItems += `
       <a href="painel.html" class="mobile-menu-item"><span class="icon">🏠</span><span>Painel Principal</span></a>
       <a href="painel-clientes.html" class="mobile-menu-item"><span class="icon">👥</span><span>Clientes</span></a>
