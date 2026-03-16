@@ -3246,19 +3246,6 @@ window.produtosData = [
           return;
         }
 
-        try {
-          const res = await fetch("/api/acessos-pantaneiro5");
-          if (res.ok) {
-            const acessos = await res.json();
-            const usuarios = (acessos.usuarios || []).map(u => (u || "").toString().toLowerCase());
-            if (!usuarios.includes((loggedInUser || "").toString().toLowerCase())) {
-              alert("Você não tem acesso à tabela Pantaneiro 5.");
-              window.location.href = "painel.html";
-              return;
-            }
-          }
-        } catch (_) {}
-
         document.getElementById("user-info").textContent = `Bem-vindo(a), ${loggedInUser}!`;
 
         document

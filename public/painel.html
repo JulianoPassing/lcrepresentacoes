@@ -298,7 +298,7 @@
           <p>Lançar pedidos da linha Vértice (Duas Rodas)</p>
         </div>
       </a>
-      <a href="pantaneiro5.html" class="card-link" id="card-pantaneiro5" style="display:none;">
+      <a href="pantaneiro5.html" class="card-link">
         <div class="card">
           <i class="fas fa-box"></i>
           <h3>Pedidos Pantaneiro 5</h3>
@@ -330,18 +330,6 @@
         return;
       }
       document.getElementById('user-info').textContent = `Olá, ${user}`;
-
-      try {
-        const res = await fetch('/api/acessos-pantaneiro5');
-        if (res.ok) {
-          const acessos = await res.json();
-          const usuarios = (acessos.usuarios || []).map(u => (u || '').toString().toLowerCase());
-          if (usuarios.includes((user || '').toString().toLowerCase())) {
-            const card5 = document.getElementById('card-pantaneiro5');
-            if (card5) card5.style.display = '';
-          }
-        }
-      } catch (_) {}
 
       document.getElementById('logout-button').addEventListener('click', () => {
         sessionStorage.removeItem('loggedInUser');

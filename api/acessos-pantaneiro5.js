@@ -1,8 +1,5 @@
-// API para gerenciar acessos à tabela Pantaneiro 5
-const fs = require('fs');
-const path = require('path');
-
-const FILE_PATH = path.join(__dirname, '../public/acessos-pantaneiro5.json');
+// API para gerenciar acessos à tabela Pantaneiro 5 (usa MySQL - Vercel tem filesystem read-only)
+const mysql = require('mysql2/promise');
 
 const addSecurityHeaders = (res) => {
   res.setHeader('Content-Type', 'application/json');
@@ -10,25 +7,34 @@ const addSecurityHeaders = (res) => {
   res.setHeader('X-Frame-Options', 'DENY');
 };
 
-function carregarAcessos() {
+function normalizarCnpj(cnpj) {
+  return (cnpj || '').toString().replace(/[.\-\/\s]/g, '');
+}
+
+async function getConnection() {
   try {
-    const data = fs.readFileSync(FILE_PATH, 'utf8');
-    const parsed = JSON.parse(data);
-    return {
-      cnpjs: Array.isArray(parsed.cnpjs) ? parsed.cnpjs : [],
-      usuarios: Array.isArray(parsed.usuarios) ? parsed.usuarios : []
-    };
+    return await mysql.createConnection({
+      host: process.env.DB_HOST || 'localhost',
+      user: process.env.DB_USER || 'root',
+      password: process.env.DB_PASSWORD || '',
+      database: process.env.DB_NAME || 'lc_representacoes'
+    });
   } catch (e) {
-    return { cnpjs: [], usuarios: [] };
+    return null;
   }
 }
 
-function salvarAcessos(data) {
-  fs.writeFileSync(FILE_PATH, JSON.stringify(data, null, 2), 'utf8');
-}
-
-function normalizarCnpj(cnpj) {
-  return (cnpj || '').toString().replace(/[.\-\/\s]/g, '');
+async function carregarAcessos(conn) {
+  try {
+    const [rows] = await conn.execute(
+      'SELECT tipo, valor FROM acessos_pantaneiro5'
+    );
+    const cnpjs = rows.filter(r => r.tipo === 'cnpj').map(r => r.valor);
+    const usuarios = rows.filter(r => r.tipo === 'usuario').map(r => r.valor);
+    return { cnpjs, usuarios };
+  } catch (e) {
+    return { cnpjs: [], usuarios: [] };
+  }
 }
 
 module.exports = async (req, res) => {
@@ -36,8 +42,18 @@ module.exports = async (req, res) => {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
+  let connection = null;
+
   try {
-    let acessos = carregarAcessos();
+    connection = await getConnection();
+    if (!connection) {
+      return res.status(503).json({
+        error: 'Banco de dados indisponível. Configure DB_HOST, DB_USER, DB_PASSWORD e DB_NAME no Vercel.',
+        acessos: { cnpjs: [], usuarios: [] }
+      });
+    }
+
+    let acessos = await carregarAcessos(connection);
 
     if (req.method === 'GET') {
       return res.status(200).json(acessos);
@@ -56,15 +72,21 @@ module.exports = async (req, res) => {
         const cnpjNorm = normalizarCnpj(valor);
         if (cnpjNorm.length < 14) return res.status(400).json({ error: 'CNPJ inválido' });
         if (!acessos.cnpjs.includes(cnpjNorm)) {
-          acessos.cnpjs.push(cnpjNorm);
-          salvarAcessos(acessos);
+          await connection.execute(
+            'INSERT IGNORE INTO acessos_pantaneiro5 (tipo, valor) VALUES (?, ?)',
+            ['cnpj', cnpjNorm]
+          );
+          acessos = await carregarAcessos(connection);
         }
         return res.status(200).json({ message: 'CNPJ adicionado', acessos });
       }
       if (tipo === 'usuario') {
         if (!acessos.usuarios.includes(v)) {
-          acessos.usuarios.push(v);
-          salvarAcessos(acessos);
+          await connection.execute(
+            'INSERT IGNORE INTO acessos_pantaneiro5 (tipo, valor) VALUES (?, ?)',
+            ['usuario', v]
+          );
+          acessos = await carregarAcessos(connection);
         }
         return res.status(200).json({ message: 'Usuário adicionado', acessos });
       }
@@ -83,13 +105,19 @@ module.exports = async (req, res) => {
       const v = (valor || '').toString().trim().toLowerCase();
       if (tipo === 'cnpj') {
         const cnpjNorm = normalizarCnpj(valor);
-        acessos.cnpjs = acessos.cnpjs.filter(c => c !== cnpjNorm);
-        salvarAcessos(acessos);
+        await connection.execute(
+          'DELETE FROM acessos_pantaneiro5 WHERE tipo = ? AND valor = ?',
+          ['cnpj', cnpjNorm]
+        );
+        acessos = await carregarAcessos(connection);
         return res.status(200).json({ message: 'CNPJ removido', acessos });
       }
       if (tipo === 'usuario') {
-        acessos.usuarios = acessos.usuarios.filter(u => u !== v);
-        salvarAcessos(acessos);
+        await connection.execute(
+          'DELETE FROM acessos_pantaneiro5 WHERE tipo = ? AND valor = ?',
+          ['usuario', v]
+        );
+        acessos = await carregarAcessos(connection);
         return res.status(200).json({ message: 'Usuário removido', acessos });
       }
       return res.status(400).json({ error: 'Tipo deve ser cnpj ou usuario' });
@@ -99,5 +127,7 @@ module.exports = async (req, res) => {
   } catch (err) {
     console.error('Erro acessos-pantaneiro5:', err);
     res.status(500).json({ error: err.message });
+  } finally {
+    if (connection) await connection.end();
   }
 };

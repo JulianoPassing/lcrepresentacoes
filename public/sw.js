@@ -11,13 +11,13 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  // Network-first: tenta rede primeiro, usa cache só se offline
+  if (!e.request.url.startsWith('http')) return;
   e.respondWith(
     fetch(e.request)
       .then(res => {
         const clone = res.clone();
         if (res.ok && (e.request.method === 'GET') && !e.request.url.includes('/api/')) {
-          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone)).catch(() => {});
         }
         return res;
       })

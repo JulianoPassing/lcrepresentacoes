@@ -21,6 +21,13 @@ CREATE TABLE IF NOT EXISTS clientes (
   obs TEXT
 );
 
+CREATE TABLE IF NOT EXISTS acessos_pantaneiro5 (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  tipo ENUM('cnpj','usuario') NOT NULL,
+  valor VARCHAR(255) NOT NULL,
+  UNIQUE KEY uk_tipo_valor (tipo, valor)
+);
+
 CREATE TABLE IF NOT EXISTS pedidos (
   id INT AUTO_INCREMENT PRIMARY KEY,
   empresa VARCHAR(255),

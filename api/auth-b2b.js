@@ -1,14 +1,14 @@
 // API de autenticação B2B para clientes LC Representações
+const mysql = require('mysql2/promise');
 const fs = require('fs');
 const path = require('path');
-const mysql = require('mysql2/promise');
 
-function carregarAcessosPantaneiro5() {
+async function carregarAcessosPantaneiro5(connection) {
   try {
-    const p = path.join(__dirname, '../public/acessos-pantaneiro5.json');
-    const data = fs.readFileSync(p, 'utf8');
-    const parsed = JSON.parse(data);
-    return Array.isArray(parsed.cnpjs) ? parsed.cnpjs : [];
+    const [rows] = await connection.execute(
+      "SELECT valor FROM acessos_pantaneiro5 WHERE tipo = 'cnpj'"
+    );
+    return rows.map(r => r.valor);
   } catch (e) {
     return [];
   }
@@ -53,6 +53,7 @@ module.exports = async (req, res) => {
     let cliente = null;
     let connection = null;
 
+    let cnpjsComAcesso = [];
     try {
       connection = await mysql.createConnection({
         host: process.env.DB_HOST || 'localhost',
@@ -66,7 +67,10 @@ module.exports = async (req, res) => {
         [cnpj, cnpjNormalizado]
       );
 
-      if (rows.length > 0) cliente = rows[0];
+      if (rows.length > 0) {
+        cliente = rows[0];
+        cnpjsComAcesso = await carregarAcessosPantaneiro5(connection);
+      }
     } catch (dbError) {
       try {
         const jsonPath = path.join(__dirname, '../public/clientes.json');
@@ -88,7 +92,6 @@ module.exports = async (req, res) => {
 
     if (cliente) {
       const cnpjNorm = (cliente.cnpj || '').toString().replace(/[.\-\/\s]/g, '');
-      const cnpjsComAcesso = carregarAcessosPantaneiro5();
       const temAcesso5 = cnpjsComAcesso.includes(cnpjNorm);
 
       return res.status(200).json({
