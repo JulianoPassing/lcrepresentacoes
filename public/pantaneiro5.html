@@ -9,6 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="g8-resumo-unidades-pdf.js"></script>
     <link rel="stylesheet" href="modern-design.css" />
     <link rel="stylesheet" href="mobile.css" />
     <script src="mobile-menu.js" defer></script>
@@ -907,22 +908,22 @@ window.produtosData = [
     CATEGORIA: "Aventura",
     REFERENCIA: "201",
     DESCRIÇÃO: "JARDINEIRA PVC COM BOTA",
-    TAMANHOS: ["ÚNICO / BOTAS 35 - 46"],
-    PRECO: 135.39,
+    TAMANHOS: ["P - EX / BOTAS 35 - 46"],
+    PRECO: 144.45,
   },
   {
     CATEGORIA: "Aventura",
     REFERENCIA: "203",
     DESCRIÇÃO: "PERNEIRA PVC VIRILHA COM BOTA",
     TAMANHOS: ["ÚNICO / BOTAS 35 - 46"],
-    PRECO: 104.79,
+    PRECO: 111.58,
   },
   {
     CATEGORIA: "Aventura",
     REFERENCIA: "204",
     DESCRIÇÃO: "PERNEIRA PVC JOELHO COM BOTA",
     TAMANHOS: ["ÚNICO / BOTAS 35 - 46"],
-    PRECO: 92.39,
+    PRECO: 98.95,
   },
   {
     CATEGORIA: "Aventura",
@@ -941,7 +942,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 42.74,
+    PRECO: 45.51,
   },
   {
     CATEGORIA: "Aventura",
@@ -960,7 +961,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 29.77,
+    PRECO: 31.36,
   },
   {
     CATEGORIA: "Aventura",
@@ -979,7 +980,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 71.04,
+    PRECO: 72.37,
   },
   {
     CATEGORIA: "Aventura",
@@ -998,7 +999,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 48.07,
+    PRECO: 48.08,
   },
   {
     CATEGORIA: "Aventura",
@@ -1017,7 +1018,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 65.35,
+    PRECO: 69.42,
   },
   {
     CATEGORIA: "Aventura",
@@ -1036,10 +1037,10 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 119.87,
+    PRECO: 121.82,
   },
   {
-    CATEGORIA: "PRO",
+    CATEGORIA: "Pro",
     REFERENCIA: "222",
     DESCRIÇÃO: "CAPA LONGA PVC COM CAPUZ LAPA SIMPLES COM VELCRO",
     TAMANHOS: [
@@ -1055,10 +1056,10 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 49.86,
+    PRECO: 52.79,
   },
   {
-    CATEGORIA: "PRO",
+    CATEGORIA: "Pro",
     REFERENCIA: "222.1",
     DESCRIÇÃO: "CAPA LONGA PVC COM CAPUZ LAPA INTERNA",
     TAMANHOS: [
@@ -1074,10 +1075,29 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 48.17,
+    PRECO: 51.1,
   },
   {
-    CATEGORIA: "PRO",
+    CATEGORIA: "Pro",
+    REFERENCIA: "223",
+    DESCRIÇÃO: "CAPA LONGA PVC PADRÃO TRANSPARENTE COM CAPUZ LAPA SIMPLES COM VELCRO",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+      "2G",
+      "3G",
+      "4G",
+      "5G",
+    ],
+    PRECO: 64.75,
+  },
+  {
+    CATEGORIA: "Pro",
     REFERENCIA: "225",
     DESCRIÇÃO: "CAPA LONGA NYLON PADRÃO ELÁSTICO NOS PUNHOS",
     TAMANHOS: [
@@ -1093,10 +1113,10 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 103.21,
+    PRECO: 104.22,
   },
   {
-    CATEGORIA: "PRO",
+    CATEGORIA: "Pro",
     REFERENCIA: "225.1",
     DESCRIÇÃO: "CAPA LONGA NYLON CAPUZ LAPA INTERNA",
     TAMANHOS: [
@@ -1112,10 +1132,10 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 99.14,
+    PRECO: 100.14,
   },
   {
-    CATEGORIA: "PRO",
+    CATEGORIA: "Pro",
     REFERENCIA: "225FT900",
     DESCRIÇÃO: "CAPA LONGA NYLON PADRÃO COM REFLETIVOS",
     TAMANHOS: [
@@ -1131,13 +1151,12 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 131.69,
+    PRECO: 137.26,
   },
   {
-    CATEGORIA: "PRO",
+    CATEGORIA: "Pro",
     REFERENCIA: "225FT900.2",
-    DESCRIÇÃO:
-      "CAPA LONGA NYLON PADRÃO COM REFLETIVOS E ABERT. VENTILAÇÃO FRENTE E COSTAS",
+    DESCRIÇÃO: "CAPA LONGA NYLON PADRÃO COM REFLETIVOS E ABERT. VENTILAÇÃO FRENTE E COSTAS",
     TAMANHOS: [
       "PP",
       "P",
@@ -1151,52 +1170,88 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 131.69,
+    PRECO: 137.14,
   },
   {
-    CATEGORIA: "PRO",
+    CATEGORIA: "Pro",
     REFERENCIA: "510",
     DESCRIÇÃO: "JAQUETA NYLON PARA FRIO COM ELÁSTICO NA CINTURA",
-    TAMANHOS: ["P", "M", "G", "GG", "EX"],
-    PRECO: 143.42,
+    TAMANHOS: [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+    ],
+    PRECO: 174.81,
   },
   {
-    CATEGORIA: "PRO",
+    CATEGORIA: "Pro",
     REFERENCIA: "511",
     DESCRIÇÃO: "JAQUETA NYLON PARA FRIO - MOD. PARKA",
-    TAMANHOS: ["P", "M", "G", "GG", "EX"],
-    PRECO: 138.75,
+    TAMANHOS: [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+    ],
+    PRECO: 172.67,
   },
   {
-    CATEGORIA: "PRO",
+    CATEGORIA: "Pro",
     REFERENCIA: "521",
     DESCRIÇÃO: "JAQUETA NYLON PARA FRIO COM CAPUZ REMOVIVEL - MOD. PARKA",
-    TAMANHOS: ["P", "M", "G", "GG", "EX"],
-    PRECO: 156.39,
+    TAMANHOS: [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+    ],
+    PRECO: 186.91,
   },
   {
-    CATEGORIA: "PRO",
+    CATEGORIA: "Pro",
     REFERENCIA: "530",
     DESCRIÇÃO: "JAQUETA NYLON PARA FRIO - MANGAS REMOVÍVEIS",
-    TAMANHOS: ["P", "M", "G", "GG", "EX"],
-    PRECO: 168.71,
+    TAMANHOS: [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+    ],
+    PRECO: 168.61,
   },
   {
-    CATEGORIA: "PRO",
+    CATEGORIA: "Pro",
     REFERENCIA: "550",
     DESCRIÇÃO: "JAQUETA NYLON FEMININO PARA FRIO",
-    TAMANHOS: ["P", "M", "G", "GG", "EX"],
-    PRECO: 116.88,
+    TAMANHOS: [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+    ],
+    PRECO: 151.0,
   },
   {
-    CATEGORIA: "PRO",
+    CATEGORIA: "Pro",
     REFERENCIA: "551",
     DESCRIÇÃO: "JAQUETA NYLON FEMININO PARA FRIO COM CAPUZ FIXO",
-    TAMANHOS: ["P", "M", "G", "GG", "EX"],
-    PRECO: 129.81,
+    TAMANHOS: [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+    ],
+    PRECO: 163.98,
   },
   {
-    CATEGORIA: "PRO",
+    CATEGORIA: "Pro",
     REFERENCIA: "670",
     DESCRIÇÃO: "CONJUNTO NYLON COM REFLETIVO - MODELO SEGURANÇA",
     TAMANHOS: [
@@ -1212,13 +1267,12 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 151.22,
+    PRECO: 146.68,
   },
   {
-    CATEGORIA: "PRO",
+    CATEGORIA: "Pro",
     REFERENCIA: "670FT900.1",
-    DESCRIÇÃO:
-      "CONJUNTO NYLON CAPUZ COM ABERTURA DE VENTILAÇÃO FRENTE E COSTAS",
+    DESCRIÇÃO: "CONJUNTO NYLON CAPUZ COM ABERTURA DE VENTILAÇÃO FRENTE E COSTAS",
     TAMANHOS: [
       "PP",
       "P",
@@ -1232,10 +1286,10 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 155.51,
+    PRECO: 165.36,
   },
   {
-    CATEGORIA: "PRO",
+    CATEGORIA: "Pro",
     REFERENCIA: "670J",
     DESCRIÇÃO: "JAQUETA NYLON - MODELO SEGURANÇA",
     TAMANHOS: [
@@ -1251,10 +1305,10 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 95.80,
+    PRECO: 93.58,
   },
   {
-    CATEGORIA: "PRO",
+    CATEGORIA: "Pro",
     REFERENCIA: "670C",
     DESCRIÇÃO: "CALÇA NYLON - MODELO SEGURANÇA",
     TAMANHOS: [
@@ -1270,7 +1324,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 57.91,
+    PRECO: 55.37,
   },
   {
     CATEGORIA: "Urbano",
@@ -1289,7 +1343,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 112.79,
+    PRECO: 114.96,
   },
   {
     CATEGORIA: "Urbano",
@@ -1308,7 +1362,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 113.62,
+    PRECO: 115.73,
   },
   {
     CATEGORIA: "Urbano",
@@ -1327,7 +1381,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 174.08,
+    PRECO: 176.17,
   },
   {
     CATEGORIA: "Urbano",
@@ -1346,7 +1400,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 175.05,
+    PRECO: 177.11,
   },
   {
     CATEGORIA: "Urbano",
@@ -1365,7 +1419,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 122.49,
+    PRECO: 124.55,
   },
   {
     CATEGORIA: "Urbano",
@@ -1384,7 +1438,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 124.15,
+    PRECO: 126.18,
   },
   {
     CATEGORIA: "Urbano",
@@ -1403,7 +1457,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 73.19,
+    PRECO: 74.17,
   },
   {
     CATEGORIA: "Urbano",
@@ -1422,7 +1476,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 75.51,
+    PRECO: 76.51,
   },
   {
     CATEGORIA: "Urbano",
@@ -1441,7 +1495,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 52.61,
+    PRECO: 53.31,
   },
   {
     CATEGORIA: "Urbano",
@@ -1460,7 +1514,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 122.61,
+    PRECO: 124.67,
   },
   {
     CATEGORIA: "Urbano",
@@ -1479,7 +1533,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 122.61,
+    PRECO: 124.67,
   },
   {
     CATEGORIA: "Urbano",
@@ -1498,7 +1552,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 128.94,
+    PRECO: 131.05,
   },
   {
     CATEGORIA: "Urbano",
@@ -1517,7 +1571,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 129.28,
+    PRECO: 131.39,
   },
   {
     CATEGORIA: "Urbano",
@@ -1536,7 +1590,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 129.28,
+    PRECO: 131.39,
   },
   {
     CATEGORIA: "Urbano",
@@ -1555,7 +1609,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 138.46,
+    PRECO: 140.64,
   },
   {
     CATEGORIA: "Urbano",
@@ -1574,7 +1628,26 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 72.83,
+    PRECO: 73.81,
+  },
+  {
+    CATEGORIA: "Urbano",
+    REFERENCIA: "1102PC",
+    DESCRIÇÃO: "JAQUETA NYLON FEMININA COM GOLA - PRETO COM CORES",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+      "2G",
+      "3G",
+      "4G",
+      "5G",
+    ],
+    PRECO: 80.19,
   },
   {
     CATEGORIA: "Urbano",
@@ -1593,7 +1666,26 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 78.03,
+    PRECO: 79.04,
+  },
+  {
+    CATEGORIA: "Urbano",
+    REFERENCIA: "1103PC",
+    DESCRIÇÃO: "JAQUETA NYLON FEMININA COM CAPUZ - PRETO COM CORES",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+      "2G",
+      "3G",
+      "4G",
+      "5G",
+    ],
+    PRECO: 89.04,
   },
   {
     CATEGORIA: "Urbano",
@@ -1612,7 +1704,26 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 49.48,
+    PRECO: 50.13,
+  },
+  {
+    CATEGORIA: "Urbano",
+    REFERENCIA: "1104PC",
+    DESCRIÇÃO: "CALÇA NYLON FEMININA - PRETO COM CORES",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+      "2G",
+      "3G",
+      "4G",
+      "5G",
+    ],
+    PRECO: 50.95,
   },
   {
     CATEGORIA: "Urbano",
@@ -1631,7 +1742,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 144.19,
+    PRECO: 145.96,
   },
   {
     CATEGORIA: "Urbano",
@@ -1650,7 +1761,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 147.98,
+    PRECO: 149.76,
   },
   {
     CATEGORIA: "Urbano",
@@ -1669,7 +1780,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 93.75,
+    PRECO: 94.55,
   },
   {
     CATEGORIA: "Urbano",
@@ -1688,7 +1799,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 98.61,
+    PRECO: 99.42,
   },
   {
     CATEGORIA: "Urbano",
@@ -1707,7 +1818,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 53.92,
+    PRECO: 54.65,
   },
   {
     CATEGORIA: "Urbano",
@@ -1726,7 +1837,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 140.67,
+    PRECO: 142.33,
   },
   {
     CATEGORIA: "Urbano",
@@ -1745,7 +1856,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 146.28,
+    PRECO: 148.25,
   },
   {
     CATEGORIA: "Urbano",
@@ -1764,7 +1875,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 148.93,
+    PRECO: 150.92,
   },
   {
     CATEGORIA: "Urbano",
@@ -1783,7 +1894,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 167.60,
+    PRECO: 168.42,
   },
   {
     CATEGORIA: "Urbano",
@@ -1802,7 +1913,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 149.23,
+    PRECO: 151.02,
   },
   {
     CATEGORIA: "Urbano",
@@ -1821,13 +1932,12 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 149.23,
+    PRECO: 151.02,
   },
   {
     CATEGORIA: "Urbano",
     REFERENCIA: "1900PC",
-    DESCRIÇÃO:
-      "CONJUNTO NYLON LUXO FEMININO COM FORRO E GOLA - PRETO COM CORES",
+    DESCRIÇÃO: "CONJUNTO NYLON LUXO FEMININO COM FORRO E GOLA - PRETO COM CORES",
     TAMANHOS: [
       "PP",
       "P",
@@ -1841,7 +1951,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 155.56,
+    PRECO: 157.4,
   },
   {
     CATEGORIA: "Urbano",
@@ -1860,7 +1970,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 157.82,
+    PRECO: 159.66,
   },
   {
     CATEGORIA: "Urbano",
@@ -1879,13 +1989,12 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 157.82,
+    PRECO: 159.66,
   },
   {
     CATEGORIA: "Urbano",
     REFERENCIA: "1901PC",
-    DESCRIÇÃO:
-      "CONJUNTO NYLON LUXO FEMININO COM FORRO E CAPUZ - PRETO COM CORES",
+    DESCRIÇÃO: "CONJUNTO NYLON LUXO FEMININO COM FORRO E CAPUZ - PRETO COM CORES",
     TAMANHOS: [
       "PP",
       "P",
@@ -1899,7 +2008,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 167.11,
+    PRECO: 169.02,
   },
   {
     CATEGORIA: "Urbano",
@@ -1918,7 +2027,26 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 92.34,
+    PRECO: 97.64,
+  },
+  {
+    CATEGORIA: "Urbano",
+    REFERENCIA: "2000PK",
+    DESCRIÇÃO: "CONJUNTO PVC PREMIUM COM GOLA, BOLSO E REFLETIVO PARKA",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+      "2G",
+      "3G",
+      "4G",
+      "5G",
+    ],
+    PRECO: 97.64,
   },
   {
     CATEGORIA: "Urbano",
@@ -1937,7 +2065,26 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 94.54,
+    PRECO: 99.09,
+  },
+  {
+    CATEGORIA: "Urbano",
+    REFERENCIA: "2001PK",
+    DESCRIÇÃO: "CONJUNTO PVC PREMIUM COM CAPUZ, BOLSO E REFLETIVO PARKA",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+      "2G",
+      "3G",
+      "4G",
+      "5G",
+    ],
+    PRECO: 99.09,
   },
   {
     CATEGORIA: "Urbano",
@@ -1956,7 +2103,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 53.36,
+    PRECO: 55.84,
   },
   {
     CATEGORIA: "Urbano",
@@ -1975,7 +2122,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 54.87,
+    PRECO: 57.46,
   },
   {
     CATEGORIA: "Urbano",
@@ -1994,7 +2141,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 39.09,
+    PRECO: 41.3,
   },
   {
     CATEGORIA: "Urbano",
@@ -2013,7 +2160,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 59.41,
+    PRECO: 63.15,
   },
   {
     CATEGORIA: "Urbano",
@@ -2032,7 +2179,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 61.79,
+    PRECO: 65.71,
   },
   {
     CATEGORIA: "Urbano",
@@ -2051,7 +2198,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 60.94,
+    PRECO: 64.68,
   },
   {
     CATEGORIA: "Urbano",
@@ -2070,21 +2217,21 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 63.32,
+    PRECO: 67.24,
   },
   {
     CATEGORIA: "Urbano",
     REFERENCIA: "2600",
     DESCRIÇÃO: "CONJUNTO PVC INFANTIL COM GOLA",
     TAMANHOS: ["ÚNICO"],
-    PRECO: 50.77,
+    PRECO: 53.12,
   },
   {
     CATEGORIA: "Urbano",
     REFERENCIA: "2601",
     DESCRIÇÃO: "CONJUNTO PVC INFANTIL COM CAPUZ",
     TAMANHOS: ["ÚNICO"],
-    PRECO: 52.13,
+    PRECO: 54.59,
   },
   {
     CATEGORIA: "Urbano",
@@ -2103,7 +2250,26 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 64.27,
+    PRECO: 67.97,
+  },
+  {
+    CATEGORIA: "Urbano",
+    REFERENCIA: "2700PK",
+    DESCRIÇÃO: "CONJUNTO PVC TORNADO COM GOLA PARKA",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+      "2G",
+      "3G",
+      "4G",
+      "5G",
+    ],
+    PRECO: 67.97,
   },
   {
     CATEGORIA: "Urbano",
@@ -2122,7 +2288,26 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 68.42,
+    PRECO: 72.46,
+  },
+  {
+    CATEGORIA: "Urbano",
+    REFERENCIA: "2701PK",
+    DESCRIÇÃO: "CONJUNTO PVC TORNADO COM CAPUZ PARKA",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+      "2G",
+      "3G",
+      "4G",
+      "5G",
+    ],
+    PRECO: 72.46,
   },
   {
     CATEGORIA: "Urbano",
@@ -2141,7 +2326,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 36.76,
+    PRECO: 38.47,
   },
   {
     CATEGORIA: "Urbano",
@@ -2160,7 +2345,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 39.45,
+    PRECO: 41.3,
   },
   {
     CATEGORIA: "Urbano",
@@ -2179,7 +2364,45 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 30.13,
+    PRECO: 31.75,
+  },
+  {
+    CATEGORIA: "Urbano",
+    REFERENCIA: "2800",
+    DESCRIÇÃO: "CONJUNTO PVC PADRÃO TRANSPARENTE COM GOLA PARKA",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+      "2G",
+      "3G",
+      "4G",
+      "5G",
+    ],
+    PRECO: 76.4,
+  },
+  {
+    CATEGORIA: "Urbano",
+    REFERENCIA: "2801",
+    DESCRIÇÃO: "CONJUNTO PVC PADRÃO TRANSPARENTE COM CAPUZ PARKA",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+      "2G",
+      "3G",
+      "4G",
+      "5G",
+    ],
+    PRECO: 79.29,
   },
   {
     CATEGORIA: "Urbano",
@@ -2198,7 +2421,26 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 65.80,
+    PRECO: 69.49,
+  },
+  {
+    CATEGORIA: "Urbano",
+    REFERENCIA: "2900PK",
+    DESCRIÇÃO: "CONJUNTO PVC TORNADO COM GOLA E BOLSO - PARKA",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+      "2G",
+      "3G",
+      "4G",
+      "5G",
+    ],
+    PRECO: 69.49,
   },
   {
     CATEGORIA: "Urbano",
@@ -2217,7 +2459,26 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 69.95,
+    PRECO: 73.99,
+  },
+  {
+    CATEGORIA: "Urbano",
+    REFERENCIA: "2901PK",
+    DESCRIÇÃO: "CONJUNTO PVC TORNADO COM CAPUZ E BOLSO - PARKA",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+      "2G",
+      "3G",
+      "4G",
+      "5G",
+    ],
+    PRECO: 73.99,
   },
   {
     CATEGORIA: "Urbano",
@@ -2236,7 +2497,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 38.28,
+    PRECO: 39.99,
   },
   {
     CATEGORIA: "Urbano",
@@ -2255,12 +2516,12 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 40.90,
+    PRECO: 42.83,
   },
   {
     CATEGORIA: "Urbano",
     REFERENCIA: "2904",
-    DESCRIÇÃO: "CALÇA  PVC TORNADO",
+    DESCRIÇÃO: "CALÇA PVC TORNADO",
     TAMANHOS: [
       "PP",
       "P",
@@ -2274,7 +2535,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 30.13,
+    PRECO: 31.75,
   },
   {
     CATEGORIA: "Urbano",
@@ -2293,7 +2554,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 67.88,
+    PRECO: 70.29,
   },
   {
     CATEGORIA: "Urbano",
@@ -2312,7 +2573,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 70.85,
+    PRECO: 73.47,
   },
   {
     CATEGORIA: "Urbano",
@@ -2331,7 +2592,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 71.97,
+    PRECO: 74.92,
   },
   {
     CATEGORIA: "Urbano",
@@ -2350,120 +2611,172 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 75.83,
+    PRECO: 177.58,
   },
   {
-    CATEGORIA: "Acessórios",
+    CATEGORIA: "Urbano",
+    REFERENCIA: "4000",
+    DESCRIÇÃO: "CONJUNTO PVC INVERNO COM GOLA",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+      "2G",
+      "3G",
+      "4G",
+      "5G",
+    ],
+    PRECO: 132.72,
+  },
+  {
+    CATEGORIA: "Urbano - Acessórios",
     REFERENCIA: "360",
     DESCRIÇÃO: "BOTA DE PVC IMPERMEÁVEL - PRETA",
-    TAMANHOS: ["35/36", "37/38", "39/40", "41/42", "43/44"],
-    PRECO: 62.73,
+    TAMANHOS: [
+      "35/36",
+      "37/38",
+      "39/40",
+      "41/42",
+      "43/44",
+    ],
+    PRECO: 66.64,
   },
   {
-    CATEGORIA: "Acessórios",
+    CATEGORIA: "Urbano - Acessórios",
     REFERENCIA: "360C",
     DESCRIÇÃO: "BOTA DE PVC IMPERMEÁVEL - CORES",
-    TAMANHOS: ["35/36", "37/38", "39/40", "41/42", "43/44"],
-    PRECO: 72.77,
+    TAMANHOS: [
+      "35/36",
+      "37/38",
+      "39/40",
+      "41/42",
+      "43/44",
+    ],
+    PRECO: 76.57,
   },
   {
-    CATEGORIA: "Acessórios",
+    CATEGORIA: "Urbano - Acessórios",
     REFERENCIA: "370",
     DESCRIÇÃO: "BOTA DE PVC IMPERMEÁVEL CANO MÉDIO",
-    TAMANHOS: ["35/36", "37/38", "39/40", "41/42", "43/44", "45/46"],
-    PRECO: 71.57,
+    TAMANHOS: [
+      "35/36",
+      "37/38",
+      "39/40",
+      "41/42",
+      "43/44",
+      "45/46",
+    ],
+    PRECO: 76.32,
   },
   {
-    CATEGORIA: "Acessórios",
-    REFERENCIA: "380",
-    DESCRIÇÃO: "BOTA DE COURO CANO CURTO COM ZÍPER - CITY",
-    TAMANHOS: ["37", "38", "39", "40", "41", "42", "43", "44", "45"],
-    PRECO: 281.09,
-  },
-  {
-    CATEGORIA: "Acessórios",
-    REFERENCIA: "390",
-    DESCRIÇÃO: "BOTA DE COURO CANO CURTO COM VELCRO E ELÁSTICO - SPEED",
-    TAMANHOS: ["37", "38", "39", "40", "41", "42", "43", "44", "45"],
-    PRECO: 313.57,
-  },
-  {
-    CATEGORIA: "Acessórios",
-    REFERENCIA: "400",
-    DESCRIÇÃO: "BOTA DE COURO CANO ALTO COM ZÍPER E IMPERMEÁVEL - DRY",
-    TAMANHOS: ["37", "38", "39", "40", "41", "42", "43", "44", "45"],
-    PRECO: 449.4,
-  },
-  {
-    CATEGORIA: "Acessórios",
+    CATEGORIA: "Urbano - Acessórios",
     REFERENCIA: "2410",
     DESCRIÇÃO: "CAPA DE MOTO PVC FORRADA COM FELTRO - PEQUENA",
     TAMANHOS: ["ATÉ 125 CILINDRADAS"],
-    PRECO: 93.27,
+    PRECO: 99.04,
   },
   {
-    CATEGORIA: "Acessórios",
+    CATEGORIA: "Urbano - Acessórios",
     REFERENCIA: "2411",
     DESCRIÇÃO: "CAPA DE MOTO PVC FORRADA COM FELTRO - MÉDIA",
     TAMANHOS: ["125 - 150 CILINDRADAS"],
-    PRECO: 96.37,
+    PRECO: 102.29,
   },
   {
-    CATEGORIA: "Acessórios",
+    CATEGORIA: "Urbano - Acessórios",
     REFERENCIA: "2412",
     DESCRIÇÃO: "CAPA DE MOTO PVC FORRADA COM FELTRO - GRANDE",
     TAMANHOS: ["250 - 450 CILINDRADAS"],
-    PRECO: 99.39,
+    PRECO: 105.53,
   },
   {
-    CATEGORIA: "Acessórios",
+    CATEGORIA: "Urbano - Acessórios",
     REFERENCIA: "2413",
     DESCRIÇÃO: "CAPA DE MOTO PVC FORRADA COM FELTRO - GRANDE GRANDE",
     TAMANHOS: ["450 - 500 - 750 CILINDRADAS"],
-    PRECO: 104.80,
+    PRECO: 110.39,
   },
   {
-    CATEGORIA: "Acessórios",
+    CATEGORIA: "Urbano - Acessórios",
     REFERENCIA: "2414",
     DESCRIÇÃO: "CAPA DE MOTO PVC FORRADA COM FELTRO - EXTRA GRANDE",
     TAMANHOS: ["750 - 1200 CILINDRADAS"],
-    PRECO: 110.94,
+    PRECO: 116.87,
   },
   {
-    CATEGORIA: "Acessórios",
+    CATEGORIA: "Urbano - Acessórios",
     REFERENCIA: "2415",
-    DESCRIÇÃO:
-      "CAPA DE MOTO PVC FORRADA COM FELTRO - EXTRA GRANDE GRANDE",
+    DESCRIÇÃO: "CAPA DE MOTO PVC FORRADA COM FELTRO - EXTRA GRANDE GRANDE",
     TAMANHOS: ["ACIMA DE 1.200 CILINDRADAS"],
-    PRECO: 134.96,
+    PRECO: 141.92,
   },
   {
-    CATEGORIA: "Acessórios",
+    CATEGORIA: "Urbano - Acessórios",
+    REFERENCIA: "2421.1",
+    DESCRIÇÃO: "POLAINA PVC PREMIUM COM MEIA SOLA VELCRO",
+    TAMANHOS: [
+      "P",
+      "M",
+      "G",
+    ],
+    PRECO: 17.66,
+  },
+  {
+    CATEGORIA: "Urbano - Acessórios",
+    REFERENCIA: "2422.1",
+    DESCRIÇÃO: "POLAINA PVC PREMIUM COM SOLA, ZÍPER E VELCRO",
+    TAMANHOS: [
+      "P",
+      "M",
+      "G",
+    ],
+    PRECO: 19.54,
+  },
+  {
+    CATEGORIA: "Urbano - Acessórios",
     REFERENCIA: "2424",
     DESCRIÇÃO: "MOCHILA NYLON",
     TAMANHOS: ["ÚNICO"],
-    PRECO: 9.48,
+    PRECO: 9.53,
   },
   {
-    CATEGORIA: "Acessórios",
+    CATEGORIA: "Urbano - Acessórios",
     REFERENCIA: "2428",
     DESCRIÇÃO: "CAPA PARA MOCHILA",
     TAMANHOS: ["ÚNICO"],
-    PRECO: 26.46,
+    PRECO: 26.64,
   },
   {
     CATEGORIA: "Estilo",
     REFERENCIA: "1008",
     DESCRIÇÃO: "MACACÃO DE NYLON - MOD. ESTILO",
-    TAMANHOS: ["P", "M", "G", "GG", "EX", "EXG"],
-    PRECO: 199.74,
+    TAMANHOS: [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+    ],
+    PRECO: 201.16,
   },
   {
     CATEGORIA: "Estilo",
     REFERENCIA: "1008PC",
     DESCRIÇÃO: "MACACÃO DE NYLON - PRETO COM CORES - MOD. ESTILO",
-    TAMANHOS: ["P", "M", "G", "GG", "EX", "EXG"],
-    PRECO: 213.54,
+    TAMANHOS: [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+    ],
+    PRECO: 215.06,
   },
   {
     CATEGORIA: "Estilo",
@@ -2482,13 +2795,12 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 173.27,
+    PRECO: 174.83,
   },
   {
     CATEGORIA: "Estilo",
     REFERENCIA: "1300C",
-    DESCRIÇÃO:
-      "CONJUNTO NYLON LUXO GOLA VENTILAÇÃO COSTAS FORRADO - CORES",
+    DESCRIÇÃO: "CONJUNTO NYLON LUXO GOLA VENTILAÇÃO COSTAS FORRADO - CORES",
     TAMANHOS: [
       "PP",
       "P",
@@ -2502,7 +2814,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 176.03,
+    PRECO: 177.6,
   },
   {
     CATEGORIA: "Estilo",
@@ -2521,13 +2833,12 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 156.23,
+    PRECO: 154.09,
   },
   {
     CATEGORIA: "Estilo",
     REFERENCIA: "1350C",
-    DESCRIÇÃO:
-      "CONJUNTO NYLON LUXO GOLA VENTILAÇÃO COSTAS SEM FORRO - CORES",
+    DESCRIÇÃO: "CONJUNTO NYLON LUXO GOLA VENTILAÇÃO COSTAS SEM FORRO - CORES",
     TAMANHOS: [
       "PP",
       "P",
@@ -2541,7 +2852,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 157.98,
+    PRECO: 155.87,
   },
   {
     CATEGORIA: "Estilo",
@@ -2560,13 +2871,12 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 179.29,
+    PRECO: 180.68,
   },
   {
     CATEGORIA: "Estilo",
     REFERENCIA: "1400PC",
-    DESCRIÇÃO:
-      "CONJUNTO DE NYLON COM FORRO MASCULINO - MOD.ESTILO - VIVO COLORIDO",
+    DESCRIÇÃO: "CONJUNTO DE NYLON COM FORRO MASCULINO - MOD.ESTILO - VIVO COLORIDO",
     TAMANHOS: [
       "PP",
       "P",
@@ -2580,7 +2890,7 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 176.80,
+    PRECO: 178.19,
   },
   {
     CATEGORIA: "Estilo",
@@ -2599,13 +2909,12 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 176.29,
+    PRECO: 177.64,
   },
   {
     CATEGORIA: "Estilo",
     REFERENCIA: "1500PC",
-    DESCRIÇÃO:
-      "CONJUNTO DE NYLON COM FORRO FEMININO - MOD. ESTILO - VIVO COLORIDO",
+    DESCRIÇÃO: "CONJUNTO DE NYLON COM FORRO FEMININO - MOD. ESTILO - VIVO COLORIDO",
     TAMANHOS: [
       "PP",
       "P",
@@ -2619,10 +2928,172 @@ window.produtosData = [
       "4G",
       "5G",
     ],
-    PRECO: 172.85,
+    PRECO: 174.19,
   },
+  {
+    CATEGORIA: "Corta Vento",
+    REFERENCIA: "100FT01.02.01",
+    DESCRIÇÃO: "JAQUETA POLIESTER CORTA VENTO MASCULINA - PRETO COM VERDE",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+    ],
+    PRECO: 81.33,
+  },
+  {
+    CATEGORIA: "Corta Vento",
+    REFERENCIA: "100FT01.02.02",
+    DESCRIÇÃO: "JAQUETA POLIESTER CORTA VENTO MASCULINA - ESTAMPA CAMUFLADA",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+    ],
+    PRECO: 81.33,
+  },
+  {
+    CATEGORIA: "Corta Vento",
+    REFERENCIA: "110FT01.02.03",
+    DESCRIÇÃO: "JAQUETA POLIESTER CORTA VENTO FEMININA - ROXA E VERDE",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+    ],
+    PRECO: 78.57,
+  },
+  {
+    CATEGORIA: "Corta Vento",
+    REFERENCIA: "110FT01.02.04",
+    DESCRIÇÃO: "JAQUETA POLIESTER CORTA VENTO FEMININA - ESTAMPA LISTRAS E FLORES",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+    ],
+    PRECO: 78.53,
+  },
+  {
+    CATEGORIA: "Corta Vento",
+    REFERENCIA: "110FT02.03.05",
+    DESCRIÇÃO: "JAQUETA POLIESTER CORTA VENTO FEMININA - ONÇINHA",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+    ],
+    PRECO: 88.19,
+  },
+  {
+    CATEGORIA: "Corta Vento",
+    REFERENCIA: "120FT03.03.01",
+    DESCRIÇÃO: "JAQUETA POLIESTER CORTA VENTO INFANTIL - ONCINHA",
+    TAMANHOS: [
+      "1",
+      "2",
+      "4",
+      "6",
+      "8",
+      "10",
+      "12 -14",
+    ],
+    PRECO: 63.55,
+  },
+  {
+    CATEGORIA: "Corta Vento",
+    REFERENCIA: "120FT03.03.02",
+    DESCRIÇÃO: "JAQUETA POLIESTER CORTA VENTO INFANTIL - CAMUFLADA",
+    TAMANHOS: [
+      "1",
+      "2",
+      "4",
+      "6",
+      "8",
+      "10",
+      "12 -14",
+    ],
+    PRECO: 63.55,
+  },
+  {
+    CATEGORIA: "Corta Vento",
+    REFERENCIA: "130",
+    DESCRIÇÃO: "JAQUETA POLIÉSTER CORTA VENTO MASCULINA - PRETO",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+    ],
+    PRECO: 57.57,
+  },
+  {
+    CATEGORIA: "Corta Vento",
+    REFERENCIA: "140",
+    DESCRIÇÃO: "JAQUETA POLIÉSTER CORTA VENTO FEMININA - PRETO",
+    TAMANHOS: [
+      "PP",
+      "P",
+      "M",
+      "G",
+      "GG",
+      "EX",
+      "EXG",
+    ],
+    PRECO: 56.48,
+  },
+  {
+    CATEGORIA: "Corta Vento",
+    REFERENCIA: "150",
+    DESCRIÇÃO: "JAQUETA POLIÉSTER CORTA VENTO INFANTIL - PRETO",
+    TAMANHOS: [
+      "1",
+      "2",
+      "4",
+      "6",
+      "8",
+      "10",
+      "12 -14",
+    ],
+    PRECO: 50.79,
+  }
 ];
 // ========== FIM DA LISTA DE PRODUTOS ATUALIZADA ==========
+      const TAMANHOS_BOTAS_PARES = ["35/36", "37/38", "39/40", "41/42", "43/44", "45/46"];
+      function produtoTemBotas(produto) {
+        if (!produto) return false;
+        const tamanhos = Array.isArray(produto.TAMANHOS) ? produto.TAMANHOS : [produto.TAMANHOS];
+        return tamanhos.join(" ").toUpperCase().includes("BOTAS");
+      }
+      function getTamanhosBotas(produto) {
+        const tamanhos = Array.isArray(produto.TAMANHOS) ? produto.TAMANHOS : [produto.TAMANHOS];
+        const pares = tamanhos.filter((t) => /^\d+\/\d+$/.test(String(t || "").trim()));
+        return pares.length ? pares : TAMANHOS_BOTAS_PARES;
+      }
+
 
       // Script para carregar dados dos clientes da API
       let clientesCadastrados = [];
@@ -2750,23 +3221,15 @@ window.produtosData = [
           };
           window.pedidoItens.push(item);
         };
-        if (produto.REFERENCIA === "201") {
+        if (produtoTemBotas(produto)) {
           // Referência 201: Processar tamanhos de botas
-          const tamanhosBotas = ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"];
+          const tamanhosBotas = getTamanhosBotas(produto);
           tamanhosBotas.forEach((tamanho) => {
             const quantidade = parseInt(
-              document.getElementById(`quantidade-mobile-${produto.REFERENCIA}-${tamanho}`).value
+              document.getElementById(`quantidade-mobile-${produto.REFERENCIA}-${tamanho.replace(/[^a-zA-Z0-9]/g, "")}`).value
             ) || 0;
-            handleItem(tamanho, quantidade);
+            handleItem(`Bota ${tamanho}`, quantidade);
           });
-        } else if (produto.REFERENCIA === "203" || produto.REFERENCIA === "204") {
-          // Referências 203 e 204: Tamanho manual
-          const tamanhoInput = document.getElementById(`tamanho-mobile-${produto.REFERENCIA}`);
-          const tamanho = tamanhoInput.value.trim();
-          const quantidade = 1;
-          if (tamanho) {
-            handleItem(tamanho, quantidade);
-          }
         } else {
           // Produtos normais
           const tamanhosProduto = Array.isArray(produto.TAMANHOS) ? produto.TAMANHOS : [produto.TAMANHOS];
@@ -2782,14 +3245,12 @@ window.produtosData = [
           atualizarVisualizacaoPedido();
           // Produto adicionado com sucesso
           // Limpar campos mobile
-          if (produto.REFERENCIA === "201") {
-            const tamanhosBotas = ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"];
+          if (produtoTemBotas(produto)) {
+            const tamanhosBotas = getTamanhosBotas(produto);
             tamanhosBotas.forEach((tamanho) => {
-              document.getElementById(`quantidade-mobile-${produto.REFERENCIA}-${tamanho}`).value = 0;
+              document.getElementById(`quantidade-mobile-${produto.REFERENCIA}-${tamanho.replace(/[^a-zA-Z0-9]/g, "")}`).value = 0;
             });
-          } else if (produto.REFERENCIA === "203" || produto.REFERENCIA === "204") {
-            document.getElementById(`tamanho-mobile-${produto.REFERENCIA}`).value = "";
-          } else {
+        } else {
             const tamanhosProduto = Array.isArray(produto.TAMANHOS) ? produto.TAMANHOS : [produto.TAMANHOS];
             tamanhosProduto.forEach((tamanho) => {
               const tamanhoId = tamanho.replace(/[^a-zA-Z0-9]/g, "");
@@ -2848,26 +3309,14 @@ window.produtosData = [
             });
           }
         };
-        if (produto.REFERENCIA === "201") {
+        if (produtoTemBotas(produto)) {
           // Referência 201: Processar tamanhos de botas
-          const tamanhosBotas = ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"];
+          const tamanhosBotas = getTamanhosBotas(produto);
           tamanhosBotas.forEach((tamanho) => {
-            const quantidadeInput = document.getElementById(`quantidade-${produto.REFERENCIA}-${tamanho}`);
+            const quantidadeInput = document.getElementById(`quantidade-${produto.REFERENCIA}-${tamanho.replace(/[^a-zA-Z0-9]/g, "")}`);
             const quantidade = quantidadeInput ? parseInt(quantidadeInput.value) || 0 : 0;
-            handleItem(tamanho, quantidade);
+            handleItem(`Bota ${tamanho}`, quantidade);
           });
-        } else if (produto.REFERENCIA === "203" || produto.REFERENCIA === "204") {
-          // Referências 203 e 204: Tamanho manual
-          const tamanhoManual = document
-            .getElementById(`tamanho-${produto.REFERENCIA}`)
-            .value.trim();
-          if (tamanhoManual) {
-            handleItem(tamanhoManual, 1);
-          } else {
-            alert(
-              `Por favor, digite o tamanho para o produto ${produto.DESCRIÇÃO}.`
-            );
-          }
         } else {
           // Produtos normais
           const tamanhosProduto = Array.isArray(produto.TAMANHOS)
@@ -2882,7 +3331,7 @@ window.produtosData = [
         }
         if (itemAdicionado) {
           atualizarVisualizacaoPedido();
-        } else if (produto.REFERENCIA !== "203" && produto.REFERENCIA !== "204") {
+        } else if (!produtoTemBotas(produto)) {
           alert(
             `Por favor, informe a quantidade para pelo menos um tamanho do produto ${produto.DESCRIÇÃO}.`
           );
@@ -3111,7 +3560,10 @@ window.produtosData = [
           margin: { top: 30, bottom: 15 },
         });
 
-        const finalY = doc.autoTable.previous.finalY;
+        let finalY = doc.autoTable.previous.finalY;
+        if (typeof g8PdfDesenharResumoQuantidades === 'function') {
+          finalY = g8PdfDesenharResumoQuantidades(doc, margin, pageWidth, finalY + 6, window.pedidoItens || []);
+        }
 
         const obsText = `Transporte: ${
           inputsCliente.transporte.value || "A combinar"
@@ -3387,16 +3839,13 @@ window.produtosData = [
             
             let tamanhosMobileHTML = '';
             
-            if (produto.REFERENCIA === "201") {
+            if (produtoTemBotas(produto)) {
               // Referência 201: Tamanho único com seleção de botas
-              const tamanhosBotas = ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"];
+              const tamanhosBotas = getTamanhosBotas(produto);
               tamanhosBotas.forEach((tamanho) => {
-                tamanhosMobileHTML += `<div><label for="quantidade-mobile-${produto.REFERENCIA}-${tamanho}">${tamanho}</label><input type="number" min="0" value="0" id="quantidade-mobile-${produto.REFERENCIA}-${tamanho}"></div>`;
+                tamanhosMobileHTML += `<div><label for="quantidade-mobile-${produto.REFERENCIA}-${tamanho.replace(/[^a-zA-Z0-9]/g, "")}">Bota ${tamanho}</label><input type="number" min="0" value="0" id="quantidade-mobile-${produto.REFERENCIA}-${tamanho.replace(/[^a-zA-Z0-9]/g, "")}"></div>`;
               });
-            } else if (produto.REFERENCIA === "203" || produto.REFERENCIA === "204") {
-              // Outras referências com tamanho manual
-              tamanhosMobileHTML = `<input type="text" placeholder="Digite Tamanho/Bota" class="manual-tamanho-input" id="tamanho-mobile-${produto.REFERENCIA}">`;
-            } else {
+        } else {
               // Produtos normais com tamanhos padrão
               const tamanhosProduto = Array.isArray(produto.TAMANHOS) ? produto.TAMANHOS : [produto.TAMANHOS];
               tamanhosProduto.forEach((tamanho) => {
@@ -3446,16 +3895,13 @@ window.produtosData = [
             let tabelaHTML = `<div class="card-header"><h2>${produto.CATEGORIA}</h2></div><div class="table-responsive"><table><thead><tr><th>REF.</th><th>DESCRIÇÃO</th><th>PREÇO</th><th>Desc. Extra</th><th>Tamanhos & Quantidades</th><th>Cor</th><th>Ação</th></tr></thead><tbody>`;
             let tamanhosInputHTML = '<div class="tamanho-input-container">';
             
-            if (produto.REFERENCIA === "201") {
+            if (produtoTemBotas(produto)) {
               // Referência 201: Tamanho único com seleção de botas
-              const tamanhosBotas = ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"];
+              const tamanhosBotas = getTamanhosBotas(produto);
               tamanhosBotas.forEach((tamanho) => {
-                tamanhosInputHTML += `<div><label for="quantidade-${produto.REFERENCIA}-${tamanho}">${tamanho}</label><input type="number" min="0" value="0" id="quantidade-${produto.REFERENCIA}-${tamanho}"></div>`;
+                tamanhosInputHTML += `<div><label for="quantidade-${produto.REFERENCIA}-${tamanho.replace(/[^a-zA-Z0-9]/g, "")}">Bota ${tamanho}</label><input type="number" min="0" value="0" id="quantidade-${produto.REFERENCIA}-${tamanho.replace(/[^a-zA-Z0-9]/g, "")}"></div>`;
               });
-            } else if (produto.REFERENCIA === "203" || produto.REFERENCIA === "204") {
-              // Outras referências com tamanho manual
-              tamanhosInputHTML += `<input type="text" placeholder="Digite Tamanho/Bota" class="manual-tamanho-input" id="tamanho-${produto.REFERENCIA}">`;
-            } else {
+        } else {
               // Produtos normais com tamanhos padrão
               const tamanhosProduto = Array.isArray(produto.TAMANHOS) ? produto.TAMANHOS : [produto.TAMANHOS];
               tamanhosProduto.forEach((tamanho) => {
@@ -3501,15 +3947,12 @@ window.produtosData = [
             categoriaProdutos.forEach((produto) => {
               let tamanhosMobileHTML = '';
               
-              if (produto.REFERENCIA === "201") {
+              if (produtoTemBotas(produto)) {
                 // Referência 201: Tamanho único com seleção de botas
-                const tamanhosBotas = ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"];
+                const tamanhosBotas = getTamanhosBotas(produto);
                 tamanhosBotas.forEach((tamanho) => {
-                  tamanhosMobileHTML += `<div><label for="quantidade-mobile-${produto.REFERENCIA}-${tamanho}">${tamanho}</label><input type="number" min="0" value="0" id="quantidade-mobile-${produto.REFERENCIA}-${tamanho}"></div>`;
+                  tamanhosMobileHTML += `<div><label for="quantidade-mobile-${produto.REFERENCIA}-${tamanho.replace(/[^a-zA-Z0-9]/g, "")}">Bota ${tamanho}</label><input type="number" min="0" value="0" id="quantidade-mobile-${produto.REFERENCIA}-${tamanho.replace(/[^a-zA-Z0-9]/g, "")}"></div>`;
                 });
-              } else if (produto.REFERENCIA === "203" || produto.REFERENCIA === "204") {
-                // Outras referências com tamanho manual
-                tamanhosMobileHTML = `<input type="text" placeholder="Digite Tamanho/Bota" class="manual-tamanho-input" id="tamanho-mobile-${produto.REFERENCIA}">`;
               } else {
                 // Produtos normais com tamanhos padrão
                 const tamanhosProduto = Array.isArray(produto.TAMANHOS) ? produto.TAMANHOS : [produto.TAMANHOS];
@@ -3563,15 +4006,12 @@ window.produtosData = [
             categoriaProdutos.forEach((produto) => {
               let tamanhosInputHTML = '<div class="tamanho-input-container">';
               
-              if (produto.REFERENCIA === "201") {
+              if (produtoTemBotas(produto)) {
                 // Referência 201: Tamanho único com seleção de botas
-                const tamanhosBotas = ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"];
+                const tamanhosBotas = getTamanhosBotas(produto);
                 tamanhosBotas.forEach((tamanho) => {
-                  tamanhosInputHTML += `<div><label for="quantidade-${produto.REFERENCIA}-${tamanho}">${tamanho}</label><input type="number" min="0" value="0" id="quantidade-${produto.REFERENCIA}-${tamanho}"></div>`;
+                  tamanhosInputHTML += `<div><label for="quantidade-${produto.REFERENCIA}-${tamanho.replace(/[^a-zA-Z0-9]/g, "")}">Bota ${tamanho}</label><input type="number" min="0" value="0" id="quantidade-${produto.REFERENCIA}-${tamanho.replace(/[^a-zA-Z0-9]/g, "")}"></div>`;
                 });
-              } else if (produto.REFERENCIA === "203" || produto.REFERENCIA === "204") {
-                // Outras referências com tamanho manual
-                tamanhosInputHTML += `<input type="text" placeholder="Digite Tamanho/Bota" class="manual-tamanho-input" id="tamanho-${produto.REFERENCIA}">`;
               } else {
                 // Produtos normais com tamanhos padrão
                 const tamanhosProduto = Array.isArray(produto.TAMANHOS) ? produto.TAMANHOS : [produto.TAMANHOS];

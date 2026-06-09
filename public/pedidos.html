@@ -9,6 +9,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="g8-resumo-unidades-pdf.js"></script>
   <link rel="stylesheet" href="mobile.css" />
   <link rel="stylesheet" href="modern-design.css" />
   <style>
@@ -496,7 +497,11 @@
         margin: { top: 30, bottom: 15 }
       });
 
-      const finalY = doc.autoTable.previous.finalY + 8;
+      let finalY = doc.autoTable.previous.finalY;
+      if (typeof g8PdfDesenharResumoQuantidades === 'function') {
+        finalY = g8PdfDesenharResumoQuantidades(doc, margin, pageWidth, finalY + 6, itens || []);
+      }
+      finalY += 2;
       const transporte = dados.transporte || get('transporte') || 'A combinar';
       const prazo = dados.prazo || get('prazo') || 'A combinar';
       const obs = dados.observacoes || get('obs') || 'Nenhuma.';
